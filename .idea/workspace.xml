@@ -1,0 +1,874 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AndroidLayoutPreviewToolWindow">
+    <option name="state">
+      <GlobalState>
+        <option name="visible" value="false" />
+      </GlobalState>
+    </option>
+  </component>
+  <component name="AndroidLayouts">
+    <shared>
+      <config />
+    </shared>
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="8850f3e3-b1d9-4967-83e5-47b564471346" name="Default" comment="" />
+    <ignored path="Mupdf.iws" />
+    <ignored path=".idea/workspace.xml" />
+    <option name="TRACKING_ENABLED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ChangesViewManager" flattened_view="true" show_ignored="false" />
+  <component name="CompilerWorkspaceConfiguration">
+    <option name="CLEAR_OUTPUT_DIRECTORY" value="false" />
+  </component>
+  <component name="CreatePatchCommitExecutor">
+    <option name="PATCH_PATH" value="" />
+  </component>
+  <component name="DaemonCodeAnalyzer">
+    <disable_hints />
+  </component>
+  <component name="DebuggerManager">
+    <ui_properties default_suspend_policy="SuspendAll" default_condition_enabled="true" />
+    <breakpoint_any default_suspend_policy="SuspendAll" default_condition_enabled="true">
+      <breakpoint>
+        <option name="NOTIFY_CAUGHT" value="true" />
+        <option name="NOTIFY_UNCAUGHT" value="true" />
+        <option name="ENABLED" value="false" />
+        <option name="LOG_ENABLED" value="false" />
+        <option name="LOG_EXPRESSION_ENABLED" value="false" />
+        <option name="REMOVE_AFTER_HIT" value="false" />
+        <option name="SUSPEND_POLICY" value="SuspendAll" />
+        <option name="SUSPEND" value="true" />
+        <option name="COUNT_FILTER_ENABLED" value="false" />
+        <option name="COUNT_FILTER" value="0" />
+        <option name="CONDITION_ENABLED" value="true" />
+        <option name="CLASS_FILTERS_ENABLED" value="false" />
+        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
+        <option name="CONDITION" value="" />
+        <option name="LOG_MESSAGE" value="" />
+      </breakpoint>
+      <breakpoint>
+        <option name="NOTIFY_CAUGHT" value="true" />
+        <option name="NOTIFY_UNCAUGHT" value="true" />
+        <option name="ENABLED" value="false" />
+        <option name="LOG_ENABLED" value="false" />
+        <option name="LOG_EXPRESSION_ENABLED" value="false" />
+        <option name="REMOVE_AFTER_HIT" value="false" />
+        <option name="SUSPEND_POLICY" value="SuspendAll" />
+        <option name="SUSPEND" value="true" />
+        <option name="COUNT_FILTER_ENABLED" value="false" />
+        <option name="COUNT_FILTER" value="0" />
+        <option name="CONDITION_ENABLED" value="true" />
+        <option name="CLASS_FILTERS_ENABLED" value="false" />
+        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
+        <option name="CONDITION" value="" />
+        <option name="LOG_MESSAGE" value="" />
+      </breakpoint>
+    </breakpoint_any>
+    <breakpoint_rules />
+    <ui_properties />
+  </component>
+  <component name="ErrorTreeViewConfiguration">
+    <option name="hideWarnings" value="true" />
+    <option name="HIDE_WARNINGS" value="true" />
+  </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
+  <component name="FavoritesManager">
+    <favorites_list name="Mupdf" />
+  </component>
+  <component name="FileEditorManager">
+    <leaf>
+      <file leaf-file-name="ChoosePDFActivity.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/com/artifex/mupdfdemo/ChoosePDFActivity.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="213" column="32" selection-start="6501" selection-end="6501" vertical-scroll-proportion="0.0" vertical-offset="3621" max-vertical-offset="5984">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="PagesView.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/cx/hell/android/lib/pagesview/PagesView.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="1143" column="65" selection-start="33751" selection-end="33751" vertical-scroll-proportion="0.0" vertical-offset="19431" max-vertical-offset="28169">
+              <folding>
+                <marker date="1381887725820" expanded="false" signature="25616:27638" placeholder="..." />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="AKReaderView.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/com/artifex/mupdfdemo/AKReaderView.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="476" column="84" selection-start="15914" selection-end="15914" vertical-scroll-proportion="0.0" vertical-offset="8092" max-vertical-offset="14195">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="PdfPage.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/org/vudroid/pdfdroid/codec/PdfPage.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="45" column="24" selection-start="946" selection-end="946" vertical-scroll-proportion="0.0" vertical-offset="345" max-vertical-offset="1411">
+              <folding>
+                <element signature="method#PdfPage#0;class#PdfPage#0" expanded="false" />
+                <element signature="method#isDecoding#0;class#PdfPage#0" expanded="false" />
+                <element signature="method#waitForDecode#0;class#PdfPage#0" expanded="false" />
+                <element signature="method#createPage#0;class#PdfPage#0" expanded="false" />
+                <element signature="method#finalize#0;class#PdfPage#0" expanded="false" />
+                <element signature="method#recycle#0;class#PdfPage#0" expanded="false" />
+                <element signature="method#render#0;class#PdfPage#0" expanded="false" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="AKPdfPage.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/org/vudroid/pdfdroid/codec/AKPdfPage.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="88" column="44" selection-start="2082" selection-end="2082" vertical-scroll-proportion="0.0" vertical-offset="884" max-vertical-offset="1870">
+              <folding>
+                <element signature="method#AKPdfPage#0;class#AKPdfPage#0" expanded="false" />
+                <element signature="method#isDecoding#0;class#AKPdfPage#0" expanded="false" />
+                <element signature="method#waitForDecode#0;class#AKPdfPage#0" expanded="false" />
+                <element signature="method#createPage#0;class#AKPdfPage#0" expanded="false" />
+                <element signature="method#finalize#0;class#AKPdfPage#0" expanded="false" />
+                <element signature="method#recycle#0;class#AKPdfPage#0" expanded="false" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="AKPDFPagesProvider.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/cx/hell/android/pdfviewpro/AKPDFPagesProvider.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="367" column="20" selection-start="11093" selection-end="11093" vertical-scroll-proportion="0.0" vertical-offset="6239" max-vertical-offset="8245">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="PageTreeNode.java" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/org/vudroid/core/PageTreeNode.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="106" column="36" selection-start="3177" selection-end="3178" vertical-scroll-proportion="-0.39873418" vertical-offset="932" max-vertical-offset="2278">
+              <folding>
+                <element signature="method#PageTreeNode#0;class#PageTreeNode#0" expanded="false" />
+                <element signature="method#updateVisibility#0;class#PageTreeNode#0" expanded="false" />
+                <element signature="method#invalidate#0;class#PageTreeNode#0" expanded="false" />
+                <element signature="method#invalidateRecursive#0;class#PageTreeNode#0" expanded="false" />
+                <element signature="method#invalidateNodeBounds#0;class#PageTreeNode#0" expanded="false" />
+                <element signature="method#draw#0;class#PageTreeNode#0" expanded="false" />
+                <element signature="method#isVisible#0;class#PageTreeNode#0" expanded="false" />
+                <element signature="method#getTargetRectF#0;class#PageTreeNode#0" expanded="false" />
+                <element signature="method#getBitmap#0;class#PageTreeNode#0" expanded="false" />
+                <element signature="method#restoreBitmapReference#0;class#PageTreeNode#0" expanded="false" />
+                <element signature="method#decodePageTreeNode#0;class#PageTreeNode#0" expanded="false" />
+                <element signature="method#evaluatePageSliceBounds#0;class#PageTreeNode#0" expanded="false" />
+                <element signature="method#setBitmap#0;class#PageTreeNode#0" expanded="false" />
+                <element signature="method#setDecodingNow#0;class#PageTreeNode#0" expanded="false" />
+                <element signature="method#stopDecodingThisNode#0;class#PageTreeNode#0" expanded="false" />
+                <element signature="method#isHiddenByChildren#0;class#PageTreeNode#0" expanded="false" />
+                <element signature="method#recycleChildren#0;class#PageTreeNode#0" expanded="false" />
+                <element signature="method#containsBitmaps#0;class#PageTreeNode#0" expanded="false" />
+                <element signature="method#childrenContainBitmaps#0;class#PageTreeNode#0" expanded="false" />
+                <element signature="method#recycle#0;class#PageTreeNode#0" expanded="false" />
+                <element signature="method#isVisibleAndNotHiddenByChildren#0;class#PageTreeNode#0" expanded="false" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="PdfDocument.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/org/vudroid/pdfdroid/codec/PdfDocument.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="24" column="8" selection-start="602" selection-end="604" vertical-scroll-proportion="0.0" vertical-offset="51" max-vertical-offset="1003">
+              <folding>
+                <element signature="imports" expanded="false" />
+                <element signature="e#359#360#0" expanded="false" />
+                <element signature="e#389#390#0" expanded="false" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="MuPDFCore.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/com/artifex/mupdfdemo/MuPDFCore.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="192" column="2" selection-start="5943" selection-end="6002" vertical-scroll-proportion="0.0" vertical-offset="3264" max-vertical-offset="6681">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="pdfdroidbridge.c" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../mupdf/platform/android/jni/pdfdroidbridge.c">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="363" column="39" selection-start="8610" selection-end="8626" vertical-scroll-proportion="0.0" vertical-offset="6381" max-vertical-offset="7633">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="hello-jni.c" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://D:/workspace/HelloGif2PngLib/jni/hello-jni.c">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="177" column="62" selection-start="5406" selection-end="5454" vertical-scroll-proportion="0.0" vertical-offset="2822" max-vertical-offset="5576">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="mupdf.c" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../mupdf/platform/android/jni/mupdf.c">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="1103" column="60" selection-start="27075" selection-end="27127" vertical-scroll-proportion="0.0" vertical-offset="18521" max-vertical-offset="48161">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Page.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/org/vudroid/core/Page.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="17" column="47" selection-start="509" selection-end="509" vertical-scroll-proportion="0.0" vertical-offset="40" max-vertical-offset="1071">
+              <folding>
+                <element signature="method#getPageHeight#0;class#Page#0" expanded="false" />
+                <element signature="method#getTop#0;class#Page#0" expanded="false" />
+                <element signature="method#strokePaint#0;class#Page#0" expanded="false" />
+                <element signature="method#fillPaint#0;class#Page#0" expanded="false" />
+                <element signature="method#textPaint#0;class#Page#0" expanded="false" />
+                <element signature="method#setAspectRatio#0;class#Page#0" expanded="false" />
+                <element signature="method#isVisible#0;class#Page#0" expanded="false" />
+                <element signature="method#setAspectRatio#1;class#Page#0" expanded="false" />
+                <element signature="method#setBounds#0;class#Page#0" expanded="false" />
+                <element signature="method#updateVisibility#0;class#Page#0" expanded="false" />
+                <element signature="method#invalidate#0;class#Page#0" expanded="false" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="DocumentView.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/org/vudroid/core/DocumentView.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="276" column="19" selection-start="9213" selection-end="9213" vertical-scroll-proportion="0.0" vertical-offset="1465" max-vertical-offset="2295">
+              <folding>
+                <element signature="method#DocumentView#0;class#DocumentView#0" expanded="false" />
+                <element signature="method#initMultiTouchZoomIfAvailable#0;class#DocumentView#0" expanded="false" />
+                <element signature="method#goToPageImpl#0;class#DocumentView#0" expanded="false" />
+                <element signature="method#onScrollChanged#0;class#DocumentView#0" expanded="false" />
+                <element signature="method#updatePageVisibility#0;class#DocumentView#0" expanded="false" />
+                <element signature="method#commitZoom#0;class#DocumentView#0" expanded="false" />
+                <element signature="method#goToPage#0;class#DocumentView#0" expanded="false" />
+                <element signature="method#getCurrentPage#0;class#DocumentView#0" expanded="false" />
+                <element signature="method#zoomChanged#0;class#DocumentView#0" expanded="false" />
+                <element signature="method#onTouchEvent#0;class#DocumentView#0" expanded="false" />
+                <element signature="method#setLastPosition#0;class#DocumentView#0" expanded="false" />
+                <element signature="method#dispatchKeyEvent#0;class#DocumentView#0" expanded="false" />
+                <element signature="method#verticalDpadScroll#0;class#DocumentView#0" expanded="false" />
+                <element signature="method#lineByLineMoveTo#0;class#DocumentView#0" expanded="false" />
+                <element signature="method#getTopLimit#0;class#DocumentView#0" expanded="false" />
+                <element signature="method#getLeftLimit#0;class#DocumentView#0" expanded="false" />
+                <element signature="method#getBottomLimit#0;class#DocumentView#0" expanded="false" />
+                <element signature="method#getRightLimit#0;class#DocumentView#0" expanded="false" />
+                <element signature="method#scrollTo#0;class#DocumentView#0" expanded="false" />
+                <element signature="method#getViewRect#0;class#DocumentView#0" expanded="false" />
+                <element signature="method#computeScroll#0;class#DocumentView#0" expanded="false" />
+                <element signature="method#onLayout#0;class#DocumentView#0" expanded="false" />
+                <element signature="method#invalidateScroll#0;class#DocumentView#0" expanded="false" />
+                <element signature="method#getScrollScaleRatio#0;class#DocumentView#0" expanded="false" />
+                <element signature="method#stopScroller#0;class#DocumentView#0" expanded="false" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="OpenFileActivity.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/cx/hell/android/pdfviewpro/OpenFileActivity.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="746" column="22" selection-start="26268" selection-end="26268" vertical-scroll-proportion="0.0" vertical-offset="12682" max-vertical-offset="27183">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="DecodeServiceBase.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/org/vudroid/core/DecodeServiceBase.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="115" column="84" selection-start="4027" selection-end="4027" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="4352">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
+  </component>
+  <component name="FindManager">
+    <FindUsagesManager>
+      <setting name="OPEN_NEW_TAB" value="false" />
+    </FindUsagesManager>
+  </component>
+  <component name="Git.Settings">
+    <option name="SYNC_SETTING" value="DONT" />
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="changedFiles" />
+  </component>
+  <component name="ProjectFrameBounds">
+    <option name="x" value="54" />
+    <option name="y" value="-8" />
+    <option name="width" value="1320" />
+    <option name="height" value="784" />
+  </component>
+  <component name="ProjectLevelVcsManager" settingsEditedManually="false">
+    <OptionsSetting value="true" id="Add" />
+    <OptionsSetting value="true" id="Remove" />
+    <OptionsSetting value="true" id="Checkout" />
+    <OptionsSetting value="true" id="Update" />
+    <OptionsSetting value="true" id="Status" />
+    <OptionsSetting value="true" id="Edit" />
+    <ConfirmationsSetting value="0" id="Add" />
+    <ConfirmationsSetting value="0" id="Remove" />
+  </component>
+  <component name="ProjectReloadState">
+    <option name="STATE" value="0" />
+  </component>
+  <component name="ProjectView">
+    <navigator proportions="" version="1" splitterProportion="0.5">
+      <flattenPackages />
+      <showMembers />
+      <showModules />
+      <showLibraryContents />
+      <hideEmptyPackages />
+      <abbreviatePackageNames />
+      <autoscrollToSource />
+      <autoscrollFromSource />
+      <sortByType ProjectPane="true" />
+    </navigator>
+    <panes />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="GoToFile.includeJavaFiles" value="false" />
+    <property name="GoToClass.toSaveIncludeLibraries" value="false" />
+    <property name="options.splitter.main.proportions" value="0.19595142" />
+    <property name="MemberChooser.sorted" value="false" />
+    <property name="options.lastSelected" value="android.dex.compiler" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/libs/android-support-v4.jar!/" />
+    <property name="MemberChooser.showClasses" value="true" />
+    <property name="GoToClass.includeLibraries" value="false" />
+    <property name="MemberChooser.copyJavadoc" value="false" />
+    <property name="options.splitter.details.proportions" value="0.2" />
+    <property name="options.searchVisible" value="true" />
+    <property name="recentsLimit" value="5" />
+    <property name="project.structure.last.edited" value="SDKs" />
+    <property name="project.structure.proportion" value="0.0" />
+    <property name="project.structure.side.proportion" value="0.2" />
+    <property name="OverrideImplement.combined" value="true" />
+    <property name="OverrideImplement.overriding.sorted" value="false" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="org.vudroid.pdfdroid.codec" />
+      <recent name="com.artifex.mupdfdemo" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\read-only-project\PDF\Mupdf\res\drawable" />
+      <recent name="D:\read-only-project\mupdf\platform\android\libs" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Android Application.Mupdf">
+    <configuration default="true" type="AndroidTestRunConfigurationType" factoryName="Android Tests">
+      <module name="" />
+      <option name="TESTING_TYPE" value="0" />
+      <option name="INSTRUMENTATION_RUNNER_CLASS" value="" />
+      <option name="METHOD_NAME" value="" />
+      <option name="CLASS_NAME" value="" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="TARGET_SELECTION_MODE" value="EMULATOR" />
+      <option name="PREFERRED_AVD" value="" />
+      <option name="USE_COMMAND_LINE" value="true" />
+      <option name="COMMAND_LINE" value="" />
+      <option name="WIPE_USER_DATA" value="false" />
+      <option name="DISABLE_BOOT_ANIMATION" value="false" />
+      <option name="NETWORK_SPEED" value="full" />
+      <option name="NETWORK_LATENCY" value="none" />
+      <option name="CLEAR_LOGCAT" value="false" />
+      <option name="SHOW_LOGCAT_AUTOMATICALLY" value="true" />
+      <method />
+    </configuration>
+    <configuration default="true" type="Remote" factoryName="Remote">
+      <option name="USE_SOCKET_TRANSPORT" value="true" />
+      <option name="SERVER_MODE" value="false" />
+      <option name="SHMEM_ADDRESS" value="javadebug" />
+      <option name="HOST" value="localhost" />
+      <option name="PORT" value="5005" />
+      <method />
+    </configuration>
+    <configuration default="true" type="Applet" factoryName="Applet">
+      <module name="" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="HTML_FILE_NAME" />
+      <option name="HTML_USED" value="false" />
+      <option name="WIDTH" value="400" />
+      <option name="HEIGHT" value="300" />
+      <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
+      <option name="VM_PARAMETERS" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <method />
+    </configuration>
+    <configuration default="true" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" />
+      <option name="VM_PARAMETERS" />
+      <option name="PROGRAM_PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="ENABLE_SWING_INSPECTOR" value="false" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <module name="" />
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="true" type="JUnit" factoryName="JUnit">
+      <module name="" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PACKAGE_NAME" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="METHOD_NAME" />
+      <option name="TEST_OBJECT" value="class" />
+      <option name="VM_PARAMETERS" value="-ea" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="moduleWithDependencies" />
+      </option>
+      <envs />
+      <patterns />
+      <method />
+    </configuration>
+    <configuration default="true" type="AndroidRunConfigurationType" factoryName="Android Application">
+      <module name="" />
+      <option name="ACTIVITY_CLASS" value="" />
+      <option name="MODE" value="default_activity" />
+      <option name="DEPLOY" value="true" />
+      <option name="TARGET_SELECTION_MODE" value="EMULATOR" />
+      <option name="PREFERRED_AVD" value="" />
+      <option name="USE_COMMAND_LINE" value="true" />
+      <option name="COMMAND_LINE" value="" />
+      <option name="WIPE_USER_DATA" value="false" />
+      <option name="DISABLE_BOOT_ANIMATION" value="false" />
+      <option name="NETWORK_SPEED" value="full" />
+      <option name="NETWORK_LATENCY" value="none" />
+      <option name="CLEAR_LOGCAT" value="false" />
+      <option name="SHOW_LOGCAT_AUTOMATICALLY" value="true" />
+      <method />
+    </configuration>
+    <configuration default="false" name="Mupdf" type="AndroidRunConfigurationType" factoryName="Android Application">
+      <module name="Mupdf" />
+      <option name="ACTIVITY_CLASS" value="" />
+      <option name="MODE" value="default_activity" />
+      <option name="DEPLOY" value="true" />
+      <option name="TARGET_SELECTION_MODE" value="EMULATOR" />
+      <option name="PREFERRED_AVD" value="" />
+      <option name="USE_COMMAND_LINE" value="true" />
+      <option name="COMMAND_LINE" value="" />
+      <option name="WIPE_USER_DATA" value="false" />
+      <option name="DISABLE_BOOT_ANIMATION" value="false" />
+      <option name="NETWORK_SPEED" value="full" />
+      <option name="NETWORK_LATENCY" value="none" />
+      <option name="CLEAR_LOGCAT" value="false" />
+      <option name="SHOW_LOGCAT_AUTOMATICALLY" value="true" />
+      <RunnerSettings RunnerId="AndroidDebugRunner" />
+      <ConfigurationWrapper RunnerId="AndroidDebugRunner" />
+      <method />
+    </configuration>
+    <list size="1">
+      <item index="0" class="java.lang.String" itemvalue="Android Application.Mupdf" />
+    </list>
+    <configuration name="&lt;template&gt;" type="WebApp" default="true" selected="false">
+      <Host>localhost</Host>
+      <Port>5050</Port>
+    </configuration>
+  </component>
+  <component name="ShelveChangesManager" show_recycled="false" />
+  <component name="StructureViewFactory">
+    <option name="AUTOSCROLL_MODE" value="false" />
+    <option name="ACTIVE_ACTIONS" value=",VISIBILITY_SORTER" />
+  </component>
+  <component name="SvnConfiguration" maxAnnotateRevisions="500" myUseAcceleration="nothing" myAutoUpdateAfterCommit="false" cleanupOnStartRun="false" SSL_PROTOCOLS="all">
+    <option name="USER" value="" />
+    <option name="PASSWORD" value="" />
+    <option name="mySSHConnectionTimeout" value="30000" />
+    <option name="mySSHReadTimeout" value="30000" />
+    <option name="LAST_MERGED_REVISION" />
+    <option name="MERGE_DRY_RUN" value="false" />
+    <option name="MERGE_DIFF_USE_ANCESTRY" value="true" />
+    <option name="UPDATE_LOCK_ON_DEMAND" value="false" />
+    <option name="IGNORE_SPACES_IN_MERGE" value="false" />
+    <option name="CHECK_NESTED_FOR_QUICK_MERGE" value="false" />
+    <option name="IGNORE_SPACES_IN_ANNOTATE" value="true" />
+    <option name="SHOW_MERGE_SOURCES_IN_ANNOTATE" value="true" />
+    <option name="FORCE_UPDATE" value="false" />
+    <option name="IGNORE_EXTERNALS" value="false" />
+    <configuration useDefault="false">C:\Users\archko\AppData\Roaming\Subversion</configuration>
+    <myIsUseDefaultProxy>false</myIsUseDefaultProxy>
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="54" y="-8" width="1320" height="784" extended-state="6" />
+    <editor active="true" />
+    <layout>
+      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.38235295" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32935917" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32994527" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
+      <window_info id="Build Variants" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="4" side_tool="true" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32817337" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Android" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24941361" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24863175" sideWeight="0.623839" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Preview" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3291634" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24941361" sideWeight="0.5" order="5" side_tool="false" content_ui="combo" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+    </layout>
+  </component>
+  <component name="VcsContentAnnotationSettings">
+    <option name="myLimit" value="2678400000" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="myTodoPanelSettings">
+      <TodoPanelSettings />
+    </option>
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager />
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/../../mupdf/platform/android/jni/mupdf.cc">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="13" column="0" selection-start="0" selection-end="70662" vertical-scroll-proportion="0.32985073" vertical-offset="0" max-vertical-offset="48484" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../apv/pdfview/jni/pdfview2/apvandroid.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="283" column="25" selection-start="8818" selection-end="8831" vertical-scroll-proportion="-3.3214285" vertical-offset="4718" max-vertical-offset="17629" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../apv/pdfview/jni/pdfview2/apvcore.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="515" column="20" selection-start="15478" selection-end="15490" vertical-scroll-proportion="-0.09933775" vertical-offset="8815" max-vertical-offset="13107" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../apv/pdfview/src/cx/hell/android/lib/pdf/PDF.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="411" column="46" selection-start="11187" selection-end="11187" vertical-scroll-proportion="0.07751938" vertical-offset="1395" max-vertical-offset="2091" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/artifex/mupdfdemo/ChoosePDFActivity.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="213" column="32" selection-start="6501" selection-end="6501" vertical-scroll-proportion="0.0" vertical-offset="3621" max-vertical-offset="5984">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/artifex/mupdfdemo/AKReaderView.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="476" column="84" selection-start="15914" selection-end="15914" vertical-scroll-proportion="0.0" vertical-offset="8092" max-vertical-offset="14195">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/cx/hell/android/pdfviewpro/OpenFileActivity.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="746" column="22" selection-start="26268" selection-end="26268" vertical-scroll-proportion="0.0" vertical-offset="2754" max-vertical-offset="6766">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://D:/workspace/HelloGif2PngLib/jni/hello-jni.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="177" column="62" selection-start="5406" selection-end="5454" vertical-scroll-proportion="0.0" vertical-offset="2822" max-vertical-offset="5576">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../mupdf/platform/android/jni/mupdf.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="1103" column="60" selection-start="27075" selection-end="27127" vertical-scroll-proportion="0.0" vertical-offset="18521" max-vertical-offset="48161">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/cx/hell/android/lib/pagesview/PagesView.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="1143" column="65" selection-start="33751" selection-end="33751" vertical-scroll-proportion="0.0" vertical-offset="4232" max-vertical-offset="6001">
+          <folding>
+            <marker date="1381887725820" expanded="false" signature="25616:27638" placeholder="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/cx/hell/android/pdfviewpro/AKPDFPagesProvider.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="367" column="20" selection-start="11093" selection-end="11093" vertical-scroll-proportion="0.0" vertical-offset="5261" max-vertical-offset="6817">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/artifex/mupdfdemo/MuPDFCore.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="192" column="2" selection-start="5943" selection-end="6002" vertical-scroll-proportion="0.0" vertical-offset="1927" max-vertical-offset="3587">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/vudroid/core/codec/CodecPage.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="15" column="11" selection-start="234" selection-end="234" vertical-scroll-proportion="0.36899224" vertical-offset="0" max-vertical-offset="645" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/vudroid/pdfdroid/codec/AKPdfPage.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="88" column="44" selection-start="2082" selection-end="2082" vertical-scroll-proportion="0.0" vertical-offset="884" max-vertical-offset="1870">
+          <folding>
+            <element signature="method#AKPdfPage#0;class#AKPdfPage#0" expanded="false" />
+            <element signature="method#isDecoding#0;class#AKPdfPage#0" expanded="false" />
+            <element signature="method#waitForDecode#0;class#AKPdfPage#0" expanded="false" />
+            <element signature="method#createPage#0;class#AKPdfPage#0" expanded="false" />
+            <element signature="method#finalize#0;class#AKPdfPage#0" expanded="false" />
+            <element signature="method#recycle#0;class#AKPdfPage#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/vudroid/pdfdroid/codec/PdfDocument.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="24" column="8" selection-start="602" selection-end="604" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1003">
+          <folding>
+            <element signature="imports" expanded="false" />
+            <element signature="e#359#360#0" expanded="false" />
+            <element signature="e#389#390#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/vudroid/pdfdroid/codec/PdfPage.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="45" column="24" selection-start="946" selection-end="946" vertical-scroll-proportion="0.0" vertical-offset="345" max-vertical-offset="1411">
+          <folding>
+            <element signature="method#PdfPage#0;class#PdfPage#0" expanded="false" />
+            <element signature="method#isDecoding#0;class#PdfPage#0" expanded="false" />
+            <element signature="method#waitForDecode#0;class#PdfPage#0" expanded="false" />
+            <element signature="method#createPage#0;class#PdfPage#0" expanded="false" />
+            <element signature="method#finalize#0;class#PdfPage#0" expanded="false" />
+            <element signature="method#recycle#0;class#PdfPage#0" expanded="false" />
+            <element signature="method#render#0;class#PdfPage#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/vudroid/core/DocumentView.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="276" column="19" selection-start="9213" selection-end="9213" vertical-scroll-proportion="0.0" vertical-offset="1465" max-vertical-offset="2295">
+          <folding>
+            <element signature="method#DocumentView#0;class#DocumentView#0" expanded="false" />
+            <element signature="method#initMultiTouchZoomIfAvailable#0;class#DocumentView#0" expanded="false" />
+            <element signature="method#goToPageImpl#0;class#DocumentView#0" expanded="false" />
+            <element signature="method#onScrollChanged#0;class#DocumentView#0" expanded="false" />
+            <element signature="method#updatePageVisibility#0;class#DocumentView#0" expanded="false" />
+            <element signature="method#commitZoom#0;class#DocumentView#0" expanded="false" />
+            <element signature="method#goToPage#0;class#DocumentView#0" expanded="false" />
+            <element signature="method#getCurrentPage#0;class#DocumentView#0" expanded="false" />
+            <element signature="method#zoomChanged#0;class#DocumentView#0" expanded="false" />
+            <element signature="method#onTouchEvent#0;class#DocumentView#0" expanded="false" />
+            <element signature="method#setLastPosition#0;class#DocumentView#0" expanded="false" />
+            <element signature="method#dispatchKeyEvent#0;class#DocumentView#0" expanded="false" />
+            <element signature="method#verticalDpadScroll#0;class#DocumentView#0" expanded="false" />
+            <element signature="method#lineByLineMoveTo#0;class#DocumentView#0" expanded="false" />
+            <element signature="method#getTopLimit#0;class#DocumentView#0" expanded="false" />
+            <element signature="method#getLeftLimit#0;class#DocumentView#0" expanded="false" />
+            <element signature="method#getBottomLimit#0;class#DocumentView#0" expanded="false" />
+            <element signature="method#getRightLimit#0;class#DocumentView#0" expanded="false" />
+            <element signature="method#scrollTo#0;class#DocumentView#0" expanded="false" />
+            <element signature="method#getViewRect#0;class#DocumentView#0" expanded="false" />
+            <element signature="method#computeScroll#0;class#DocumentView#0" expanded="false" />
+            <element signature="method#onLayout#0;class#DocumentView#0" expanded="false" />
+            <element signature="method#invalidateScroll#0;class#DocumentView#0" expanded="false" />
+            <element signature="method#getScrollScaleRatio#0;class#DocumentView#0" expanded="false" />
+            <element signature="method#stopScroller#0;class#DocumentView#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../mupdf/platform/android/jni/pdfdroidbridge.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="363" column="39" selection-start="8610" selection-end="8626" vertical-scroll-proportion="0.0" vertical-offset="6381" max-vertical-offset="7633">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/vudroid/core/Page.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="17" column="47" selection-start="509" selection-end="509" vertical-scroll-proportion="0.0" vertical-offset="40" max-vertical-offset="1071">
+          <folding>
+            <element signature="method#getPageHeight#0;class#Page#0" expanded="false" />
+            <element signature="method#getTop#0;class#Page#0" expanded="false" />
+            <element signature="method#strokePaint#0;class#Page#0" expanded="false" />
+            <element signature="method#fillPaint#0;class#Page#0" expanded="false" />
+            <element signature="method#textPaint#0;class#Page#0" expanded="false" />
+            <element signature="method#setAspectRatio#0;class#Page#0" expanded="false" />
+            <element signature="method#isVisible#0;class#Page#0" expanded="false" />
+            <element signature="method#setAspectRatio#1;class#Page#0" expanded="false" />
+            <element signature="method#setBounds#0;class#Page#0" expanded="false" />
+            <element signature="method#updateVisibility#0;class#Page#0" expanded="false" />
+            <element signature="method#invalidate#0;class#Page#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/vudroid/core/DecodeServiceBase.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="115" column="84" selection-start="4027" selection-end="4027" vertical-scroll-proportion="0.0" vertical-offset="1320" max-vertical-offset="4352">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/vudroid/core/PageTreeNode.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="106" column="36" selection-start="3177" selection-end="3178" vertical-scroll-proportion="-0.39873418" vertical-offset="932" max-vertical-offset="2278">
+          <folding>
+            <element signature="method#PageTreeNode#0;class#PageTreeNode#0" expanded="false" />
+            <element signature="method#updateVisibility#0;class#PageTreeNode#0" expanded="false" />
+            <element signature="method#invalidate#0;class#PageTreeNode#0" expanded="false" />
+            <element signature="method#invalidateRecursive#0;class#PageTreeNode#0" expanded="false" />
+            <element signature="method#invalidateNodeBounds#0;class#PageTreeNode#0" expanded="false" />
+            <element signature="method#draw#0;class#PageTreeNode#0" expanded="false" />
+            <element signature="method#isVisible#0;class#PageTreeNode#0" expanded="false" />
+            <element signature="method#getTargetRectF#0;class#PageTreeNode#0" expanded="false" />
+            <element signature="method#getBitmap#0;class#PageTreeNode#0" expanded="false" />
+            <element signature="method#restoreBitmapReference#0;class#PageTreeNode#0" expanded="false" />
+            <element signature="method#decodePageTreeNode#0;class#PageTreeNode#0" expanded="false" />
+            <element signature="method#evaluatePageSliceBounds#0;class#PageTreeNode#0" expanded="false" />
+            <element signature="method#setBitmap#0;class#PageTreeNode#0" expanded="false" />
+            <element signature="method#setDecodingNow#0;class#PageTreeNode#0" expanded="false" />
+            <element signature="method#stopDecodingThisNode#0;class#PageTreeNode#0" expanded="false" />
+            <element signature="method#isHiddenByChildren#0;class#PageTreeNode#0" expanded="false" />
+            <element signature="method#recycleChildren#0;class#PageTreeNode#0" expanded="false" />
+            <element signature="method#containsBitmaps#0;class#PageTreeNode#0" expanded="false" />
+            <element signature="method#childrenContainBitmaps#0;class#PageTreeNode#0" expanded="false" />
+            <element signature="method#recycle#0;class#PageTreeNode#0" expanded="false" />
+            <element signature="method#isVisibleAndNotHiddenByChildren#0;class#PageTreeNode#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+  </component>
+  <component name="masterDetails">
+    <states>
+      <state key="ArtifactsStructureConfigurable.UI">
+        <settings>
+          <artifact-editor />
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="FacetStructureConfigurable.UI">
+        <settings>
+          <last-edited>Android</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="GlobalLibrariesConfigurable.UI">
+        <settings>
+          <last-edited>scala-compiler</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="JdkListConfigurable.UI">
+        <settings>
+          <last-edited>1.6</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="ModuleStructureConfigurable.UI">
+        <settings>
+          <last-edited>Android|Mupdf</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="ProjectJDKs.UI">
+        <settings>
+          <last-edited>1.6</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="ProjectLibrariesConfigurable.UI">
+        <settings>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+    </states>
+  </component>
+</project>
+
