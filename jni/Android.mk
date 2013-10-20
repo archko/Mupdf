@@ -21,7 +21,7 @@ LOCAL_C_INCLUDES := \
 	$(TOP_LOCAL_PATH)/mupdf-apv/pdf 
 LOCAL_CFLAGS :=
 LOCAL_MODULE    := mupdf
-LOCAL_SRC_FILES := mupdf.c
+LOCAL_SRC_FILES := amupdf.c
 LOCAL_STATIC_LIBRARIES := mupdfcore mupdfcore2 mupdfthirdparty
 ifdef NDK_PROFILER
 LOCAL_CFLAGS += -pg -DNDK_PROFILER
@@ -29,7 +29,7 @@ LOCAL_STATIC_LIBRARIES += andprof
 else
 endif
 
-LOCAL_LDLIBS    := -lm -llog -ljnigraphics
+LOCAL_LDLIBS    := -lm -lz -llog -ljnigraphics
 ifdef V8_BUILD
 LOCAL_LDLIBS	+= -L$(MUPDF_ROOT)/thirdparty/v8-3.9/android -lv8_$(TARGET_ARCH_ABI)
 endif

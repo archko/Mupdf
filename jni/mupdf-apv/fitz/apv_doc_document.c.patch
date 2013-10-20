@@ -1,0 +1,49 @@
+--- doc_document.c	2013-05-19 15:21:50.000000000 +0200
++++ apv_doc_document.c	2013-05-19 15:23:18.000000000 +0200
+@@ -2,14 +2,8 @@
+ 
+ /* Yuck! Promiscuous we are. */
+ extern struct pdf_document *pdf_open_document(fz_context *ctx, const char *filename);
+-extern struct xps_document *xps_open_document(fz_context *ctx, const char *filename);
+-extern struct cbz_document *cbz_open_document(fz_context *ctx, const char *filename);
+-extern struct image_document *image_open_document(fz_context *ctx, const char *filename);
+ 
+ extern struct pdf_document *pdf_open_document_with_stream(fz_context *ctx, fz_stream *file);
+-extern struct xps_document *xps_open_document_with_stream(fz_context *ctx, fz_stream *file);
+-extern struct cbz_document *cbz_open_document_with_stream(fz_context *ctx, fz_stream *file);
+-extern struct image_document *image_open_document_with_stream(fz_context *ctx, fz_stream *file);
+ 
+ extern int pdf_js_supported(void);
+ 
+@@ -34,6 +28,7 @@
+ fz_document *
+ fz_open_document_with_stream(fz_context *ctx, const char *magic, fz_stream *stream)
+ {
++#if 0
+ 	char *ext = strrchr(magic, '.');
+ 
+ 	if (ext)
+@@ -64,6 +59,7 @@
+ 		!strcmp(magic, "tif") || !strcmp(magic, "image/tiff") ||
+ 		!strcmp(magic, "tiff") || !strcmp(magic, "image/x-tiff"))
+ 		return (fz_document*) image_open_document_with_stream(ctx, stream);
++#endif
+ 
+ 	/* last guess: pdf */
+ 	return (fz_document*) pdf_open_document_with_stream(ctx, stream);
+@@ -72,6 +68,7 @@
+ fz_document *
+ fz_open_document(fz_context *ctx, const char *filename)
+ {
++#if 0
+ 	char *ext = strrchr(filename, '.');
+ 
+ 	if (ext)
+@@ -88,6 +85,7 @@
+ 			!fz_strcasecmp(ext, ".tif") || !fz_strcasecmp(ext, ".tiff"))
+ 			return (fz_document*) image_open_document(ctx, filename);
+ 	}
++#endif
+ 
+ 	/* last guess: pdf */
+ 	return (fz_document*) pdf_open_document(ctx, filename);
