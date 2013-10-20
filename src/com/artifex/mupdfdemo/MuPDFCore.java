@@ -1,11 +1,20 @@
 package com.artifex.mupdfdemo;
+import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import android.content.Context;
+import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
 import android.graphics.PointF;
 import android.graphics.RectF;
+import android.util.Log;
+import cx.hell.android.pdfviewpro.APVApplication;
 
 public class MuPDFCore
 {
@@ -376,12 +385,121 @@ public class MuPDFCore
 		}
 	}
 
-
+    //==========================================================================
     public float getPDFPageWidth(){
         return pageWidth;
     }
 
     public float getPDFPageHeight(){
         return pageHeight;
+    }
+
+
+
+    private static Map<String,String> fontNameToFile = null;
+
+    static {
+        /* there's also DroidSansFallback, but it's too big and we're handling it specially */
+        HashMap<String,String> m = new HashMap<String,String>();
+
+        m.put("Courier", "NimbusMonL-Regu.cff");
+        m.put("Courier-Bold", "NimbusMonL-Bold.cff");
+        m.put("Courier-Oblique", "NimbusMonL-ReguObli.cff");
+        m.put("Courier-BoldOblique", "NimbusMonL-BoldObli.cff");
+
+        m.put("Helvetica", "NimbusSanL-Regu.cff");
+        m.put("Helvetica-Bold", "NimbusSanL-Bold.cff");
+        m.put("Helvetica-Oblique", "NimbusSanL-ReguItal.cff");
+        m.put("Helvetica-BoldOblique", "NimbusSanL-BoldItal.cff");
+
+        m.put("Times-Roman", "NimbusRomNo9L-Regu.cff");
+        m.put("Times-Bold", "NimbusRomNo9L-Medi.cff");
+        m.put("Times-Italic", "NimbusRomNo9L-ReguItal.cff");
+        m.put("Times-BoldItalic", "NimbusRomNo9L-MediItal.cff");
+
+        m.put("Symbol", "StandardSymL.cff");
+        m.put("ZapfDingbats", "Dingbats.cff");
+        m.put("DroidSans", "droid/DroidSans.ttf");
+        m.put("DroidSansMono", "droid/DroidSansMono.ttf");
+        MuPDFCore.fontNameToFile = m;
+    }
+
+    private final static String TAG = "mupdf";
+
+    public static byte[] getFontData(String name) {
+        Log.d(TAG, "getFontData:"+name);
+
+        if (name == null) throw new IllegalArgumentException("name can't be null");
+        if (name.equals("")) throw new IllegalArgumentException("name can't be empty");
+        if (name.equals("DroidSansFallback")) return MuPDFCore.getDroidSansFallbackData();
+        String assetFontName = null;
+        if (MuPDFCore.fontNameToFile.containsKey(name)) {
+            assetFontName = MuPDFCore.fontNameToFile.get(name);
+        } else {
+            Log.w(TAG, "font name \""+name+"\" not found in file name mapping");
+            assetFontName = name;
+        }
+        Log.i(TAG, "trying to load font data " + name + " from " + assetFontName);
+        return MuPDFCore.getAssetBytes("font/" + assetFontName);
+    }
+
+    /**
+     * TODO: mmap, because theoretically it might be almost free.
+     */
+    public static byte[] getDroidSansFallbackData() {
+        try {
+            InputStream i = new FileInputStream("/system/fonts/DroidSansFallback.ttf");
+            ByteArrayOutputStream bytes = new ByteArrayOutputStream(Math.max(i.available(), 1024));
+            byte tmp[] = new byte[256 * 1024];
+            int read = 0;
+            while(true) {
+                read = i.read(tmp);
+                if (read == -1) {
+                    break;
+                } else {
+                    bytes.write(tmp, 0, read);
+                }
+            }
+            byte d[] = bytes.toByteArray();
+            Log.i(TAG, "loaded " + d.length + " bytes for DroidSansFallback.ttf");
+            return d;
+        } catch (IOException e) {
+            Log.e(TAG, "got exception while trying to load DroidSansFallback.ttf: " + e);
+            return null;
+        }
+    }
+
+    /**
+     * Get cmap as bytes.
+     */
+    public static byte[] getCmapData(String name) {
+        String cmapPath = "cmap/" + name;
+        Log.d(TAG, "getCmapData:"+cmapPath);
+
+        byte[] d =  getAssetBytes(cmapPath);
+        Log.d(TAG, "loaded cmap " + name + " (size: " + d.length + ")");
+        return d;
+    }
+
+    public static byte[] getAssetBytes(String path) {
+        AssetManager assets = APVApplication.getInstance().getAssets();
+        try {
+            InputStream i = assets.open(path, AssetManager.ACCESS_BUFFER);
+            ByteArrayOutputStream bytes = new ByteArrayOutputStream(Math.max(i.available(), 1024));
+            byte tmp[] = new byte[256 * 1024];
+            int read = 0;
+            while(true) {
+                read = i.read(tmp);
+                if (read == -1) {
+                    break;
+                } else {
+                    bytes.write(tmp, 0, read);
+                }
+            }
+            return bytes.toByteArray();
+        } catch (IOException e) {
+            Log.e(TAG, "failed to read asset \"" + path + "\": " + e);
+            return null;
+        }
     }
 }
