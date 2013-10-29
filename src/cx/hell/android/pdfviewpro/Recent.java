@@ -50,7 +50,7 @@ public class Recent extends ArrayList<String> {
 		edit.commit();
 	}
 	
-	void commit() {
+	public void commit() {
 		for(int i=size()-1; i>=0; i--) {
 			for(int j=0; j<i; j++) {
 				if (get(i).equals(get(j))) {

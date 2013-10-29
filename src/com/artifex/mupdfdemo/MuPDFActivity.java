@@ -36,6 +36,7 @@ import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.ViewAnimator;
+import cx.hell.android.pdfviewpro.Recent;
 
 class ThreadPerTaskExecutor implements Executor {
 	public void execute(Runnable r) {
@@ -216,6 +217,9 @@ public class MuPDFActivity extends Activity implements FilePicker.FilePickerSupp
 			core = new MuPDFCore(this, path);
 			// New file: drop the old outline data
 			OutlineActivityData.set(null);
+            Recent recent = new Recent(this);
+            recent.add(0, mFileName);
+            recent.commit();
 		}
 		catch (Exception e)
 		{
