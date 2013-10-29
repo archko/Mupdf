@@ -651,9 +651,9 @@ public class AKReaderView
 					(cvBottom + cvTop - lv.getMeasuredHeight())/2,
 					cvLeft - gap,
 					(cvBottom + cvTop + lv.getMeasuredHeight())/2);*/
-            int gap=leftOffset.y+GAP/2+cvOffset.y;
+            int gap=leftOffset.y+GAP/2;
             lv.layout(cvLeft,
-                (cvTop-lv.getMeasuredHeight()-gap)/2,
+                (cvTop-lv.getMeasuredHeight()-gap),
                 cvRight,
                 cvTop);
         }
@@ -666,11 +666,11 @@ public class AKReaderView
 					(cvBottom + cvTop - rv.getMeasuredHeight())/2,
 					cvRight + rv.getMeasuredWidth() + gap,
 					(cvBottom + cvTop + rv.getMeasuredHeight())/2);*/
-            int gap=cvOffset.y+GAP/2+rightOffset.y;
+            int gap=GAP/2+rightOffset.y;
             rv.layout(cvLeft,
                 cvBottom+gap,
                 cvRight,
-                (cvBottom+rv.getMeasuredHeight())/2);
+                (cvBottom+rv.getMeasuredHeight()));
         }
 
 		invalidate();
