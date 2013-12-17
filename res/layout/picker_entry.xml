@@ -15,11 +15,12 @@
 		android:id="@+id/name"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
+        android:minHeight="48dp"
 		android:layout_toRightOf="@+id/icon"
 		android:paddingBottom="8dp"
-		android:paddingLeft="12dp"
-		android:paddingRight="12dp"
+		android:paddingLeft="10dp"
+		android:paddingRight="10dp"
 		android:paddingTop="8dp"
-		android:textAppearance="?android:attr/textAppearanceLarge" />
+		android:textSize="17sp" />
 
 </RelativeLayout>

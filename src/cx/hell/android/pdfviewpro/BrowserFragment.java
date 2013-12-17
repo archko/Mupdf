@@ -334,7 +334,7 @@ public class BrowserFragment extends RefreshableFragment implements OnItemClickL
     		clickedFile = clickedEntry.getFile();
     	}
     	
-    	if (!clickedFile.exists())
+    	if (null==clickedFile||!clickedFile.exists())
     		return;
     	
     	if (clickedFile.isDirectory()) {
@@ -438,7 +438,7 @@ public class BrowserFragment extends RefreshableFragment implements OnItemClickL
 
             clickedFile = entry.getFile();
 
-            if (clickedFile.exists()) {
+            if (null!=clickedFile&&clickedFile.exists()) {
                 Uri uri = Uri.parse(clickedFile.getAbsolutePath());
                 Intent intent ;
                 intent=new Intent();
