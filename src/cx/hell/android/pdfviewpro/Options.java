@@ -218,7 +218,7 @@ public class Options extends PreferenceActivity implements OnSharedPreferenceCha
 	public void onResume() {
 		super.onResume();
 		
-		setOrientation(this);
+		//setOrientation(this);
 
 		getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
 		setSummaries();

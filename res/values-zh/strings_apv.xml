@@ -44,7 +44,6 @@
 		<item>总是隐藏</item>
 		<item>渐变</item>
 	</string-array>
-	<string name="default_zoom_animation">2</string> 
 	<string name="page_animation">页码/总页数</string>
 	<string-array name="page_animations">
 		<item>100</item>
@@ -60,7 +59,6 @@
 		<item>渐变</item>
 		<item>显示</item>
 	</string-array>
-	<string name="default_page_animation">2</string> 
 	<string name="fade_speed">页面缩放渐变等待</string>
 	<string-array name="fade_speeds">
 		<item>1</item>
@@ -80,12 +78,10 @@
 		<item>6 seconds</item>
 		<item>7 seconds</item>
 	</string-array>
-	<string name="default_fade_speed">3</string>
 	<string name="invert">反色</string>
 	<string name="dirs_first">目录优先</string>
 	<string name="show_extension">显示 .pdf后缀</string>
 	<string name="orientation">方向</string>
-	<string name="default_orientation">0</string>
 	<string-array name="orientation_labels">
 	<item>自动</item>
 	<item>不变</item>
@@ -127,7 +123,6 @@
 		<item>6</item>
 		<item>7</item>
 	</string-array>
-	<string name="default_color_mode">0</string>
 	<string name="omit_images">略过图片</string>
 	<string name="vertical_scroll_lock">垂直滚动锁定</string>
 	<string name="vertical_scroll_lock_sub">要水平滚动,你要先滚动屏幕的1/5.</string>
@@ -146,8 +141,7 @@
 		<item>3</item>
 		<item>4</item>
 	</string-array>
-	<string name="default_box">2</string>
-	<string name="extra_cache">额外的内存缓存</string> 
+	<string name="extra_cache">额外的内存缓存</string>
 	<string name="extra_cache_sub">使用额外的内存缓存提高流畅性.</string> 
 	<string-array name="extra_caches">
 		<item>0</item>
@@ -167,9 +161,7 @@
 		<item>8 MB</item>
 		<item>10 MB</item>
 	</string-array>
-	<string name="default_extra_cache">0</string>
-	<string name="side_margin">额外的间距</string>	
-	<string name="default_side_margin">0</string>
+	<string name="side_margin">额外的间距</string>
 		<string-array name="margins">
 	<item>0</item>
 	<item>5</item>
@@ -183,7 +175,6 @@
 	<item>large</item>
 	</string-array>
 	<string name="top_margin">页面间距</string>
-	<string name="default_top_margin">0</string>
 	<string name="remove_from_recent">从最近中移出</string>
 	<!--<string name="delete">删除文件</string>-->
 	<string-array name = "double_tap_actions">
@@ -196,7 +187,6 @@
 	<item>zoom in</item>
 	<item>zoom in or back out</item>
 	</string-array>
-	<string name="default_double_tap_action">0</string>
 	<string name="double_tap_action">双击行为</string>
 	<string-array name = "action_pairs">
 	<item>0</item>
@@ -235,13 +225,6 @@
 	<string name="long_zoom_pair">长按缩放按钮行为</string>
 	<string name="right_up_down_pair">Nook Touch right up/down key actions</string>
 	<string name="top_bottom_tap_pair">顶/底部点击行为</string>
-	<string name="default_volume_pair">1</string>
-	<string name="default_up_down_pair">1</string>
-	<string name="default_left_right_pair">0</string>
-	<string name="default_zoom_pair">3</string>
-	<string name="default_long_zoom_pair">0</string>
-	<string name="default_right_up_down_pair">1</string>
-	<string name="default_top_bottom_tap_pair">1</string>
 	<string name="hw">硬件特殊设置</string>
 	<string name="eink">E-ink optimizations</string>
 	<string name="nook2">Nook2 fast e-ink refresh</string>

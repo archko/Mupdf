@@ -9,7 +9,7 @@
   	<PreferenceCategory android:title="@string/viewer">
     <CheckBoxPreference
     	android:title="@string/fullscreen"
-    	android:defaultValue="false"
+    	android:defaultValue="true"
     	android:key="fullscreen"/>
     <ListPreference
     	android:title="@string/color_mode"
