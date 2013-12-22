@@ -482,7 +482,7 @@ public class OpenFileActivity extends Activity implements SensorEventListener {
 
 		fadeStartOffset = 1000 * Integer.parseInt(options.getString(Options.PREF_FADE_SPEED, "7"));
 		
-		if (options.getBoolean(Options.PREF_FULLSCREEN, false))
+		if (options.getBoolean(Options.PREF_FULLSCREEN, true))
 			getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		else
 			getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);

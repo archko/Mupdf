@@ -85,7 +85,7 @@
 	<string name="dirs_first">List directories first</string>
 	<string name="show_extension">Show .pdf extension</string>
 	<string name="orientation">Orientation</string>
-	<string name="default_orientation">0</string>
+	<string name="default_orientation">2</string>
 	<string-array name="orientation_labels">
 	<item>automatic</item>
 	<item>harder to change</item>

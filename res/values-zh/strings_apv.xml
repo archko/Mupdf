@@ -85,7 +85,6 @@
 	<string name="dirs_first">目录优先</string>
 	<string name="show_extension">显示 .pdf后缀</string>
 	<string name="orientation">方向</string>
-	<string name="default_orientation">0</string>
 	<string-array name="orientation_labels">
 	<item>自动</item>
 	<item>不变</item>
