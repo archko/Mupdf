@@ -366,6 +366,16 @@ public abstract class PageView extends ViewGroup {
 					if (mDrawing != null) {
 						Path path = new Path();
 						PointF p;
+
+						paint.setAntiAlias(true);
+						paint.setDither(true);
+						paint.setStrokeJoin(Paint.Join.ROUND);
+						paint.setStrokeCap(Paint.Cap.ROUND);
+
+						paint.setStyle(Paint.Style.FILL);
+						paint.setStrokeWidth(INK_THICKNESS * scale);
+						paint.setColor(INK_COLOR);
+
 						Iterator<ArrayList<PointF>> it = mDrawing.iterator();
 						while (it.hasNext()) {
 							ArrayList<PointF> arc = it.next();
@@ -384,18 +394,13 @@ public abstract class PageView extends ViewGroup {
 									mY = y;
 								}
 								path.lineTo(mX, mY);
+							} else {
+								p = arc.get(0);
+								canvas.drawCircle(p.x * scale, p.y * scale, INK_THICKNESS * scale / 2, paint);
 							}
 						}
 
-						paint.setAntiAlias(true);
-						paint.setDither(true);
-						paint.setStrokeJoin(Paint.Join.ROUND);
-						paint.setStrokeCap(Paint.Cap.ROUND);
-
 						paint.setStyle(Paint.Style.STROKE);
-						paint.setStrokeWidth(INK_THICKNESS * scale);
-						paint.setColor(INK_COLOR);
-
 						canvas.drawPath(path, paint);
 					}
 				}
@@ -464,6 +469,7 @@ public abstract class PageView extends ViewGroup {
 		ArrayList<PointF> arc = new ArrayList<PointF>();
 		arc.add(new PointF(docRelX, docRelY));
 		mDrawing.add(arc);
+		mSearchView.invalidate();
 	}
 
 	public void continueDraw(float x, float y) {
@@ -539,9 +545,11 @@ public abstract class PageView extends ViewGroup {
 		int h = bottom-top;
 
 		if (mEntire != null) {
-			mEntireMat.setScale(w/(float)mSize.x, h/(float)mSize.y);
-			mEntire.setImageMatrix(mEntireMat);
-			mEntire.invalidate();
+			if (mEntire.getWidth() != w || mEntire.getHeight() != h) {
+				mEntireMat.setScale(w/(float)mSize.x, h/(float)mSize.y);
+				mEntire.setImageMatrix(mEntireMat);
+				mEntire.invalidate();
+			}
 			mEntire.layout(0, 0, w, h);
 		}
 
@@ -571,10 +579,15 @@ public abstract class PageView extends ViewGroup {
 		}
 	}
 
-	public void addHq(boolean update) {
+	public void updateHq(boolean update) {
 		Rect viewArea = new Rect(getLeft(),getTop(),getRight(),getBottom());
-		// If the viewArea's size matches the unzoomed size, there is no need for an hq patch
-		if (viewArea.width() != mSize.x || viewArea.height() != mSize.y) {
+		if (viewArea.width() == mSize.x || viewArea.height() == mSize.y) {
+			// If the viewArea's size matches the unzoomed size, there is no need for an hq patch
+			if (mPatch != null) {
+				mPatch.setImageBitmap(null);
+				mPatch.invalidate();
+			}
+		} else {
 			Point patchViewSize = new Point(viewArea.width(), viewArea.height());
 			Rect patchArea = new Rect(0, 0, mParentSize.x, mParentSize.y);
 
@@ -631,7 +644,6 @@ public abstract class PageView extends ViewGroup {
 					// Calling requestLayout here doesn't lead to a later call to layout. No idea
 					// why, but apparently others have run into the problem.
 					mPatch.layout(mPatchArea.left, mPatchArea.top, mPatchArea.right, mPatchArea.bottom);
-					invalidate();
 				}
 			};
 
@@ -666,7 +678,7 @@ public abstract class PageView extends ViewGroup {
 
 		mDrawEntire.execute();
 
-		addHq(true);
+		updateHq(true);
 	}
 
 	public void removeHq() {
