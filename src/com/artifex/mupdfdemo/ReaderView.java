@@ -209,7 +209,7 @@ public class ReaderView
 		}
 		mScrollerLastX = mScrollerLastY = 0;
 		mScroller.startScroll(0, 0, remainingX - xOffset, remainingY - yOffset, 400);
-		post(this);
+		mStepper.prod();
 	}
 
 	public void smartMoveBackwards() {
@@ -281,7 +281,7 @@ public class ReaderView
 		}
 		mScrollerLastX = mScrollerLastY = 0;
 		mScroller.startScroll(0, 0, remainingX - xOffset, remainingY - yOffset, 400);
-		post(this);
+		mStepper.prod();
 	}
 
 	public void resetupChildren() {

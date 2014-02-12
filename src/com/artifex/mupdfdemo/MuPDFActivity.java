@@ -685,12 +685,14 @@ public class MuPDFActivity extends Activity implements FilePicker.FilePickerSupp
 
 	public void onDestroy()
 	{
-		mDocView.applyToChildren(new AKReaderView.ViewMapper() {
-			void applyToView(View view) {
-				((MuPDFView)view).releaseBitmaps();
-			}
-		});
-		if (core != null)
+        if (null!=mDocView) {
+            mDocView.applyToChildren(new AKReaderView.ViewMapper() {
+                void applyToView(View view) {
+                    ((MuPDFView)view).releaseBitmaps();
+                }
+            });
+        }
+        if (core != null)
 			core.onDestroy();
 		if (mAlertTask != null) {
 			mAlertTask.cancel(true);

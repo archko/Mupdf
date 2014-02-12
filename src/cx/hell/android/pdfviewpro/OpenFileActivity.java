@@ -506,7 +506,9 @@ public class OpenFileActivity extends Activity implements SensorEventListener {
 	public void onDestroy() {
 	    super.onDestroy();
 	    Log.i(TAG, "onDestroy()");
-	    this.pdf.onDestroy();//freeMemory(); /* gc is too slow, code must make sure double free is not possible */
+        if (null!=pdf) {
+            this.pdf.onDestroy();//freeMemory(); /* gc is too slow, code must make sure double free is not possible */
+        }
         if (null!=pdfPagesProvider) {
             AKPDFPagesProvider pagesProvider=(AKPDFPagesProvider) pdfPagesProvider;
             pagesProvider.release();
