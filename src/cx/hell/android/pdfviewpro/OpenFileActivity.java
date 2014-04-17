@@ -48,6 +48,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 //import cx.hell.android.lib.pagesview.FindResult;
+import cn.me.archko.pdf.AKRecent;
 import com.artifex.mupdfdemo.ChoosePDFActivity;
 import com.artifex.mupdfdemo.OutlineActivity;
 import com.artifex.mupdfdemo.OutlineActivityData;
@@ -624,9 +625,9 @@ public class OpenFileActivity extends Activity implements SensorEventListener {
 		filePath = uri.getPath();
 		if (uri.getScheme().equals("file")) {
 			if (history) {
-				Recent recent = new Recent(this);
+				/*Recent recent = new Recent(this);
 				recent.add(0, filePath);
-				recent.commit();
+				recent.commit();*/
 				APVApplication apvApplication=APVApplication.getInstance();
 				apvApplication.hasChanged=true;
 			}
@@ -1030,7 +1031,8 @@ public class OpenFileActivity extends Activity implements SensorEventListener {
         Bookmark b = new Bookmark(this.getApplicationContext()).open();
         b.setLast(filePath, entry);
         b.close();
-        Log.i(TAG, "last page saved for "+filePath);    
+        Log.i(TAG, "last page saved for "+filePath+" entry:"+entry);
+        AKRecent.getInstance(getApplicationContext()).addAsync(filePath, entry.page, entry.numberOfPages);
     }
     
     /**

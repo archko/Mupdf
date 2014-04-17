@@ -11,17 +11,41 @@
 		android:layout_centerVertical="true"
 		android:layout_alignParentLeft="true" />
 
+    <TextView
+        android:id="@+id/size"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:maxLines="1" android:ellipsize="end"
+        android:layout_alignParentRight="true"
+        android:paddingBottom="8dp"
+        android:paddingLeft="4dp"
+        android:paddingRight="0dp"
+        android:paddingTop="8dp" android:text=""
+        android:textSize="12sp" />
+
 	<TextView
 		android:id="@+id/name"
+        android:layout_toLeftOf="@id/size"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-        android:minHeight="48dp"
-        android:maxLines="2" android:ellipsize="end"
+        android:minHeight="38dp"
+        android:maxLines="3" android:ellipsize="end"
 		android:layout_toRightOf="@+id/icon"
-		android:paddingBottom="8dp"
-		android:paddingLeft="10dp"
-		android:paddingRight="10dp"
+		android:paddingBottom="0dp"
+		android:paddingLeft="8dp"
+		android:paddingRight="0dp"
 		android:paddingTop="8dp" android:text=""
 		android:textSize="16sp" />
+
+    <ProgressBar
+        android:id="@+id/progressbar"
+        style="@android:style/Widget.ProgressBar.Horizontal"
+        android:maxHeight="4dp" android:minHeight="4dp"
+        android:layout_toRightOf="@+id/icon"
+        android:layout_below="@id/name"
+        android:paddingBottom="4dp"
+        android:paddingLeft="8dp"
+        android:paddingRight="16dp"
+        android:layout_width="match_parent" android:layout_height="wrap_content"/>
 
 </RelativeLayout>

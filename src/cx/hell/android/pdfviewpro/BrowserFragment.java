@@ -31,6 +31,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
+import cn.me.archko.pdf.AKRecent;
 import com.artifex.mupdfdemo.MuPDFActivity;
 import com.artifex.mupdfdemo.R;
 import org.vudroid.pdfdroid.PdfViewerActivity;
@@ -49,7 +50,7 @@ public class BrowserFragment extends RefreshableFragment implements OnItemClickL
 	protected TextView pathTextView = null;
 	protected ListView filesListView = null;
 	private FileFilter fileFilter = null;
-	protected ArrayAdapter<FileListEntry> fileListAdapter = null;
+	protected AKAdapter fileListAdapter = null;
 	protected ArrayList<FileListEntry> fileList = null;
 	
 	private Boolean dirsFirst = true;
@@ -183,24 +184,11 @@ public class BrowserFragment extends RefreshableFragment implements OnItemClickL
     	//registerForContextMenu(this.filesListView);
     }
     
-    public static final String getFileSize(final long size) {
-        if (size > 1073741824) {
-            return String.format("%.2f", size / 1073741824.0) + " GB";
-        } else if (size > 1048576) {
-            return String.format("%.2f", size / 1048576.0) + " MB";
-        } else if (size > 1024) {
-            return String.format("%.2f", size / 1024.0) + " KB";
-        } else {
-            return size + " B";
-        }
-
-    }
-    
     public void updateAdapter() {
-    	fileList.clear();
     	final Activity activity = getActivity();
     	if (null==fileListAdapter) {
-			this.fileListAdapter = new ArrayAdapter<FileListEntry>(activity,
+            fileListAdapter=new AKAdapter(activity);
+			/*this.fileListAdapter = new ArrayAdapter(activity,
 					R.layout.picker_entry, fileList) {
 				public View getView(int position, View convertView,
 						ViewGroup parent) {
@@ -234,13 +222,9 @@ public class BrowserFragment extends RefreshableFragment implements OnItemClickL
 							entry.getType() == FileListEntry.RECENT ? Typeface.ITALIC
 									: Typeface.NORMAL);
 					
-					/*TextView sv = (TextView) v.findViewById(R.id.size);
-					if (null!=entry.getFile()) {
-						sv.setText(getFileSize(entry.getFile().length()));
-					}*/
 					return v;
 				}
-			};
+			};*/
 		}
 		this.filesListView.setAdapter(this.fileListAdapter);
     	this.filesListView.setOnItemClickListener(this);
@@ -249,18 +233,17 @@ public class BrowserFragment extends RefreshableFragment implements OnItemClickL
 	}
 
 	public void update() {
+        fileList.clear();
     	this.pathTextView.setText(this.currentPath);
 		FileListEntry entry;
-    	
-    	entry = new FileListEntry(FileListEntry.HOME, 
-    			      getResources().getString(R.string.go_home));
-    	this.fileListAdapter.add(entry);
+
+        entry=new FileListEntry(FileListEntry.HOME, getResources().getString(R.string.go_home));
+        fileList.add(entry);
     	
     	if (!this.currentPath.equals("/")) {
     		File upFolder = new File(this.currentPath).getParentFile();
-    		entry = new FileListEntry(FileListEntry.NORMAL,
-    				-1, upFolder, "..");
-    		this.fileListAdapter.add(entry);
+            entry=new FileListEntry(FileListEntry.NORMAL, -1, upFolder, "..");
+            fileList.add(entry);
     	}
     	
     	File files[] = new File(this.currentPath).listFiles(this.fileFilter);
@@ -290,10 +273,12 @@ public class BrowserFragment extends RefreshableFragment implements OnItemClickL
 	    	
 	    	for (File file:files) {
 	    		entry = new FileListEntry(FileListEntry.NORMAL, -1, file, showExtension);
-	    		this.fileListAdapter.add(entry);
+                fileList.add(entry);
 	    	}
     	}
 
+        fileListAdapter.setData(fileList);
+        fileListAdapter.notifyDataSetChanged();
     	this.filesListView.setSelection(0);
 	}
 
@@ -416,10 +401,11 @@ public class BrowserFragment extends RefreshableFragment implements OnItemClickL
     	}
     	else if (item == removeContextMenuItem) {
     		FileListEntry entry = this.fileList.get(position);
-    		if (entry.getType() == FileListEntry.RECENT) {
-    			Recent recent=new Recent(getActivity());
+    		if (entry.getType() == FileListEntry.RECENT) {//TODO
+    			/*Recent recent=new Recent(getActivity());
     			recent.remove(entry.getRecentNumber());
-    			recent.commit();
+    			recent.commit();*/
+                AKRecent.getInstance(getActivity().getApplicationContext()).remove(entry.getFile().getAbsolutePath());
     			update();
     		}
     	} else if (item == openContextMenuItem) {

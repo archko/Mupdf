@@ -1,5 +1,8 @@
 package cx.hell.android.pdfviewpro;
 
+import cn.me.archko.pdf.AKProgress;
+import cn.me.archko.pdf.AKRecent;
+
 import java.io.File;
 
 public class FileListEntry {
@@ -11,8 +14,17 @@ public class FileListEntry {
 	static final int NORMAL = 0; 
 	static final int HOME   = 1;
 	static final int RECENT = 2;
-	
-	public FileListEntry(int type, int recentNumber, File file, String label) {
+    AKProgress mAkProgress;
+
+    public AKProgress getAkProgress() {
+        return mAkProgress;
+    }
+
+    public void setAkProgress(AKProgress mAkProgress) {
+        this.mAkProgress=mAkProgress;
+    }
+
+    public FileListEntry(int type, int recentNumber, File file, String label) {
 		this.file = file;
 		this.label = file.getName();
 		this.isDirectory = file.isDirectory();
@@ -54,8 +66,15 @@ public class FileListEntry {
 	public File getFile() {
 		return this.file;
 	}
-	
-	public String getLabel() {
+
+    public long getFileSize() {
+        if (null!=mAkProgress) {
+            return mAkProgress.size;
+        }
+        return getFile()!=null ? getFile().length() : 0;
+    }
+
+    public String getLabel() {
 		return this.label;
 	}
 	
