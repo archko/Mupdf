@@ -1,10 +1,8 @@
 LOCAL_PATH := $(call my-dir)
 
 include $(CLEAR_VARS)
-LOCAL_CFLAGS := -DHAVE_PTHREADS	
-MY_ROOT := ../..
 
-V8 := v8-3.9
+MY_ROOT := ../..
 
 ifeq ($(TARGET_ARCH),arm)
 LOCAL_CFLAGS += -DARCH_ARM -DARCH_THUMB -DARCH_ARM_CAN_LOAD_UNALIGNED
@@ -22,8 +20,9 @@ endif
 
 LOCAL_C_INCLUDES := \
 	../../thirdparty/jbig2dec \
-	../../thirdparty/openjpeg/src/lib/openjp2 \
+	../../thirdparty/openjpeg/libopenjpeg \
 	../../thirdparty/jpeg \
+	../../thirdparty/mujs \
 	../../thirdparty/zlib \
 	../../thirdparty/freetype/include \
 	../../source/fitz \
@@ -31,12 +30,13 @@ LOCAL_C_INCLUDES := \
 	../../source/xps \
 	../../source/cbz \
 	../../source/img \
-	../../scripts \
+	../../source/tiff \
+	../../scripts/freetype \
+	../../scripts/jpeg \
+	../../scripts/openjpeg \
 	../../generated \
 	../../resources \
 	../../include \
-	$(LOCAL_PATH)/mupdf-apv/fitz \
-	$(LOCAL_PATH)/mupdf-apv/pdf \
 	../..
 ifdef V8_BUILD
 LOCAL_C_INCLUDES += ../../thirdparty/$(V8)/include
@@ -52,19 +52,12 @@ LOCAL_SRC_FILES := \
 	$(wildcard $(MY_ROOT)/source/xps/*.c) \
 	$(wildcard $(MY_ROOT)/source/cbz/*.c) \
 	$(wildcard $(MY_ROOT)/source/img/*.c) \
-	$(wildcard $(LOCAL_PATH)/mupdf-apv/fitz/*.c) \
-	$(wildcard $(LOCAL_PATH)/mupdf-apv/pdf/*.c)
-ifdef MEMENTO
-LOCAL_SRC_FILES += $(MY_ROOT)/fitz/memento.c
-endif
-ifdef V8_BUILD
+	$(wildcard $(MY_ROOT)/source/tiff/*.c)
 LOCAL_SRC_FILES += \
 	$(MY_ROOT)/source/pdf/js/pdf-js.c \
-	$(MY_ROOT)/source/pdf/js/pdf-jsimp-cpp.c \
-	$(MY_ROOT)/source/pdf/js/pdf-jsimp-v8.cpp
-else
-LOCAL_SRC_FILES += \
-	$(MY_ROOT)/source/pdf/js/pdf-js-none.c
+	$(MY_ROOT)/source/pdf/js/pdf-jsimp-mu.c
+ifdef MEMENTO
+LOCAL_SRC_FILES += $(MY_ROOT)/fitz/memento.c
 endif
 
 LOCAL_LDLIBS    := -lm -llog -ljnigraphics

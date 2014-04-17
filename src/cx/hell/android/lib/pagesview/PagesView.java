@@ -1460,11 +1460,11 @@ public class PagesView extends View implements
 		int maxy = this.height/2 + getUpperBound(this.height, marginY,
 				  getCurrentDocumentHeight());
 		
-		if (Math.abs(vy) >= (dpi * 2.54f + height) * 2.54f) {
+		/*if (Math.abs(vy) >= (dpi * 2.54f + height) * 2.54f) {
 			onlyDrawPagenumber = true;
 		} else {
 			onlyDrawPagenumber = false;
-		}
+		}*/
 
 		//this.scroller = new Scroller(activity);
 		this.scroller.fling(this.left, this.top, 

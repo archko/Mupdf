@@ -199,6 +199,9 @@ static void alerts_init(globals *glo)
 	if (!idoc || glo->alerts_initialised)
 		return;
 
+	if (idoc)
+		pdf_enable_js(idoc);
+
 	glo->alerts_active = 0;
 	glo->alert_request = 0;
 	glo->alert_reply = 0;
@@ -296,6 +299,8 @@ JNI_FN(MuPDFCore_openFile)(JNIEnv * env, jobject thiz, jstring jfilename)
 		return 0;
 	}
 
+	fz_register_document_handlers(ctx);
+
 	glo->doc = NULL;
 	fz_try(ctx)
 	{
@@ -330,12 +335,21 @@ JNI_FN(MuPDFCore_openFile)(JNIEnv * env, jobject thiz, jstring jfilename)
 	return (jlong)(void *)glo;
 }
 
-static int bufferStreamRead(fz_stream *stream, unsigned char *buf, int len)
+typedef struct buffer_state_s
 {
-	globals *glo = (globals *)stream->state;
+	globals *globals;
+	char buffer[4096];
+}
+buffer_state;
+
+static int bufferStreamNext(fz_stream *stream, int max)
+{
+	buffer_state *bs = (buffer_state *)stream->state;
+	globals *glo = bs->globals;
 	JNIEnv *env = glo->env;
 	jbyteArray array = (jbyteArray)(void *)((*env)->GetObjectField(env, glo->thiz, buffer_fid));
 	int arrayLength = (*env)->GetArrayLength(env, array);
+	int len = sizeof(bs->buffer);
 
 	if (stream->pos > arrayLength)
 		stream->pos = arrayLength;
@@ -344,19 +358,25 @@ static int bufferStreamRead(fz_stream *stream, unsigned char *buf, int len)
 	if (len + stream->pos > arrayLength)
 		len = arrayLength - stream->pos;
 
-	(*env)->GetByteArrayRegion(env, array, stream->pos, len, buf);
+	(*env)->GetByteArrayRegion(env, array, stream->pos, len, bs->buffer);
 	(*env)->DeleteLocalRef(env, array);
-	return len;
+
+	stream->rp = bs->buffer;
+	stream->wp = stream->rp + len;
+	if (len == 0)
+		return EOF;
+	return *stream->rp++;
 }
 
 static void bufferStreamClose(fz_context *ctx, void *state)
 {
-	/* Nothing to do */
+	fz_free(ctx, state);
 }
 
 static void bufferStreamSeek(fz_stream *stream, int offset, int whence)
 {
-	globals *glo = (globals *)stream->state;
+	buffer_state *bs = (buffer_state *)stream->state;
+	globals *glo = bs->globals;
 	JNIEnv *env = glo->env;
 	jbyteArray array = (jbyteArray)(void *)((*env)->GetObjectField(env, glo->thiz, buffer_fid));
 	int arrayLength = (*env)->GetArrayLength(env, array);
@@ -375,8 +395,7 @@ static void bufferStreamSeek(fz_stream *stream, int offset, int whence)
 	if (stream->pos < 0)
 		stream->pos = 0;
 
-	stream->rp = stream->bp;
-	stream->wp = stream->bp;
+	stream->wp = stream->rp;
 }
 
 JNIEXPORT jlong JNICALL
@@ -385,7 +404,8 @@ JNI_FN(MuPDFCore_openBuffer)(JNIEnv * env, jobject thiz)
 	globals *glo;
 	fz_context *ctx;
 	jclass clazz;
-	fz_stream *stream;
+	fz_stream *stream = NULL;
+	buffer_state *bs;
 
 #ifdef NDK_PROFILER
 	monstartup("libmupdf.so");
@@ -412,10 +432,14 @@ JNI_FN(MuPDFCore_openBuffer)(JNIEnv * env, jobject thiz)
 		return 0;
 	}
 
+	fz_var(stream);
+
 	glo->doc = NULL;
 	fz_try(ctx)
 	{
-		stream = fz_new_stream(ctx, glo, bufferStreamRead, bufferStreamClose);
+		bs = fz_malloc_struct(ctx, buffer_state);
+		bs->globals = glo;
+		stream = fz_new_stream(ctx, bs, bufferStreamNext, bufferStreamClose, NULL);
 		stream->seek = bufferStreamSeek;
 
 		glo->colorspace = fz_device_rgb(ctx);
@@ -531,7 +555,7 @@ JNI_FN(MuPDFCore_gotoPageInternal)(JNIEnv *env, jobject thiz, int page)
 	pc->height = 100;
 
 	pc->number = page;
-	//LOGI("Goto page %d...", page);
+	LOGE("Goto page %d...", page);
 	fz_try(ctx)
 	{
 		fz_rect rect;
@@ -555,7 +579,7 @@ JNIEXPORT float JNICALL
 JNI_FN(MuPDFCore_getPageWidth)(JNIEnv *env, jobject thiz)
 {
 	globals *glo = get_globals(env, thiz);
-	//LOGE("PageWidth=%d", glo->pages[glo->current].width);
+	LOGE("PageWidth=%d", glo->pages[glo->current].width);
 	return glo->pages[glo->current].width;
 }
 
@@ -563,14 +587,16 @@ JNIEXPORT float JNICALL
 JNI_FN(MuPDFCore_getPageHeight)(JNIEnv *env, jobject thiz)
 {
 	globals *glo = get_globals(env, thiz);
-	//LOGE("PageHeight=%d", glo->pages[glo->current].height);
+	LOGE("PageHeight=%d", glo->pages[glo->current].height);
 	return glo->pages[glo->current].height;
 }
 
 JNIEXPORT jboolean JNICALL
 JNI_FN(MuPDFCore_javascriptSupported)(JNIEnv *env, jobject thiz)
 {
-	return fz_javascript_supported();
+	globals *glo = get_globals(env, thiz);
+	pdf_document *idoc = pdf_specifics(glo->doc);
+	return pdf_js_supported(idoc);
 }
 
 static void update_changed_rects(globals *glo, page_cache *pc, pdf_document *idoc)
@@ -620,19 +646,19 @@ JNI_FN(MuPDFCore_drawPage)(JNIEnv *env, jobject thiz, jobject bitmap,
 	fz_var(pix);
 	fz_var(dev);
 
-	//LOGI("In native method\n");
+	LOGI("In native method\n");
 	if ((ret = AndroidBitmap_getInfo(env, bitmap, &info)) < 0) {
 		LOGE("AndroidBitmap_getInfo() failed ! error=%d", ret);
 		return 0;
 	}
 
-	//LOGI("Checking format\n");
+	LOGI("Checking format\n");
 	if (info.format != ANDROID_BITMAP_FORMAT_RGBA_8888) {
 		LOGE("Bitmap format is not RGBA_8888 !");
 		return 0;
 	}
 
-	//LOGI("locking pixels\n");
+	LOGI("locking pixels\n");
 	if ((ret = AndroidBitmap_lockPixels(env, bitmap, &pixels)) < 0) {
 		LOGE("AndroidBitmap_lockPixels() failed ! error=%d", ret);
 		return 0;
@@ -743,313 +769,6 @@ JNI_FN(MuPDFCore_drawPage)(JNIEnv *env, jobject thiz, jobject bitmap,
 	return 1;
 }
 
-//===============================================
-JNIEXPORT jboolean JNICALL
-JNI_FN(MuPDFCore_drawPage3)(JNIEnv *env, jobject thiz, jobject bitmap,
-		int pageW, int pageH, int patchX, int patchY, int patchW, int patchH)
-{
-	AndroidBitmapInfo info;
-	void *pixels;
-	int ret;
-	fz_device *dev = NULL;
-	float zoom;
-	fz_matrix ctm;
-	fz_irect bbox;
-	fz_rect rect;
-	fz_pixmap *pix = NULL;
-	float xscale, yscale;
-	globals *glo = get_globals(env, thiz);
-	fz_context *ctx = glo->ctx;
-	fz_document *doc = glo->doc;
-	page_cache *pc = &glo->pages[glo->current];
-	int hq = (patchW < pageW || patchH < pageH);
-	fz_matrix scale;
-
-	if (pc->page == NULL)
-		return 0;
-
-	fz_var(pix);
-	fz_var(dev);
-
-	//LOGI("In native method\n");
-	if ((ret = AndroidBitmap_getInfo(env, bitmap, &info)) < 0) {
-		LOGE("AndroidBitmap_getInfo() failed ! error=%d", ret);
-		return 0;
-	}
-
-	//LOGI("Checking format\n");
-	if (info.format != ANDROID_BITMAP_FORMAT_RGBA_8888) {
-		LOGE("Bitmap format is not RGBA_8888 !");
-		return 0;
-	}
-
-	//LOGI("locking pixels\n");
-	if ((ret = AndroidBitmap_lockPixels(env, bitmap, &pixels)) < 0) {
-		LOGE("AndroidBitmap_lockPixels() failed ! error=%d", ret);
-		return 0;
-	}
-
-	/* Call mupdf to render display list to screen */
-	LOGE("Rendering page(%d)=%dx%d patch=[%d,%d,%d,%d]",
-			pc->number, pageW, pageH, patchX, patchY, patchW, patchH);
-
-	fz_try(ctx)
-	{
-		fz_irect pixbbox;
-		pdf_document *idoc = pdf_specifics(doc);
-
-		//if (idoc)
-		//{
-		//	/* Update the changed-rects for both hq patch and main bitmap */
-		//	update_changed_rects(glo, pc, idoc);
-        //
-		//	/* Then drop the changed-rects for the bitmap we're about to
-		//	render because we are rendering the entire area */
-		//	drop_changed_rects(ctx, hq ? &pc->hq_changed_rects : &pc->changed_rects);
-		//}
-
-		if (pc->page_list == NULL)
-		{
-			/* Render to list */
-			pc->page_list = fz_new_display_list(ctx);
-			dev = fz_new_list_device(ctx, pc->page_list);
-			fz_run_page_contents(doc, pc->page, dev, &fz_identity, NULL);
-			fz_free_device(dev);
-			dev = NULL;
-		}
-		if (pc->annot_list == NULL)
-		{
-			fz_annot *annot;
-			pc->annot_list = fz_new_display_list(ctx);
-			dev = fz_new_list_device(ctx, pc->annot_list);
-			for (annot = fz_first_annot(doc, pc->page); annot; annot = fz_next_annot(doc, annot))
-				fz_run_annot(doc, pc->page, annot, dev, &fz_identity, NULL);
-			fz_free_device(dev);
-			dev = NULL;
-		}
-		bbox.x0 = patchX;
-		bbox.y0 = patchY;
-		bbox.x1 = patchX + patchW;
-		bbox.y1 = patchY + patchH;
-		pixbbox = bbox;
-		pixbbox.x1 = pixbbox.x0 + info.width;
-		/* pixmaps cannot handle right-edge padding, so the bbox must be expanded to
-		 * match the pixels data */
-		pix = fz_new_pixmap_with_bbox_and_data(ctx, glo->colorspace, &pixbbox, pixels);
-		if (pc->page_list == NULL && pc->annot_list == NULL)
-		{
-			fz_clear_pixmap_with_value(ctx, pix, 0xd0);
-			break;
-		}
-		fz_clear_pixmap_with_value(ctx, pix, 0xff);
-
-		zoom = glo->resolution / 72;
-		fz_scale(&ctm, zoom, zoom);
-		rect = pc->media_box;
-		fz_round_rect(&bbox, fz_transform_rect(&rect, &ctm));
-		/* Now, adjust ctm so that it would give the correct page width
-		 * heights. */
-		xscale = (float)pageW/(float)(bbox.x1-bbox.x0);
-		yscale = (float)pageH/(float)(bbox.y1-bbox.y0);
-		fz_concat(&ctm, &ctm, fz_scale(&scale, xscale, yscale));
-		rect = pc->media_box;
-		fz_transform_rect(&rect, &ctm);
-		dev = fz_new_draw_device(ctx, pix);
-#ifdef TIME_DISPLAY_LIST
-		{
-			clock_t time;
-			int i;
-
-			LOGE("Executing display list");
-			time = clock();
-			for (i=0; i<100;i++) {
-#endif
-				if (pc->page_list)
-					fz_run_display_list(pc->page_list, dev, &ctm, &rect, NULL);
-				if (pc->annot_list)
-					fz_run_display_list(pc->annot_list, dev, &ctm, &rect, NULL);
-#ifdef TIME_DISPLAY_LIST
-			}
-			time = clock() - time;
-			LOGE("100 renders in %d (%d per sec)", time, CLOCKS_PER_SEC);
-		}
-#endif
-		fz_free_device(dev);
-		dev = NULL;
-		fz_drop_pixmap(ctx, pix);
-		//LOGE("Rendered");
-	}
-	fz_always(ctx)
-	{
-		fz_free_device(dev);
-		dev = NULL;
-	}
-	fz_catch(ctx)
-	{
-		LOGE("Render failed");
-	}
-
-	AndroidBitmap_unlockPixels(env, bitmap);
-
-	return 1;
-}
-
-JNIEXPORT void JNICALL
-JNI_FN(MuPDFCore_gotoPageInternal2)(JNIEnv *env, jobject thiz, int page)
-{
-	int i;
-	int furthest;
-	int furthest_dist = -1;
-	float zoom;
-	fz_matrix ctm;
-	fz_irect bbox;
-	page_cache *pc;
-	globals *glo = get_globals(env, thiz);
-	fz_context *ctx = glo->ctx;
-
-	for (i = 0; i < NUM_CACHE; i++)
-	{
-		if (glo->pages[i].page != NULL && glo->pages[i].number == page)
-		{
-			/* The page is already cached */
-			glo->current = i;
-			return;
-		}
-
-		if (glo->pages[i].page == NULL)
-		{
-			/* cache record unused, and so a good one to use */
-			furthest = i;
-			furthest_dist = INT_MAX;
-		}
-		else
-		{
-			int dist = abs(glo->pages[i].number - page);
-
-			/* Further away - less likely to be needed again */
-			if (dist > furthest_dist)
-			{
-				furthest_dist = dist;
-				furthest = i;
-			}
-		}
-	}
-
-	glo->current = furthest;
-	pc = &glo->pages[glo->current];
-
-	drop_page_cache(glo, pc);
-
-	/* In the event of an error, ensure we give a non-empty page */
-	pc->width = 100;
-	pc->height = 100;
-
-	pc->number = page;
-	//LOGI("Goto page %d...", page);
-	fz_try(ctx)
-	{
-		fz_rect rect;
-		LOGI("Load page %d", pc->number);
-		pc->page = fz_load_page(glo->doc, pc->number);
-		zoom = glo->resolution / 72;
-		fz_bound_page(glo->doc, pc->page, &pc->media_box);
-		fz_scale(&ctm, zoom, zoom);
-		rect = pc->media_box;
-		fz_round_rect(&bbox, fz_transform_rect(&rect, &ctm));
-		pc->width = bbox.x1-bbox.x0;
-		pc->height = bbox.y1-bbox.y0;
-		LOGI("gotoPageInternal2 %d,%d,%d,%d", bbox.x0,bbox.y0,bbox.x1,bbox.y1);
-	}
-	fz_catch(ctx)
-	{
-		LOGE("cannot make displaylist from page %d", pc->number);
-	}
-}
-
-JNIEXPORT void JNICALL
-JNI_FN(MuPDFCore_getMediaBox)(JNIEnv *env, jobject thiz, int page, jfloatArray mediabox)
-{
-	int i;
-	int furthest;
-	int furthest_dist = -1;
-	float zoom;
-	fz_matrix ctm;
-	fz_irect bbox;
-	page_cache *pc;
-	globals *glo = get_globals(env, thiz);
-	fz_context *ctx = glo->ctx;
-
-	for (i = 0; i < NUM_CACHE; i++)
-	{
-		if (glo->pages[i].page != NULL && glo->pages[i].number == page)
-		{
-			/* The page is already cached */
-			glo->current = i;
-			return;
-		}
-
-		if (glo->pages[i].page == NULL)
-		{
-			/* cache record unused, and so a good one to use */
-			furthest = i;
-			furthest_dist = INT_MAX;
-		}
-		else
-		{
-			int dist = abs(glo->pages[i].number - page);
-
-			/* Further away - less likely to be needed again */
-			if (dist > furthest_dist)
-			{
-				furthest_dist = dist;
-				furthest = i;
-			}
-		}
-	}
-
-	glo->current = furthest;
-	pc = &glo->pages[glo->current];
-
-	drop_page_cache(glo, pc);
-
-	/* In the event of an error, ensure we give a non-empty page */
-	pc->width = 100;
-	pc->height = 100;
-
-	pc->number = page;
-	//LOGI("Goto page %d...", page);
-	fz_try(ctx)
-	{
-		fz_rect rect;
-		LOGI("Load page %d", pc->number);
-		pc->page = fz_load_page(glo->doc, pc->number);
-		zoom = glo->resolution / 72;
-		fz_bound_page(glo->doc, pc->page, &pc->media_box);
-		fz_scale(&ctm, zoom, zoom);
-		rect = pc->media_box;
-		fz_round_rect(&bbox, fz_transform_rect(&rect, &ctm));
-		LOGI("getMediaBox %d,%d,%d,%d", bbox.x0,bbox.y0,bbox.x1,bbox.y1);
-	}
-	fz_catch(ctx)
-	{
-		LOGE("cannot make displaylist from page %d", pc->number);
-	}
-
-	/*fz_try(ctx)
-	{
-		LOGE("pc->page->media_box %d", page);
-		jfloat *bbox = (*env)->GetPrimitiveArrayCritical(env, mediabox, 0);
-        if(!bbox) return;
-        bbox[0] = ((pdf_page *)pc->page)->mediabox.x0;
-        bbox[1] = ((pdf_page *)pc->page)->mediabox.y0;
-        bbox[2] = ((pdf_page *)pc->page)->mediabox.x1;
-        bbox[3] = ((pdf_page *)pc->page)->mediabox.y1;
-        (*env)->ReleasePrimitiveArrayCritical(env, mediabox, bbox, 0);
-	}*/
-}
-
-//===============================================
-
 static char *widget_type_string(int t)
 {
 	switch(t)
@@ -1110,19 +829,19 @@ JNI_FN(MuPDFCore_updatePageInternal)(JNIEnv *env, jobject thiz, jobject bitmap, 
 	fz_var(pix);
 	fz_var(dev);
 
-	//LOGI("In native method\n");
+	LOGI("In native method\n");
 	if ((ret = AndroidBitmap_getInfo(env, bitmap, &info)) < 0) {
 		LOGE("AndroidBitmap_getInfo() failed ! error=%d", ret);
 		return 0;
 	}
 
-	//LOGI("Checking format\n");
+	LOGI("Checking format\n");
 	if (info.format != ANDROID_BITMAP_FORMAT_RGBA_8888) {
 		LOGE("Bitmap format is not RGBA_8888 !");
 		return 0;
 	}
 
-	//LOGI("locking pixels\n");
+	LOGI("locking pixels\n");
 	if ((ret = AndroidBitmap_lockPixels(env, bitmap, &pixels)) < 0) {
 		LOGE("AndroidBitmap_lockPixels() failed ! error=%d", ret);
 		return 0;

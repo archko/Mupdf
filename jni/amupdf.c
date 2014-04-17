@@ -214,6 +214,9 @@ static void alerts_init(globals *glo)
 	if (!idoc || glo->alerts_initialised)
 		return;
 
+	if (idoc)
+		pdf_enable_js(idoc);
+
 	glo->alerts_active = 0;
 	glo->alert_request = 0;
 	glo->alert_reply = 0;
@@ -311,6 +314,8 @@ JNI_FN(MuPDFCore_openFile)(JNIEnv * env, jobject thiz, jstring jfilename)
 		return 0;
 	}
 
+	fz_register_document_handlers(ctx);
+
 	glo->doc = NULL;
 	fz_try(ctx)
 	{
@@ -345,12 +350,21 @@ JNI_FN(MuPDFCore_openFile)(JNIEnv * env, jobject thiz, jstring jfilename)
 	return (jlong)(void *)glo;
 }
 
-static int bufferStreamRead(fz_stream *stream, unsigned char *buf, int len)
+typedef struct buffer_state_s
 {
-	globals *glo = (globals *)stream->state;
+	globals *globals;
+	char buffer[4096];
+}
+buffer_state;
+
+static int bufferStreamNext(fz_stream *stream, int max)
+{
+	buffer_state *bs = (buffer_state *)stream->state;
+	globals *glo = bs->globals;
 	JNIEnv *env = glo->env;
 	jbyteArray array = (jbyteArray)(void *)((*env)->GetObjectField(env, glo->thiz, buffer_fid));
 	int arrayLength = (*env)->GetArrayLength(env, array);
+	int len = sizeof(bs->buffer);
 
 	if (stream->pos > arrayLength)
 		stream->pos = arrayLength;
@@ -359,19 +373,25 @@ static int bufferStreamRead(fz_stream *stream, unsigned char *buf, int len)
 	if (len + stream->pos > arrayLength)
 		len = arrayLength - stream->pos;
 
-	(*env)->GetByteArrayRegion(env, array, stream->pos, len, buf);
+	(*env)->GetByteArrayRegion(env, array, stream->pos, len, bs->buffer);
 	(*env)->DeleteLocalRef(env, array);
-	return len;
+
+	stream->rp = bs->buffer;
+	stream->wp = stream->rp + len;
+	if (len == 0)
+		return EOF;
+	return *stream->rp++;
 }
 
 static void bufferStreamClose(fz_context *ctx, void *state)
 {
-	/* Nothing to do */
+	fz_free(ctx, state);
 }
 
 static void bufferStreamSeek(fz_stream *stream, int offset, int whence)
 {
-	globals *glo = (globals *)stream->state;
+	buffer_state *bs = (buffer_state *)stream->state;
+	globals *glo = bs->globals;
 	JNIEnv *env = glo->env;
 	jbyteArray array = (jbyteArray)(void *)((*env)->GetObjectField(env, glo->thiz, buffer_fid));
 	int arrayLength = (*env)->GetArrayLength(env, array);
@@ -390,8 +410,7 @@ static void bufferStreamSeek(fz_stream *stream, int offset, int whence)
 	if (stream->pos < 0)
 		stream->pos = 0;
 
-	stream->rp = stream->bp;
-	stream->wp = stream->bp;
+	stream->wp = stream->rp;
 }
 
 JNIEXPORT jlong JNICALL
@@ -400,7 +419,8 @@ JNI_FN(MuPDFCore_openBuffer)(JNIEnv * env, jobject thiz)
 	globals *glo;
 	fz_context *ctx;
 	jclass clazz;
-	fz_stream *stream;
+	fz_stream *stream = NULL;
+	buffer_state *bs;
 
 #ifdef NDK_PROFILER
 	monstartup("libmupdf.so");
@@ -427,10 +447,14 @@ JNI_FN(MuPDFCore_openBuffer)(JNIEnv * env, jobject thiz)
 		return 0;
 	}
 
+	fz_var(stream);
+
 	glo->doc = NULL;
 	fz_try(ctx)
 	{
-		stream = fz_new_stream(ctx, glo, bufferStreamRead, bufferStreamClose);
+		bs = fz_malloc_struct(ctx, buffer_state);
+		bs->globals = glo;
+		stream = fz_new_stream(ctx, bs, bufferStreamNext, bufferStreamClose, NULL);
 		stream->seek = bufferStreamSeek;
 
 		glo->colorspace = fz_device_rgb(ctx);
@@ -585,7 +609,9 @@ JNI_FN(MuPDFCore_getPageHeight)(JNIEnv *env, jobject thiz)
 JNIEXPORT jboolean JNICALL
 JNI_FN(MuPDFCore_javascriptSupported)(JNIEnv *env, jobject thiz)
 {
-	return fz_javascript_supported();
+	globals *glo = get_globals(env, thiz);
+	pdf_document *idoc = pdf_specifics(glo->doc);
+	return pdf_js_supported(idoc);
 }
 
 static void update_changed_rects(globals *glo, page_cache *pc, pdf_document *idoc)

@@ -16,23 +16,18 @@ LOCAL_C_INCLUDES := \
 	jni/andprof \
 	$(MUPDF_ROOT)/include \
 	$(MUPDF_ROOT)/source/fitz \
-	$(MUPDF_ROOT)/source/pdf \
-	$(TOP_LOCAL_PATH)/mupdf-apv/fitz \
-	$(TOP_LOCAL_PATH)/mupdf-apv/pdf 
+	$(MUPDF_ROOT)/source/pdf
 LOCAL_CFLAGS :=
 LOCAL_MODULE    := mupdf
 LOCAL_SRC_FILES := amupdf.c
-LOCAL_STATIC_LIBRARIES := mupdfcore mupdfcore2 mupdfthirdparty
+LOCAL_STATIC_LIBRARIES := mupdfcore mupdfthirdparty
 ifdef NDK_PROFILER
 LOCAL_CFLAGS += -pg -DNDK_PROFILER
 LOCAL_STATIC_LIBRARIES += andprof
 else
 endif
 
-LOCAL_LDLIBS    := -lm -lz -llog -ljnigraphics
-ifdef V8_BUILD
-LOCAL_LDLIBS	+= -L$(MUPDF_ROOT)/thirdparty/v8-3.9/android -lv8_$(TARGET_ARCH_ABI)
-endif
+LOCAL_LDLIBS    := -lm -llog -ljnigraphics
 ifdef SSL_BUILD
 LOCAL_LDLIBS	+= -L$(MUPDF_ROOT)/thirdparty/openssl/android -lcrypto -lssl
 endif

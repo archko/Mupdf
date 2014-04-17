@@ -1,7 +1,4 @@
-//#include "fitz-internal.h"
-//#include "mupdf-internal.h"
 #include "mupdf/pdf.h"
-
 
 #include <jni.h>
 

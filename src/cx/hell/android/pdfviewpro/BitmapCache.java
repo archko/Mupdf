@@ -26,7 +26,7 @@ public class BitmapCache {
      */
     private Map<Tile, BitmapCacheValue> bitmaps;
 
-    private int maxCacheSizeBytes=6*1024*1024;
+    private int maxCacheSizeBytes=16*1024*1024;
 
     /**
      * Stats logging - number of cache hits.
