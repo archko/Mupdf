@@ -28,6 +28,9 @@ public class AKProgress implements Serializable, Comparator<AKProgress> {
     public String ext;
     public long timestampe;
 
+    public AKProgress() {
+    }
+
     public AKProgress(String path) {
         timestampe=System.currentTimeMillis();
         this.path=path;

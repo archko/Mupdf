@@ -2,12 +2,21 @@ package cn.me.archko.pdf;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.os.Environment;
 import android.text.TextUtils;
 import android.util.Log;
 import cx.hell.android.pdfviewpro.APVApplication;
+import cx.hell.android.pdfviewpro.StreamUtils;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.Serializable;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 
 /**
@@ -141,5 +150,110 @@ public class AKRecent implements Serializable {
             mAkProgresses.addAll(progresses);
             Log.d(TAG, "read path:"+path+" size:"+mAkProgresses.size());
         }
+    }
+
+    public String backup() {
+        if (null==mAkProgresses||mAkProgresses.size()<1) {
+            readRecent();
+        }
+
+        try {
+            String name=DateUtil.formatTime(System.currentTimeMillis(), "yyyy-MM-dd-HH-mm-ss");
+            JSONObject root=new JSONObject();
+            JSONArray ja=new JSONArray();
+            root.put("root", ja);
+            root.put("name", name);
+
+            JSONObject tmp;
+            int i=0;
+            for (AKProgress progress : mAkProgresses) {
+                tmp=new JSONObject();
+                try {
+                    tmp.put("index", progress.index);
+                    tmp.put("path", URLEncoder.encode(progress.path));
+                    tmp.put("numberOfPages", progress.numberOfPages);
+                    tmp.put("page", progress.page);
+                    tmp.put("size", progress.size);
+                    tmp.put("ext", progress.ext);
+                    tmp.put("timestampe", progress.timestampe);
+                    ja.put(i, tmp);
+                    i++;
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+            name=Environment.getExternalStorageDirectory().getPath()+File.separator+"mupdf_"+name;
+            Log.d(TAG, "backup.name:"+name+" root:"+root);
+            StreamUtils.copyStringToFile(root.toString(), name);
+            return name;
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public boolean restore(String filepath) {
+        boolean flag=false;
+        try {
+            String content=StreamUtils.parseFile(filepath);
+            Log.d(TAG, "restore.file:"+filepath+" content:"+content);
+            ArrayList<AKProgress> akProgresses=parseProgresses(content);
+            if (null!=akProgresses&&akProgresses.size()>0) {
+                mAkProgresses=akProgresses;
+                File f=new File(APVApplication.getInstance().getFilesDir().getPath()+File.separator+"mupdf_recent.jso");
+                StreamUtils.copyStringToFile(content, f.getAbsolutePath());
+                filepath=mContext.getFilesDir().getPath()+File.separator+FILE_RECENT;
+                Util.serializeObject(mAkProgresses, filepath);
+                flag=true;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return flag;
+    }
+
+    public static AKProgress parseProgress(JSONObject jsonobject) throws Exception {
+        if (null==jsonobject) {
+            return null;
+        }
+        AKProgress bean=new AKProgress();
+        try {
+            bean.index=jsonobject.optInt("index");
+            bean.path=URLDecoder.decode(jsonobject.optString("path"));
+            bean.numberOfPages=jsonobject.optInt("numberOfPages");
+            bean.page=jsonobject.optInt("page");
+            bean.size=jsonobject.optInt("size");
+            bean.ext=jsonobject.optString("ext");
+            bean.timestampe=jsonobject.optLong("timestampe");
+        } catch (Exception jsonexception) {
+            throw new Exception(jsonexception.getMessage()+":"+jsonobject, jsonexception);
+        }
+        return bean;
+    }
+
+    /**
+     * @return
+     * @throws WeiboException
+     */
+    private static ArrayList<AKProgress> parseProgresses(String jo) {
+        ArrayList<AKProgress> arraylist=new ArrayList<AKProgress>();
+        int i=0;
+
+        try {
+            JSONObject json=new JSONObject(jo);
+            JSONArray jsonarray=json.optJSONArray("root");
+            int len=jsonarray.length();
+            for (; i<len; i++) {
+                AKProgress bean=null;
+                bean=parseProgress(jsonarray.optJSONObject(i));
+                arraylist.add(bean);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return arraylist;
     }
 }

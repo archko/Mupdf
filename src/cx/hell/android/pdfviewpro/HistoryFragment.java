@@ -2,24 +2,25 @@ package cx.hell.android.pdfviewpro;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 
+import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import android.os.Environment;
 import android.support.v4.view.MenuItemCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
-import android.widget.TextView;
+import android.widget.Toast;
 import cn.me.archko.pdf.AKProgress;
 import cn.me.archko.pdf.AKRecent;
+import cn.me.archko.pdf.LengthUtils;
 import cn.me.archko.pdf.Util;
 import com.artifex.mupdfdemo.R;
 
@@ -31,7 +32,6 @@ import com.artifex.mupdfdemo.R;
 public class HistoryFragment extends BrowserFragment {
 
     public static final String TAG="HistoryFragment";
-    //private Recent recent = null;
     private Boolean showExtension=false;
 
     @Override
@@ -45,6 +45,119 @@ public class HistoryFragment extends BrowserFragment {
         menu.clear();
         this.optionsMenuItem=menu.add(R.string.options);
         MenuItemCompat.setShowAsAction(this.optionsMenuItem, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
+        backMenuItem=menu.add(R.string.options_back);
+        MenuItemCompat.setShowAsAction(this.backMenuItem, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
+        restoreMenuItem=menu.add(R.string.options_restore);
+        MenuItemCompat.setShowAsAction(this.restoreMenuItem, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem menuItem) {
+        if (menuItem==this.backMenuItem) {
+            backup();
+        } else if (menuItem==this.restoreMenuItem) {
+            restore();
+        }
+        return super.onOptionsItemSelected(menuItem);
+    }
+
+    private void backup() {
+        final ProgressDialog progressDialog=new ProgressDialog(getActivity());
+        final long now=System.currentTimeMillis();
+        Util.execute(false, new AsyncTask<Void, Void, String>() {
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                progressDialog.setCancelable(false);
+                progressDialog.show();
+            }
+
+            @Override
+            protected String doInBackground(Void... params) {
+                String filepath=AKRecent.getInstance(APVApplication.getInstance()).backup();
+                long newTime=System.currentTimeMillis()-now;
+                if (newTime<1500l) {
+                    newTime=1500l-newTime;
+                } else {
+                    newTime=0;
+                }
+
+                try {
+                    Thread.sleep(newTime);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                return filepath;
+            }
+
+            @Override
+            protected void onPostExecute(String s) {
+                if (null!=progressDialog) {
+                    progressDialog.dismiss();
+                }
+
+                if (!LengthUtils.isEmpty(s)) {
+                    Log.d("", "file:"+s);
+                    Toast.makeText(APVApplication.getInstance(), "备份成功:"+s, Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(APVApplication.getInstance(), "未备份成功", Toast.LENGTH_LONG).show();
+                }
+            }
+        }, (Void[]) null);
+    }
+
+    private void restore() {
+        final ProgressDialog progressDialog=new ProgressDialog(getActivity());
+        final long now=System.currentTimeMillis();
+        Util.execute(false, new AsyncTask<Void, Void, Boolean>() {
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                progressDialog.setCancelable(false);
+                progressDialog.show();
+            }
+
+            @Override
+            protected Boolean doInBackground(Void... params) {
+                String filepath=null;
+                String[] filenames=Environment.getExternalStorageDirectory().list();
+                for (String s : filenames) {
+                    if (s.startsWith("mupdf_")) {
+                        filepath=Environment.getExternalStorageDirectory()+File.separator+s;
+                        Log.d(TAG, "restore file:"+s);
+                    }
+                }
+
+                boolean flag=AKRecent.getInstance(APVApplication.getInstance()).restore(filepath);
+                long newTime=System.currentTimeMillis()-now;
+                if (newTime<1500l) {
+                    newTime=1500l-newTime;
+                } else {
+                    newTime=0;
+                }
+
+                try {
+                    Thread.sleep(newTime);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                return flag;
+            }
+
+            @Override
+            protected void onPostExecute(Boolean s) {
+                if (null!=progressDialog) {
+                    progressDialog.dismiss();
+                }
+
+                if (s) {
+                    Toast.makeText(APVApplication.getInstance(), "恢复成功:"+s, Toast.LENGTH_LONG).show();
+                    update();
+                } else {
+                    Toast.makeText(APVApplication.getInstance(), "未恢复成功", Toast.LENGTH_LONG).show();
+                }
+            }
+        }, (Void[]) null);
     }
 
     @Override

@@ -67,6 +67,9 @@ public class BrowserFragment extends RefreshableFragment implements OnItemClickL
     private MenuItem apvContextMenuItem= null;
     private MenuItem vudroidContextMenuItem= null;
 
+    protected MenuItem backMenuItem = null;
+    protected MenuItem restoreMenuItem = null;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -31,6 +31,8 @@
 	<string name="searching_for">查找 "%1$s"</string>
 	<string name="page_of">页 %1$d of %2$d</string>
 	<string name="options">设置</string>
+    <string name="options_back">备份历史</string>
+    <string name="options_restore">恢复历史</string>
 	<string name="zoom_animation">缩放按钮</string>
 	<string-array name="zoom_animations">
 		<item>100</item>

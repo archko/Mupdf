@@ -31,6 +31,8 @@
 	<string name="searching_for">Searching for "%1$s"</string>
 	<string name="page_of">Page %1$d of %2$d</string>
 	<string name="options">Settings</string>
+    <string name="options_back">Back</string>
+    <string name="options_restore">Restore</string>
 	<string name="zoom_animation">Zoom buttons</string>
 	<string-array name="zoom_animations">
 		<item>100</item>
