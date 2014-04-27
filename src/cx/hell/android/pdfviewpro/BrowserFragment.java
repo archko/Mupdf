@@ -282,7 +282,7 @@ public class BrowserFragment extends RefreshableFragment implements OnItemClickL
 
         fileListAdapter.setData(fileList);
         fileListAdapter.notifyDataSetChanged();
-    	this.filesListView.setSelection(0);
+    	//this.filesListView.setSelection(0);
 	}
 
 	private String getHome() {

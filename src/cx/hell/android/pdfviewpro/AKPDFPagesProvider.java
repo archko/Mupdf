@@ -2,6 +2,8 @@ package cx.hell.android.pdfviewpro;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.graphics.PointF;
 import android.os.Handler;
 import android.os.Looper;
@@ -369,8 +371,17 @@ public class AKPDFPagesProvider extends PagesProvider {
                 (int) size.x*tile.getZoom()/1000, (int) size.y*tile.getZoom()/1000,
                 tile.getX(), tile.getY(),
                 tile.getPrefXSize(), tile.getPrefYSize());
-            this.bitmapCache.put(tile, b);
-            return b;
+
+            Bitmap maskBitmap=Bitmap.createBitmap(b.getWidth(), b.getHeight(), Bitmap.Config.RGB_565);
+            Canvas c=new Canvas();
+            c.setBitmap(maskBitmap);
+            Paint p=new Paint();
+            //p.setFilterBitmap(true); // possibly not nessecary as there is no scaling
+            c.drawBitmap(b, 0, 0, p);
+            b.recycle();
+
+            this.bitmapCache.put(tile, maskBitmap);
+            return maskBitmap;
         }
     }
 

@@ -231,7 +231,7 @@ public class HistoryFragment extends BrowserFragment {
                     fileList=entries;
                     fileListAdapter.setData(fileList);
                     fileListAdapter.notifyDataSetChanged();
-                    filesListView.setSelection(0);
+                    //filesListView.setSelection(0);
                 }
             }
         }, (Void[]) null);

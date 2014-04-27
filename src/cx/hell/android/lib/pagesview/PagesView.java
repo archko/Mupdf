@@ -345,6 +345,7 @@ public class PagesView extends View implements
 	public void setStartBookmark(Bookmark b, String bookmarkName) {
 		if (b != null) {
 			this.bookmarkToRestore = b.getLast(bookmarkName);
+            Log.d(TAG, "setStartBookmark:"+bookmarkToRestore);
 			
 			if (this.bookmarkToRestore == null)
 				return;
@@ -488,7 +489,8 @@ public class PagesView extends View implements
 	private int getCurrentPageWidth(int pageno) {
 		float realpagewidth = (float)this.pageSizes[pageno][this.rotation % 2 == 0 ? 0 : 1];
 		float currentpagewidth = scale(realpagewidth);
-		return (int)currentpagewidth;
+        //System.out.println("pagewidth:"+realpagewidth+" scaling0:"+scaling0+" zoomLevel:"+zoomLevel);
+        return (int)currentpagewidth;
 	}
 	
 	private float scale(float unscaled) {
