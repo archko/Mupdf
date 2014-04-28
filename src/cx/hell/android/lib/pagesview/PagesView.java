@@ -50,9 +50,9 @@ public class PagesView extends View implements
 	 * and must be balanced against the size of memory chunks being requested.
 	 */
 	private static final int MIN_TILE_WIDTH = 256;
-	private static final int MAX_TILE_WIDTH = 640;
+	private static final int MAX_TILE_WIDTH = 1024;
 	private static final int MIN_TILE_HEIGHT = 256;
-	private static final int MAX_TILE_PIXELS = 640*360;
+	private static final int MAX_TILE_PIXELS = 1024*720;
 	
 //	private final static int MAX_ZOOM = 4000;
 //	private final static int MIN_ZOOM = 100;
