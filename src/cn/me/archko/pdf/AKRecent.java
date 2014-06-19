@@ -6,13 +6,14 @@ import android.os.Environment;
 import android.text.TextUtils;
 import android.util.Log;
 import cx.hell.android.pdfviewpro.APVApplication;
+import cx.hell.android.pdfviewpro.Bookmark;
+import cx.hell.android.pdfviewpro.BookmarkEntry;
 import cx.hell.android.pdfviewpro.StreamUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.URLDecoder;
@@ -49,17 +50,25 @@ public class AKRecent implements Serializable {
         mContext=context;
     }
 
-    public void addAsync(final String path, final int page, final int numberOfPage) {
+    /**
+     * 异步添加进度,
+     *
+     * @param path          文件全路径
+     * @param page          当前的页码
+     * @param numberOfPage  总页数
+     * @param bookmarkEntry 书签字符串,是一个合并形式的.
+     */
+    public void addAsync(final String path, final int page, final int numberOfPage, final String bookmarkEntry) {
         Util.execute(false, new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
-                add(path, page, numberOfPage);
+                add(path, page, numberOfPage, bookmarkEntry);
                 return null;
             }
         }, (Void[]) null);
     }
 
-    public ArrayList<AKProgress> add(final String path, final int page, final int numberOfPage) {
+    public ArrayList<AKProgress> add(final String path, final int page, final int numberOfPage, String bookmarkEntry) {
         if (TextUtils.isEmpty(path)) {
             Log.d("", "path is null.");
             return mAkProgresses;
@@ -79,30 +88,32 @@ public class AKRecent implements Serializable {
                 }
             }
 
-            Log.d(TAG, "add :"+" progress:"+tmp);
             if (tmp!=null) {
                 mAkProgresses.remove(tmp);
                 tmp.timestampe=System.currentTimeMillis();
                 tmp.page=page;
                 tmp.numberOfPages=numberOfPage;
+                tmp.bookmarkEntry=bookmarkEntry;
                 mAkProgresses.add(0, tmp);
                 String filepath=mContext.getFilesDir().getPath()+File.separator+FILE_RECENT;
                 Util.serializeObject(mAkProgresses, filepath);
             } else {
-                addNewRecent(path, page, numberOfPage);
+                addNewRecent(path, page, numberOfPage, bookmarkEntry);
             }
+            Log.d(TAG, "add :"+" progress:"+tmp);
         } else {
-            addNewRecent(path, page, numberOfPage);
+            addNewRecent(path, page, numberOfPage, bookmarkEntry);
         }
         return mAkProgresses;
 
     }
 
-    private void addNewRecent(String path, int page, int numberOfPage) {
+    private void addNewRecent(String path, int page, int numberOfPage, String bookmarkEntry) {
         Log.d(TAG, "addNewRecent:"+page+" nop:"+numberOfPage+" path:"+path);
         AKProgress tmp=new AKProgress(path);
         tmp.page=page;
         tmp.numberOfPages=numberOfPage;
+        tmp.bookmarkEntry=bookmarkEntry;
         mAkProgresses.add(tmp);
         String filepath=mContext.getFilesDir().getPath()+File.separator+FILE_RECENT;
         Util.serializeObject(mAkProgresses, filepath);
@@ -176,6 +187,7 @@ public class AKRecent implements Serializable {
                     tmp.put("size", progress.size);
                     tmp.put("ext", progress.ext);
                     tmp.put("timestampe", progress.timestampe);
+                    tmp.put("bookmarkEntry", progress.bookmarkEntry);
                     ja.put(i, tmp);
                     i++;
                 } catch (JSONException e) {
@@ -209,6 +221,26 @@ public class AKRecent implements Serializable {
                 Util.serializeObject(mAkProgresses, filepath);
                 flag=true;
             }
+
+            Bookmark b=null;
+            try {
+                b=new Bookmark(APVApplication.getInstance()).open();
+                b.getDb().beginTransaction();
+                for (AKProgress progress : akProgresses) {
+                    if (!TextUtils.isEmpty(progress.bookmarkEntry)) {
+                        b.setLast(progress.path, new BookmarkEntry(progress.bookmarkEntry));
+                        Log.d(TAG, "update bookmark:"+progress);
+                    }
+                }
+                b.getDb().setTransactionSuccessful();
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                if (null!=b) {
+                    b.getDb().endTransaction();
+                    b.close();
+                }
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -228,6 +260,7 @@ public class AKRecent implements Serializable {
             bean.size=jsonobject.optInt("size");
             bean.ext=jsonobject.optString("ext");
             bean.timestampe=jsonobject.optLong("timestampe");
+            bean.bookmarkEntry=jsonobject.optString("bookmarkEntry");
         } catch (Exception jsonexception) {
             throw new Exception(jsonexception.getMessage()+":"+jsonobject, jsonexception);
         }

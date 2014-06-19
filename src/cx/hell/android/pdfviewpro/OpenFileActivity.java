@@ -1032,7 +1032,7 @@ public class OpenFileActivity extends Activity implements SensorEventListener {
         b.setLast(filePath, entry);
         b.close();
         Log.i(TAG, "last page saved for "+filePath+" entry:"+entry);
-        AKRecent.getInstance(getApplicationContext()).addAsync(filePath, entry.page, entry.numberOfPages);
+        AKRecent.getInstance(getApplicationContext()).addAsync(filePath, entry.page, entry.numberOfPages, entry.toString());
     }
     
     /**

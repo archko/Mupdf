@@ -27,6 +27,10 @@ public class AKProgress implements Serializable, Comparator<AKProgress> {
     public long size;
     public String ext;
     public long timestampe;
+    /**
+     * 这是新加的数据,对应BookmarkEntry.toString()这样便于保存数据.
+     */
+    public String bookmarkEntry;
 
     public AKProgress() {
     }
@@ -46,12 +50,13 @@ public class AKProgress implements Serializable, Comparator<AKProgress> {
     @Override
     public String toString() {
         return "AKProgress{"+
-            "path='"+path+'\''+
+            ", path='"+path+'\''+
             ", numberOfPages="+numberOfPages+
             ", page="+page+
             ", size="+size+
             ", ext='"+ext+'\''+
             ", timestampe="+timestampe+
+            ", bookmarkEntry='"+bookmarkEntry+'\''+
             '}';
     }
 

@@ -99,7 +99,11 @@ public class Bookmark {
 		return this;
 	}
 
-	/**
+    public SQLiteDatabase getDb() {
+        return db;
+    }
+
+    /**
 	 * close the database
 	 */
 	public void close() {
