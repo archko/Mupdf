@@ -121,6 +121,10 @@ public class HistoryFragment extends BrowserFragment {
             protected Boolean doInBackground(Void... params) {
                 String filepath=null;
                 String[] filenames=Environment.getExternalStorageDirectory().list();
+                if (null==filenames){
+                    return false;
+                }
+
                 for (String s : filenames) {
                     if (s.startsWith("mupdf_")) {
                         filepath=Environment.getExternalStorageDirectory()+File.separator+s;
@@ -128,6 +132,9 @@ public class HistoryFragment extends BrowserFragment {
                     }
                 }
 
+                if (null==filepath){
+                    return false;
+                }
                 boolean flag=AKRecent.getInstance(APVApplication.getInstance()).restore(filepath);
                 long newTime=System.currentTimeMillis()-now;
                 if (newTime<1500l) {
