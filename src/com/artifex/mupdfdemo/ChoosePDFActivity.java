@@ -35,6 +35,7 @@ enum Purpose {
 }
 
 public class ChoosePDFActivity extends ListActivity {
+	static public final String PICK_KEY_FILE = "com.artifex.mupdfdemo.PICK_KEY_FILE";
 	static private File  mDirectory;
 	static private Map<String, Integer> mPositions = new HashMap<String, Integer>();
 	private File         mParent;
@@ -49,7 +50,7 @@ public class ChoosePDFActivity extends ListActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		mPurpose = Intent.ACTION_MAIN.equals(getIntent().getAction()) ? Purpose.PickPDF : Purpose.PickKeyFile;
+		mPurpose = PICK_KEY_FILE.equals(getIntent().getAction()) ? Purpose.PickKeyFile : Purpose.PickPDF;
 
 
 		String storageState = Environment.getExternalStorageState();

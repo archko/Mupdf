@@ -367,10 +367,10 @@ public class AKPDFPagesProvider extends PagesProvider {
                     Bitmap.Config.RGB_565);*/
             Bitmap b=Bitmap.createBitmap(tile.getPrefXSize(), tile.getPrefYSize(), Bitmap.Config.ARGB_8888);
             PointF size=pdf.getPageSize(tile.getPage());
-            pdf.drawPage3(b, tile.getPage(),
+            pdf.renderPage(b, tile.getPage(),
                 (int) size.x*tile.getZoom()/1000, (int) size.y*tile.getZoom()/1000,
                 tile.getX(), tile.getY(),
-                tile.getPrefXSize(), tile.getPrefYSize());
+                tile.getPrefXSize(), tile.getPrefYSize(), pdf.new Cookie());
 
             Bitmap maskBitmap=Bitmap.createBitmap(b.getWidth(), b.getHeight(), Bitmap.Config.RGB_565);
             Canvas c=new Canvas();

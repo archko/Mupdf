@@ -676,7 +676,8 @@ public class OpenFileActivity extends Activity implements SensorEventListener {
             }
         }
         if (buffer!=null) {
-            core=openBuffer(buffer);
+            Intent intent = getIntent();
+            core=openBuffer(buffer, intent.getType());
         } else {
             core=openFile(Uri.decode(uri.getEncodedPath()));
         }
@@ -701,11 +702,13 @@ public class OpenFileActivity extends Activity implements SensorEventListener {
         return core;
     }
 
-    private MuPDFCore openBuffer(byte buffer[]) {
+    private MuPDFCore openBuffer(byte buffer[], String magic)
+	{
         MuPDFCore core=null;
         System.out.println("Trying to open byte buffer");
-        try {
-            core=new MuPDFCore(this, buffer);
+		try
+		{
+			core = new MuPDFCore(this, buffer, magic);
             // New file: drop the old outline data
             OutlineActivityData.set(null);
         } catch (Exception e) {

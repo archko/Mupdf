@@ -47,11 +47,13 @@ public class AKReaderView
 	private int               mXScroll;    // Scroll amounts recorded from events.
 	private int               mYScroll;    // and then accounted for in onLayout
 	private boolean           mReflow = false;
+	private boolean           mReflowChanged = false;
 	private final GestureDetector
 				  mGestureDetector;
 	private final ScaleGestureDetector
 				  mScaleGestureDetector;
 	private final Scroller    mScroller;
+	private final Stepper     mStepper;
 	private int               mScrollerLastX;
 	private int               mScrollerLastY;
 	private boolean           mScrollDisabled;
@@ -65,13 +67,28 @@ public class AKReaderView
 		mGestureDetector = new GestureDetector(this);
 		mScaleGestureDetector = new ScaleGestureDetector(context, this);
 		mScroller        = new Scroller(context);
+		mStepper = new Stepper(this, this);
 	}
 
 	public AKReaderView(Context context, AttributeSet attrs) {
 		super(context, attrs);
-		mGestureDetector = new GestureDetector(this);
-		mScaleGestureDetector = new ScaleGestureDetector(context, this);
-		mScroller        = new Scroller(context);
+
+		// "Edit mode" means when the View is being displayed in the Android GUI editor. (this class
+		// is instantiated in the IDE, so we need to be a bit careful what we do).
+		if (isInEditMode())
+		{
+			mGestureDetector = null;
+			mScaleGestureDetector = null;
+			mScroller = null;
+			mStepper = null;
+		}
+		else
+		{
+            mGestureDetector = new GestureDetector(this);
+            mScaleGestureDetector = new ScaleGestureDetector(context, this);
+            mScroller        = new Scroller(context);
+			mStepper = new Stepper(this, this);
+	    }
 	}
 
 	public AKReaderView(Context context, AttributeSet attrs, int defStyle) {
@@ -79,6 +96,7 @@ public class AKReaderView
 		mGestureDetector = new GestureDetector(this);
 		mScaleGestureDetector = new ScaleGestureDetector(context, this);
 		mScroller        = new Scroller(context);
+		mStepper = new Stepper(this, this);
 	}
 
 	public int getDisplayedViewIndex() {
@@ -114,7 +132,7 @@ public class AKReaderView
 	// 80% and 95% if it means we hit the bottom in a whole number
 	// of steps.
 	private int smartAdvanceAmount(int screenHeight, int max) {
-		int advance = (int)(screenHeight * 0.93 + 0.5);
+		int advance = (int)(screenHeight * 0.9 + 0.5);
 		int leftOver = max % advance;
 		int steps = max / advance;
 		if (leftOver == 0) {
@@ -207,7 +225,7 @@ public class AKReaderView
 		}
 		mScrollerLastX = mScrollerLastY = 0;
 		mScroller.startScroll(0, 0, remainingX - xOffset, remainingY - yOffset, 400);
-		post(this);
+		mStepper.prod();
 	}
 
     /**
@@ -282,7 +300,7 @@ public class AKReaderView
 		}
 		mScrollerLastX = mScrollerLastY = 0;
 		mScroller.startScroll(0, 0, remainingX - xOffset, remainingY - yOffset, 400);
-		post(this);
+		mStepper.prod();
 	}
 
 	public void resetupChildren() {
@@ -297,18 +315,11 @@ public class AKReaderView
 
 	public void refresh(boolean reflow) {
 		mReflow = reflow;
+		mReflowChanged = true;
+		mResetLayout = true;
 
 		mScale = 1.0f;
 		mXScroll = mYScroll = 0;
-
-		int numChildren = mChildViews.size();
-		for (int i = 0; i < numChildren; i++) {
-			View v = mChildViews.valueAt(i);
-			onNotInUse(v);
-			removeViewInLayout(v);
-		}
-		mChildViews.clear();
-		mViewCache.clear();
 
 		requestLayout();
 	}
@@ -345,7 +356,7 @@ public class AKReaderView
 			mScrollerLastX = x;
 			mScrollerLastY = y;
 			requestLayout();
-			post(this);
+			mStepper.prod();
 		}
 		else if (!mUserInteracting) {
 			// End of an inertial scroll and the user is not interacting.
@@ -363,7 +374,7 @@ public class AKReaderView
 
 	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
 			float velocityY) {
-		if (mScrollDisabled)
+		if (mScaling||mScrollDisabled)
 			return true;
 
 		View v = mChildViews.get(mCurrent);
@@ -411,7 +422,7 @@ public class AKReaderView
 			if(withinBoundsInDirectionOfTravel(bounds, velocityX, velocityY)
 					&& expandedBounds.contains(0, 0)) {
 				mScroller.fling(0, 0, (int)velocityX, (int)velocityY, bounds.left, bounds.right, bounds.top, bounds.bottom);
-				post(this);
+				mStepper.prod();
 			}
 		}
 
@@ -423,7 +434,7 @@ public class AKReaderView
 
 	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
 			float distanceY) {
-		if (!mScrollDisabled) {
+		if (!mScaling||!mScrollDisabled) {
 			mXScroll -= distanceX;
 			mYScroll -= distanceY;
 			requestLayout();
@@ -493,9 +504,7 @@ public class AKReaderView
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
 		mScaleGestureDetector.onTouchEvent(event);
-
-		if (!mScaling)
-			mGestureDetector.onTouchEvent(event);
+		mGestureDetector.onTouchEvent(event);
 
 		if ((event.getAction() & MotionEvent.ACTION_MASK) == MotionEvent.ACTION_DOWN) {
 			mUserInteracting = true;
@@ -538,6 +547,11 @@ public class AKReaderView
 	protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
 		super.onLayout(changed, left, top, right, bottom);
 
+		// "Edit mode" means when the View is being displayed in the Android GUI editor. (this class
+		// is instantiated in the IDE, so we need to be a bit careful what we do).
+		if (isInEditMode())
+			return;
+
 		View cv = mChildViews.get(mCurrent);
 		Point cvOffset;
 
@@ -552,7 +566,7 @@ public class AKReaderView
 					postUnsettle(cv);
 					// post to invoke test for end of animation
 					// where we must set hq area for the new current view
-					post(this);
+					mStepper.prod();
 
 					onMoveOffChild(mCurrent);
 					mCurrent++;
@@ -564,7 +578,7 @@ public class AKReaderView
 					postUnsettle(cv);
 					// post to invoke test for end of animation
 					// where we must set hq area for the new current view
-					post(this);
+					mStepper.prod();
 
 					onMoveOffChild(mCurrent);
 					mCurrent--;
@@ -601,8 +615,15 @@ public class AKReaderView
 				removeViewInLayout(v);
 			}
 			mChildViews.clear();
+
+			// Don't reuse cached views if the adapter has changed
+			if (mReflowChanged) {
+				mReflowChanged = false;
+				mViewCache.clear();
+			}
+
 			// post to ensure generation of hq area
-			post(this);
+			mStepper.prod();
 		}
 
 		// Ensure current view is present
@@ -683,14 +704,13 @@ public class AKReaderView
 
 	@Override
 	public View getSelectedView() {
-		throw new UnsupportedOperationException(getContext().getString(R.string.not_supported));
+		return null;
 	}
 
 	@Override
 	public void setAdapter(Adapter adapter) {
 		mAdapter = adapter;
-		mChildViews.clear();
-		removeAllViewsInLayout();
+
 		requestLayout();
 	}
 
@@ -730,18 +750,18 @@ public class AKReaderView
 
 	private void measureView(View v) {
 		// See what size the view wants to be
-		v.measure(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED);
+		v.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
 
 		if (!mReflow) {
 		// Work out a scale that will fit it to this view
 		float scale = Math.min((float)getWidth()/(float)v.getMeasuredWidth(),
 					(float)getHeight()/(float)v.getMeasuredHeight());
 		// Use the fitting values scaled by our current scale factor
-		v.measure(MeasureSpec.EXACTLY | (int)(v.getMeasuredWidth()*scale*mScale),
-				MeasureSpec.EXACTLY | (int)(v.getMeasuredHeight()*scale*mScale));
+		v.measure(View.MeasureSpec.EXACTLY | (int)(v.getMeasuredWidth()*scale*mScale),
+				View.MeasureSpec.EXACTLY | (int)(v.getMeasuredHeight()*scale*mScale));
 		} else {
-			v.measure(MeasureSpec.EXACTLY | (int)(v.getMeasuredWidth()),
-					MeasureSpec.EXACTLY | (int)(v.getMeasuredHeight()));
+			v.measure(View.MeasureSpec.EXACTLY | (int)(v.getMeasuredWidth()),
+					View.MeasureSpec.EXACTLY | (int)(v.getMeasuredHeight()));
 		}
 	}
 
@@ -798,7 +818,7 @@ public class AKReaderView
 		if (corr.x != 0 || corr.y != 0) {
 			mScrollerLastX = mScrollerLastY = 0;
 			mScroller.startScroll(0, 0, corr.x, corr.y, 400);
-			post(this);
+			mStepper.prod();
 		}
 	}
 
