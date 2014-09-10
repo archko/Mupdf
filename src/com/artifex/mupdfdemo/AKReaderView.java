@@ -32,6 +32,8 @@ public class AKReaderView
 	private static final float MAX_SCALE        = 5.0f;
 	private static final float REFLOW_SCALE_FACTOR = 0.5f;
 
+	private static final boolean HORIZONTAL_SCROLLING = false;
+
 	private Adapter           mAdapter;
 	private int               mCurrent;    // Adapter's index for the current view
 	private boolean           mResetLayout;
@@ -381,9 +383,8 @@ public class AKReaderView
 		if (v != null) {
 			Rect bounds = getScrollBounds(v);
 			switch(directionOfTravel(velocityX, velocityY)) {
-			//case MOVING_LEFT:
-                case MOVING_UP:
-				if (bounds.top >= 0) {
+			case MOVING_LEFT:
+				if (HORIZONTAL_SCROLLING && bounds.left >= 0) {
 					// Fling off to the left bring next view onto screen
 					View vl = mChildViews.get(mCurrent+1);
 
@@ -393,9 +394,19 @@ public class AKReaderView
 					}
 				}
 				break;
-			//case MOVING_RIGHT:
-                case MOVING_DOWN:
-				if (bounds.bottom <= 0) {
+			case MOVING_UP:
+				if (!HORIZONTAL_SCROLLING && bounds.top >= 0) {
+					// Fling off to the top bring next view onto screen
+					View vl = mChildViews.get(mCurrent+1);
+
+					if (vl != null) {
+						slideViewOntoScreen(vl);
+						return true;
+					}
+				}
+				break;
+			case MOVING_RIGHT:
+				if (HORIZONTAL_SCROLLING && bounds.right <= 0) {
 					// Fling off to the right bring previous view onto screen
 					View vr = mChildViews.get(mCurrent-1);
 
@@ -403,6 +414,17 @@ public class AKReaderView
 						slideViewOntoScreen(vr);
 						return true;
 					}
+				}
+				break;
+			case MOVING_DOWN:
+				if (HORIZONTAL_SCROLLING && bounds.bottom <= 0) {
+					// Fling off to the bottom bring previous view onto screen
+					View vr = mChildViews.get(mCurrent-1);
+
+					if (vr != null) {
+						slideViewOntoScreen(vr);
+						return true;
+			        }
 				}
 				break;
 			}
@@ -558,11 +580,15 @@ public class AKReaderView
 		if (!mResetLayout) {
 			// Move to next or previous if current is sufficiently off center
 			if (cv != null) {
+				boolean move;
 				cvOffset = subScreenSizeOffset(cv);
 				// cv.getRight() may be out of date with the current scale
 				// so add left to the measured width for the correct position
-				//if (cv.getLeft() + cv.getMeasuredWidth() + cvOffset.x + GAP/2 + mXScroll < getWidth()/2 && mCurrent + 1 < mAdapter.getCount()) {
-                if (cv.getTop() + cv.getMeasuredHeight() + cvOffset.y + GAP/2 + mYScroll < getHeight()/2 && mCurrent + 1 < mAdapter.getCount()) {
+				if (HORIZONTAL_SCROLLING)
+					move = cv.getLeft() + cv.getMeasuredWidth() + cvOffset.x + GAP/2 + mXScroll < getWidth()/2;
+				else
+					move = cv.getTop() + cv.getMeasuredHeight() + cvOffset.y + GAP/2 + mYScroll < getHeight()/2;
+				if (move && mCurrent + 1 < mAdapter.getCount()) {
 					postUnsettle(cv);
 					// post to invoke test for end of animation
 					// where we must set hq area for the new current view
@@ -573,8 +599,11 @@ public class AKReaderView
 					onMoveToChild(mCurrent);
 				}
 
-				//if (cv.getLeft() - cvOffset.x - GAP/2 + mXScroll >= getWidth()/2 && mCurrent > 0) {
-                if (cv.getTop() - cvOffset.y - GAP/2 + mYScroll >= getHeight()/2 && mCurrent > 0) {
+				if (HORIZONTAL_SCROLLING)
+					move = cv.getLeft() - cvOffset.x - GAP/2 + mXScroll >= getWidth()/2;
+				else
+					move = cv.getTop() - cvOffset.y - GAP/2 + mYScroll >= getHeight()/2;
+				if (move && mCurrent > 0) {
 					postUnsettle(cv);
 					// post to invoke test for end of animation
 					// where we must set hq area for the new current view
@@ -654,12 +683,18 @@ public class AKReaderView
 			cvLeft   += corr.x;
 			cvTop    += corr.y;
 			cvBottom += corr.y;
-		} else if (cv.getMeasuredHeight() <= getHeight()) {
+		} else if (HORIZONTAL_SCROLLING && cv.getMeasuredHeight() <= getHeight()) {
 			// When the current view is as small as the screen in height, clamp
 			// it vertically
 			Point corr = getCorrection(getScrollBounds(cvLeft, cvTop, cvRight, cvBottom));
 			cvTop    += corr.y;
 			cvBottom += corr.y;
+		} else if (!HORIZONTAL_SCROLLING && cv.getMeasuredWidth() <= getWidth()) {
+			// When the current view is as small as the screen in width, clamp
+			// it horizontally
+			Point corr = getCorrection(getScrollBounds(cvLeft, cvTop, cvRight, cvBottom));
+			cvRight  += corr.x;
+			cvLeft   += corr.x;
 		}
 
 		cv.layout(cvLeft, cvTop, cvRight, cvBottom);
@@ -667,31 +702,39 @@ public class AKReaderView
 		if (mCurrent > 0) {
 			View lv = getOrCreateChild(mCurrent - 1);
 			Point leftOffset = subScreenSizeOffset(lv);
-			/*int gap = leftOffset.x + GAP + cvOffset.x;
+			if (HORIZONTAL_SCROLLING)
+			{
+			int gap = leftOffset.x + GAP + cvOffset.x;
 			lv.layout(cvLeft - lv.getMeasuredWidth() - gap,
 					(cvBottom + cvTop - lv.getMeasuredHeight())/2,
 					cvLeft - gap,
-					(cvBottom + cvTop + lv.getMeasuredHeight())/2);*/
-            int gap=leftOffset.y+GAP/2;
-            lv.layout(cvLeft,
-                (cvTop-lv.getMeasuredHeight()-gap),
-                cvRight,
-                cvTop);
-        }
+					(cvBottom + cvTop + lv.getMeasuredHeight())/2);
+			} else {
+				int gap = leftOffset.y + GAP + cvOffset.y;
+				lv.layout((cvLeft + cvRight - lv.getMeasuredWidth())/2,
+						cvTop - lv.getMeasuredHeight() - gap,
+						(cvLeft + cvRight + lv.getMeasuredWidth())/2,
+						cvTop - gap);
+            }
+		}
 
 		if (mCurrent + 1 < mAdapter.getCount()) {
 			View rv = getOrCreateChild(mCurrent + 1);
 			Point rightOffset = subScreenSizeOffset(rv);
-			/*int gap = cvOffset.x + GAP + rightOffset.x;
+			if (HORIZONTAL_SCROLLING)
+			{
+			int gap = cvOffset.x + GAP + rightOffset.x;
 			rv.layout(cvRight + gap,
 					(cvBottom + cvTop - rv.getMeasuredHeight())/2,
 					cvRight + rv.getMeasuredWidth() + gap,
-					(cvBottom + cvTop + rv.getMeasuredHeight())/2);*/
-            int gap=GAP/2+rightOffset.y;
-            rv.layout(cvLeft,
-                cvBottom+gap,
-                cvRight,
-                (cvBottom+rv.getMeasuredHeight()));
+					(cvBottom + cvTop + rv.getMeasuredHeight())/2);
+			} else {
+				int gap = cvOffset.y + GAP + rightOffset.y;
+				rv.layout((cvLeft + cvRight - rv.getMeasuredWidth())/2,
+						cvBottom + gap,
+						(cvLeft + cvRight + rv.getMeasuredWidth())/2,
+						cvBottom + gap + rv.getMeasuredHeight());
+		    }
         }
 
 		invalidate();
