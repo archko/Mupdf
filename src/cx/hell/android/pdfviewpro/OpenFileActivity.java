@@ -1,5 +1,6 @@
 package cx.hell.android.pdfviewpro;
 
+import java.io.File;
 import java.io.InputStream;
 
 import android.app.Activity;
@@ -624,6 +625,10 @@ public class OpenFileActivity extends Activity implements SensorEventListener {
 		Uri uri = intent.getData();    	
 		filePath = uri.getPath();
 		if (uri.getScheme().equals("file")) {
+            File file=new File(filePath);
+            if (!file.exists()){
+                throw new RuntimeException("don't know how to get " + filePath);
+            }
 			if (history) {
 				/*Recent recent = new Recent(this);
 				recent.add(0, filePath);

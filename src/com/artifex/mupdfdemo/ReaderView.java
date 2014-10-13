@@ -86,11 +86,11 @@ public class ReaderView
 		}
 		else
 		{
-            mGestureDetector = new GestureDetector(this);
-            mScaleGestureDetector = new ScaleGestureDetector(context, this);
-            mScroller        = new Scroller(context);
-            mStepper = new Stepper(this, this);
-        }
+			mGestureDetector = new GestureDetector(this);
+			mScaleGestureDetector = new ScaleGestureDetector(context, this);
+			mScroller        = new Scroller(context);
+			mStepper = new Stepper(this, this);
+		}
 	}
 
 	public ReaderView(Context context, AttributeSet attrs, int defStyle) {
@@ -699,18 +699,18 @@ public class ReaderView
 			Point leftOffset = subScreenSizeOffset(lv);
 			if (HORIZONTAL_SCROLLING)
 			{
-			int gap = leftOffset.x + GAP + cvOffset.x;
-			lv.layout(cvLeft - lv.getMeasuredWidth() - gap,
-					(cvBottom + cvTop - lv.getMeasuredHeight())/2,
-					cvLeft - gap,
-					(cvBottom + cvTop + lv.getMeasuredHeight())/2);
+				int gap = leftOffset.x + GAP + cvOffset.x;
+				lv.layout(cvLeft - lv.getMeasuredWidth() - gap,
+						(cvBottom + cvTop - lv.getMeasuredHeight())/2,
+						cvLeft - gap,
+						(cvBottom + cvTop + lv.getMeasuredHeight())/2);
 			} else {
 				int gap = leftOffset.y + GAP + cvOffset.y;
 				lv.layout((cvLeft + cvRight - lv.getMeasuredWidth())/2,
 						cvTop - lv.getMeasuredHeight() - gap,
 						(cvLeft + cvRight + lv.getMeasuredWidth())/2,
 						cvTop - gap);
-		    }
+			}
 		}
 
 		if (mCurrent + 1 < mAdapter.getCount()) {
@@ -718,18 +718,18 @@ public class ReaderView
 			Point rightOffset = subScreenSizeOffset(rv);
 			if (HORIZONTAL_SCROLLING)
 			{
-			int gap = cvOffset.x + GAP + rightOffset.x;
-			rv.layout(cvRight + gap,
-					(cvBottom + cvTop - rv.getMeasuredHeight())/2,
-					cvRight + rv.getMeasuredWidth() + gap,
-					(cvBottom + cvTop + rv.getMeasuredHeight())/2);
+				int gap = cvOffset.x + GAP + rightOffset.x;
+				rv.layout(cvRight + gap,
+						(cvBottom + cvTop - rv.getMeasuredHeight())/2,
+						cvRight + rv.getMeasuredWidth() + gap,
+						(cvBottom + cvTop + rv.getMeasuredHeight())/2);
 			} else {
 				int gap = cvOffset.y + GAP + rightOffset.y;
 				rv.layout((cvLeft + cvRight - rv.getMeasuredWidth())/2,
 						cvBottom + gap,
 						(cvLeft + cvRight + rv.getMeasuredWidth())/2,
 						cvBottom + gap + rv.getMeasuredHeight());
-		    }
+			}
 		}
 
 		invalidate();
