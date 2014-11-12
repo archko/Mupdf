@@ -229,6 +229,10 @@ public class AKPDFPagesProvider extends PagesProvider {
         if (null!=mHandler) {
             mHandler.sendEmptyMessage(2);
         }
+        if (null!=bitmapCache) {
+            bitmapCache.clearCache();
+        }
+        bitmapCache=null;
     }
 
     public void internalRelease() {
