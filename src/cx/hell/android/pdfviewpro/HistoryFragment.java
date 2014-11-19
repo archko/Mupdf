@@ -39,6 +39,10 @@ public class HistoryFragment extends BrowserFragment {
         super.onCreate(savedInstanceState);
     }
 
+    public boolean onBackPressed() {
+        return false;
+    }
+
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);

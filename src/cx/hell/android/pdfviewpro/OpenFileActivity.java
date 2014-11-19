@@ -50,6 +50,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 //import cx.hell.android.lib.pagesview.FindResult;
 import cn.me.archko.pdf.AKRecent;
+import cn.me.archko.pdf.DataListener;
 import com.artifex.mupdfdemo.ChoosePDFActivity;
 import com.artifex.mupdfdemo.OutlineActivity;
 import com.artifex.mupdfdemo.OutlineActivityData;
@@ -1040,7 +1041,18 @@ public class OpenFileActivity extends Activity implements SensorEventListener {
         b.setLast(filePath, entry);
         b.close();
         Log.i(TAG, "last page saved for "+filePath+" entry:"+entry);
-        AKRecent.getInstance(getApplicationContext()).addAsync(filePath, entry.page, entry.numberOfPages, entry.toString());
+        AKRecent.getInstance(getApplicationContext()).addAsync(filePath, entry.page, entry.numberOfPages, entry.toString(),
+			new DataListener() {
+				@Override
+				public void onSuccess(Object... args) {
+					AKRecent.getInstance(getApplicationContext()).backup("mupdf_recent.jso");
+				}
+
+				@Override
+				public void onFailed(Object... args) {
+
+				}
+			});
     }
     
     /**

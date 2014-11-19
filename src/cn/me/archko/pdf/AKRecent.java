@@ -58,18 +58,21 @@ public class AKRecent implements Serializable {
      * @param numberOfPage  总页数
      * @param bookmarkEntry 书签字符串,是一个合并形式的.
      */
-    public void addAsync(final String path, final int page, final int numberOfPage, final String bookmarkEntry) {
+    public void addAsync(final String path, final int page, final int numberOfPage, final String bookmarkEntry, final DataListener dataListener) {
         Util.execute(false, new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
                 add(path, page, numberOfPage, bookmarkEntry);
+                if (null!=dataListener) {
+                    dataListener.onSuccess();
+                }
                 return null;
             }
         }, (Void[]) null);
     }
 
     public ArrayList<AKProgress> add(final String path, final int page, final int numberOfPage, String bookmarkEntry) {
-        if (TextUtils.isEmpty(path)) {
+        if (TextUtils.isEmpty(path)||TextUtils.isEmpty(bookmarkEntry)) {
             Log.d("", "path is null.");
             return mAkProgresses;
         }
@@ -95,8 +98,10 @@ public class AKRecent implements Serializable {
                 tmp.numberOfPages=numberOfPage;
                 tmp.bookmarkEntry=bookmarkEntry;
                 mAkProgresses.add(0, tmp);
-                String filepath=mContext.getFilesDir().getPath()+File.separator+FILE_RECENT;
-                Util.serializeObject(mAkProgresses, filepath);
+                if (mAkProgresses.size()>0) {
+                    String filepath=mContext.getFilesDir().getPath()+File.separator+FILE_RECENT;
+                    Util.serializeObject(mAkProgresses, filepath);
+                }
             } else {
                 addNewRecent(path, page, numberOfPage, bookmarkEntry);
             }
@@ -164,12 +169,16 @@ public class AKRecent implements Serializable {
     }
 
     public String backup() {
+        String name="mupdf_"+DateUtil.formatTime(System.currentTimeMillis(), "yyyy-MM-dd-HH-mm-ss");
+        return backup(name);
+    }
+
+    public String backup(String name) {
         if (null==mAkProgresses||mAkProgresses.size()<1) {
             readRecent();
         }
 
         try {
-            String name=DateUtil.formatTime(System.currentTimeMillis(), "yyyy-MM-dd-HH-mm-ss");
             JSONObject root=new JSONObject();
             JSONArray ja=new JSONArray();
             root.put("root", ja);
@@ -194,7 +203,7 @@ public class AKRecent implements Serializable {
                     e.printStackTrace();
                 }
             }
-            name=Environment.getExternalStorageDirectory().getPath()+File.separator+"mupdf_"+name;
+            name=Environment.getExternalStorageDirectory().getPath()+File.separator+name;
             Log.d(TAG, "backup.name:"+name+" root:"+root);
             StreamUtils.copyStringToFile(root.toString(), name);
             return name;

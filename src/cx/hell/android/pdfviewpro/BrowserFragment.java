@@ -6,15 +6,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 
-import android.R.bool;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -26,8 +23,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -105,10 +100,21 @@ public class BrowserFragment extends RefreshableFragment implements OnItemClickL
 		edit.putString(ChooseFileFragmentActivity.PREF_HOME, currentPath);
 		edit.commit();
     }
-	
+
+	public boolean onBackPressed() {
+		if (!this.currentPath.equals("/")) {
+			File upFolder=new File(this.currentPath).getParentFile();
+			if (upFolder.isDirectory()) {
+				this.currentPath=upFolder.getAbsolutePath();
+				updateAdapter();
+				return true;
+			}
+		}
+		return false;
+	}
 
 	@Override
-    public void onResume() {
+	public void onResume() {
         super.onResume();
         Log.i(TAG, ".onResume."+this);
     }

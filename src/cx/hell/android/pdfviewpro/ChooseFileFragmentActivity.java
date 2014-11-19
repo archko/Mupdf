@@ -59,6 +59,15 @@ public class ChooseFileFragmentActivity extends FragmentActivity{
     }
 
     @Override
+    public void onBackPressed() {
+        BrowserFragment fragment=(BrowserFragment) mTabsAdapter.getItem(mViewPager.getCurrentItem());
+        if (fragment.onBackPressed()){
+            return;
+        }
+        super.onBackPressed();
+    }
+
+    @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putString("tab", mTabHost.getCurrentTabTag());
