@@ -25,6 +25,8 @@ public class Tile implements Parcelable{
 	
 	private int prefXSize;
 	private int prefYSize;
+
+    public boolean isVisible=false;
 	
 	//int _hashCode;
 	
@@ -37,6 +39,7 @@ public class Tile implements Parcelable{
 		this.y = y;
 		this.rotation = rotation;
         //System.out.println("ctor :"+toString());
+        isVisible=true;
     }
 	
 	public String toString() {

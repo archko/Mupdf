@@ -13,6 +13,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
@@ -36,12 +37,13 @@ import org.vudroid.pdfdroid.PdfViewerActivity;
  * @description:
  * @author: archko 11-11-17
  */
-public class BrowserFragment extends RefreshableFragment implements OnItemClickListener {
+public class BrowserFragment extends RefreshableFragment implements OnItemClickListener, SwipeRefreshLayout.OnRefreshListener {
 
     public static final String TAG="BrowserFragment";
 
     private String currentPath;
-	
+
+	protected SwipeRefreshLayout mSwipeRefreshWidget;
 	protected TextView pathTextView = null;
 	protected ListView filesListView = null;
 	private FileFilter fileFilter = null;
@@ -102,7 +104,8 @@ public class BrowserFragment extends RefreshableFragment implements OnItemClickL
     }
 
 	public boolean onBackPressed() {
-		if (!this.currentPath.equals("/")) {
+		String path=Environment.getExternalStorageDirectory().getAbsolutePath();
+		if (!this.currentPath.equals(path)&&!this.currentPath.equals("/")) {
 			File upFolder=new File(this.currentPath).getParentFile();
 			if (upFolder.isDirectory()) {
 				this.currentPath=upFolder.getAbsolutePath();
@@ -143,9 +146,18 @@ public class BrowserFragment extends RefreshableFragment implements OnItemClickL
 
     	this.pathTextView = (TextView) view.findViewById(R.id.path);
     	this.filesListView = (ListView) view.findViewById(R.id.files);
-        
-        return view;
+		mSwipeRefreshWidget = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh_widget);
+		mSwipeRefreshWidget.setColorSchemeResources(R.color.text_border_pressed, R.color.text_border_pressed,
+				R.color.text_border_pressed, R.color.text_border_pressed);
+		mSwipeRefreshWidget.setOnRefreshListener(this);
+
+		return view;
     }
+
+	@Override
+	public void onRefresh() {
+		update();
+	}
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -289,6 +301,7 @@ public class BrowserFragment extends RefreshableFragment implements OnItemClickL
         fileListAdapter.setData(fileList);
         fileListAdapter.notifyDataSetChanged();
     	//this.filesListView.setSelection(0);
+		mSwipeRefreshWidget.setRefreshing(false);
 	}
 
 	private String getHome() {

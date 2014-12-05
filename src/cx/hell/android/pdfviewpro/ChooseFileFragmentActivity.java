@@ -2,6 +2,7 @@ package cx.hell.android.pdfviewpro;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -86,6 +87,7 @@ public class ChooseFileFragmentActivity extends FragmentActivity{
      */
     public static class TabsAdapter extends FragmentPagerAdapter
         implements TabHost.OnTabChangeListener, ViewPager.OnPageChangeListener {
+        Handler mHandler=new Handler();
         private final Context mContext;
         private final TabHost mTabHost;
         private final ViewPager mViewPager;
@@ -177,13 +179,11 @@ public class ChooseFileFragmentActivity extends FragmentActivity{
 			if (position == 0) {
 				APVApplication apvApplication = APVApplication.getInstance();
 				if (apvApplication.hasChanged) {
-					RefreshableFragment fragment = (RefreshableFragment) getItem(position);
-					fragment.update();
+					delayUpdate(position);
 					apvApplication.hasChanged = true;
 				}
-			} else if (position==2) {
-				RefreshableFragment fragment = (RefreshableFragment) getItem(position);
-				fragment.update();
+			} else if (position == 2) {
+                delayUpdate(position);
 			}
         }
         
@@ -216,6 +216,16 @@ public class ChooseFileFragmentActivity extends FragmentActivity{
 
         @Override
         public void onPageScrollStateChanged(int state) {
+        }
+
+        void delayUpdate(final int position) {
+            mHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    RefreshableFragment fragment = (RefreshableFragment) getItem(position);
+                    fragment.update();
+                }
+            }, 500L);
         }
     }
 }

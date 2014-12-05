@@ -243,6 +243,7 @@ public class HistoryFragment extends BrowserFragment {
                     fileListAdapter.setData(fileList);
                     fileListAdapter.notifyDataSetChanged();
                     //filesListView.setSelection(0);
+                    mSwipeRefreshWidget.setRefreshing(false);
                 }
             }
         }, (Void[]) null);
