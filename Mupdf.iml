@@ -27,7 +27,7 @@
       <excludeFolder url="file://$MODULE_DIR$/jni" />
       <excludeFolder url="file://$MODULE_DIR$/obj" />
     </content>
-    <orderEntry type="jdk" jdkName="Android API 19 Platform" jdkType="Android SDK" />
+    <orderEntry type="jdk" jdkName="Android API 21 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module-library">
       <library>
@@ -40,4 +40,3 @@
     </orderEntry>
   </component>
 </module>
-
