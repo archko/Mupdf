@@ -113,7 +113,7 @@ public class HistoryFragment extends BrowserFragment {
     private void restore() {
         final ProgressDialog progressDialog=new ProgressDialog(getActivity());
         final long now=System.currentTimeMillis();
-        Util.execute(false, new AsyncTask<Void, Void, Boolean>() {
+        Util.execute(true, new AsyncTask<Void, Void, Boolean>() {
             @Override
             protected void onPreExecute() {
                 super.onPreExecute();
@@ -198,13 +198,13 @@ public class HistoryFragment extends BrowserFragment {
 		}
     	    	
     	this.filesListView.setSelection(0);*/
-        Util.execute(false, new AsyncTask<Void, Void, ArrayList<FileListEntry>>() {
+        Util.execute(true, new AsyncTask<Void, Void, ArrayList<FileListEntry>>() {
             @Override
             protected ArrayList<FileListEntry> doInBackground(Void... params) {
                 AKRecent recent=AKRecent.getInstance(HistoryFragment.this.getActivity());
                 recent.readRecent();
                 ArrayList<AKProgress> progresses=recent.getAkProgresses();
-                Log.d(TAG, "progresses:"+progresses);
+                //Log.d(TAG, "progresses:"+progresses);
                 ArrayList<FileListEntry> entryList=new ArrayList<FileListEntry>();
                 if (null!=progresses&&progresses.size()>0) {
                     FileListEntry entry;

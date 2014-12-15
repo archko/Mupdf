@@ -3,6 +3,7 @@ package com.artifex.mupdfdemo;
 import android.app.ListActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.ListView;
 
 public class OutlineActivity extends ListActivity {
@@ -16,9 +17,41 @@ public class OutlineActivity extends ListActivity {
 		mItems = OutlineActivityData.get().items;
 		setListAdapter(new OutlineAdapter(getLayoutInflater(),mItems));
 		// Restore the position within the list from last viewing
-		getListView().setSelection(OutlineActivityData.get().position);
-		getListView().setDividerHeight(0);
+
+		//getListView().setDividerHeight(0);
+		getListView().setCacheColorHint(getResources().getColor(android.R.color.transparent));
 		setResult(-1);
+		getListView().getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+			@Override
+			public void onGlobalLayout() {
+				getListView().getViewTreeObserver().removeGlobalOnLayoutListener(this);
+				int pos = OutlineActivityData.get().position;
+				if (null != getIntent()) {
+					int cp = getIntent().getIntExtra("cp", -1);
+					if (cp != -1) {
+						pos = cp;
+					}
+				}
+				OutlineItem[] items = OutlineActivityData.get().items;
+				//System.out.println("pos:"+pos+" items:"+items.length);
+				OutlineItem item;
+				int idx=0;
+				for (int i = items.length - 1; i >= 0; i--) {
+					item = items[i];
+					//System.out.println("pos page:"+item.page);
+					if (item.page <= pos) {
+						//pos = item.page;
+						idx=i;
+						break;
+					}
+				}
+
+				//System.out.println("pos:"+pos+" idx:"+idx);
+				if (idx < getListView().getAdapter().getCount()) {
+					getListView().setSelection(idx);
+				}
+			}
+		});
 	}
 
 	@Override

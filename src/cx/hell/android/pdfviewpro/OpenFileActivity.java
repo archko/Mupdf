@@ -785,6 +785,7 @@ public class OpenFileActivity extends Activity implements SensorEventListener {
             if (outline != null) {
                 OutlineActivityData.get().items = outline;
                 Intent intent = new Intent(OpenFileActivity.this, OutlineActivity.class);
+				intent.putExtra("cp", pagesView.getCurrentPage());
                 startActivityForResult(intent, OUTLINE_REQUEST);
             }
 		} else if (menuItem == this.textReflowMenuItem) {

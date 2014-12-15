@@ -588,6 +588,7 @@ public class MuPDFActivity extends Activity implements FilePicker.FilePickerSupp
 					if (outline != null) {
 						OutlineActivityData.get().items = outline;
 						Intent intent = new Intent(MuPDFActivity.this, OutlineActivity.class);
+						intent.putExtra("cp", mDocView.getDisplayedViewIndex());
 						startActivityForResult(intent, OUTLINE_REQUEST);
 					}
 				}
