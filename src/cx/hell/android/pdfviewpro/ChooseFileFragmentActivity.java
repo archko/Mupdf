@@ -9,60 +9,159 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.util.SparseArray;
-import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TabHost;
-import android.widget.TabWidget;
+import cn.me.archko.pdf.SlidingTabLayout;
 import com.artifex.mupdfdemo.R;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Minimalistic file browser.
+ *
+ * @author archko
  */
-public class ChooseFileFragmentActivity extends FragmentActivity{
-	
-	/**
-	 * Logging tag.
-	 */
-	private final static String TAG = "cx.hell.android.pdfviewpro";
+public class ChooseFileFragmentActivity extends FragmentActivity {
 
-	public final static String PREF_TAG = "ChooseFileActivity";
-	public final static String PREF_HOME = "Home";
-	
-    TabHost mTabHost;
-    ViewPager  mViewPager;
-    TabsAdapter mTabsAdapter;
-	
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-    	super.onCreate(savedInstanceState);
+    /**
+     * Logging tag.
+     */
+    private final static String TAG = "pdfviewpro";
 
-        setContentView(R.layout.fragment_tabs_pager);
-        mTabHost = (TabHost)findViewById(android.R.id.tabhost);
-        mTabHost.setup();
+    public final static String PREF_TAG = "ChooseFileActivity";
+    public final static String PREF_HOME = "Home";
 
-        mViewPager = (ViewPager)findViewById(R.id.pager);
+    ViewPager mViewPager;
+    TabsAdapter mPagerAdapter;
+    final String[] titles = new String[2];
 
-        mTabsAdapter = new TabsAdapter(this, mTabHost, mViewPager);
+    /**
+     * List of {@link SamplePagerItem} which represent this sample's tabs.
+     */
+    protected List<SamplePagerItem> mTabs = new ArrayList<SamplePagerItem>();
+    /**
+     * A custom {@link android.support.v4.view.ViewPager} title strip which looks much like Tabs present in Android v4.0 and
+     * above, but is designed to give continuous feedback to the user when scrolling.
+     */
+    protected SlidingTabLayout mSlidingTabLayout;
 
-        mTabsAdapter.addTab(mTabHost.newTabSpec("history").setIndicator(getString(R.string.tab_history)),
-            HistoryFragment.class, null);
-        mTabsAdapter.addTab(mTabHost.newTabSpec("brwoser").setIndicator(getString(R.string.tab_browser)),
-            BrowserFragment.class, null);
-        /*mTabsAdapter.addTab(mTabHost.newTabSpec("about").setIndicator(getString(R.string.tab_about)),
-            AboutFragment.class, null);*/
+    /**
+     * This class represents a tab to be displayed by {@link android.support.v4.view.ViewPager} and it's associated
+     * {@link cn.me.archko.pdf.SlidingTabLayout}.
+     */
+    static class SamplePagerItem {
 
-        if (savedInstanceState != null) {
-            mTabHost.setCurrentTabByTag(savedInstanceState.getString("tab"));
+        private final CharSequence mTitle;
+        private final int mIndicatorColor;
+        private final int mDividerColor;
+        private final Class<?> clss;
+        private final Bundle args;
+
+        SamplePagerItem(Class<?> _class, Bundle _args, CharSequence title) {
+            clss = _class;
+            args = _args;
+            mTitle = title;
+            mIndicatorColor = APVApplication.getInstance().getResources().getColor(R.color.tab_indicator_selected_color);
+            mDividerColor = APVApplication.getInstance().getResources().getColor(R.color.tab_divider_color);
+        }
+
+        SamplePagerItem(Class<?> _class, Bundle _args, CharSequence title, int indicatorColor, int dividerColor) {
+            clss = _class;
+            args = _args;
+            mTitle = title;
+            mIndicatorColor = indicatorColor;
+            mDividerColor = dividerColor;
+        }
+
+        /**
+         * @return the title which represents this tab. In this sample this is used directly by
+         * {@link android.support.v4.view.PagerAdapter#getPageTitle(int)}
+         */
+        CharSequence getTitle() {
+            return mTitle;
+        }
+
+        /**
+         * @return the color to be used for indicator on the {@link cn.me.archko.pdf.SlidingTabLayout}
+         */
+        int getIndicatorColor() {
+            return mIndicatorColor;
+        }
+
+        /**
+         * @return the color to be used for right divider on the {@link cn.me.archko.pdf.SlidingTabLayout}
+         */
+        int getDividerColor() {
+            return mDividerColor;
         }
     }
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        setContentView(R.layout.fragment_tabs_pager);
+
+        mViewPager = (ViewPager) findViewById(R.id.pager);
+
+        mSlidingTabLayout = (SlidingTabLayout) findViewById(R.id.sliding_tabs);
+        addTab();
+        mPagerAdapter = new TabsAdapter(this);
+        mViewPager.setOnPageChangeListener(mPagerAdapter);
+        mViewPager.setAdapter(mPagerAdapter);
+
+        postSlidingTabLayout();
+        // END_INCLUDE (tab_colorizer)
+        // END_INCLUDE (setup_slidingtablayout)
+        mSlidingTabLayout.setViewPager(mViewPager);
+        mSlidingTabLayout.setSelectPageListener(new SlidingTabLayout.SelectPageListener() {
+            @Override
+            public void updateSubView(int position) {
+                ((RefreshableFragment) mPagerAdapter.getItem(position)).update();
+            }
+        });
+    }
+
+    protected void postSlidingTabLayout() {
+        mSlidingTabLayout.setMatchWidth(true);
+        // BEGIN_INCLUDE (tab_colorizer)
+        // Set a TabColorizer to customize the indicator and divider colors. Here we just retrieve
+        // the tab at the position, and return it's set color
+        mSlidingTabLayout.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
+
+            @Override
+            public int getIndicatorColor(int position) {
+//                LLog.d("JSSlidingTabsColorsFragment", "*****getIndicatorColor******"+mTabs.get(position).getTitle());
+                return mTabs.get(position).getIndicatorColor();
+            }
+
+            @Override
+            public int getDividerColor(int position) {
+//                LLog.d("JSSlidingTabsColorsFragment", "******getDividerColor*****"+mTabs.get(position).getTitle());
+                return mTabs.get(position).getDividerColor();
+            }
+
+        });
+    }
+
+    protected void addTab() {
+        titles[0] = getString(R.string.tab_history);
+        titles[1] = getString(R.string.tab_browser);
+
+        String title = titles[0];
+        Bundle bundle = new Bundle();
+        mTabs.add(new SamplePagerItem(HistoryFragment.class, bundle, title));
+
+        title = titles[1];
+        bundle = new Bundle();
+        mTabs.add(new SamplePagerItem(BrowserFragment.class, bundle, title));
+    }
+
+    @Override
     public void onBackPressed() {
-        BrowserFragment fragment=(BrowserFragment) mTabsAdapter.getItem(mViewPager.getCurrentItem());
-        if (fragment.onBackPressed()){
+        BrowserFragment fragment = (BrowserFragment) mPagerAdapter.getItem(mViewPager.getCurrentItem());
+        if (fragment.onBackPressed()) {
             return;
         }
         super.onBackPressed();
@@ -71,75 +170,26 @@ public class ChooseFileFragmentActivity extends FragmentActivity{
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putString("tab", mTabHost.getCurrentTabTag());
     }
 
     /**
-     * This is a helper class that implements the management of tabs and all
-     * details of connecting a ViewPager with associated TabHost.  It relies on a
-     * trick.  Normally a tab host has a simple API for supplying a View or
-     * Intent that each tab will show.  This is not sufficient for switching
-     * between pages.  So instead we make the content part of the tab host
-     * 0dp high (it is not shown) and the TabsAdapter supplies its own dummy
-     * view to show as the tab content.  It listens to changes in tabs, and takes
-     * care of switch to the correct paged in the ViewPager whenever the selected
-     * tab changes.
+     * The {@link android.support.v4.app.FragmentPagerAdapter} used to display pages in this sample. The individual pages
+     * are instances of {@link ContentFragment} which just display three lines of text. Each page is
+     * created by the relevant {@link SamplePagerItem} for the requested position.
+     * <p/>
+     * The important section of this class is the {@link #getPageTitle(int)} method which controls
+     * what is displayed in the {@link SlidingTabLayout}.
      */
-    public static class TabsAdapter extends FragmentPagerAdapter
-        implements TabHost.OnTabChangeListener, ViewPager.OnPageChangeListener {
-        Handler mHandler=new Handler();
+    public class TabsAdapter extends FragmentPagerAdapter
+            implements ViewPager.OnPageChangeListener {
+        Handler mHandler = new Handler();
         private final Context mContext;
-        private final TabHost mTabHost;
-        private final ViewPager mViewPager;
-        private final ArrayList<TabInfo> mTabs = new ArrayList<TabInfo>();
-        private final SparseArray<WeakReference<Fragment>> mFragmentArray=new SparseArray<WeakReference<Fragment>>();
+        private final SparseArray<WeakReference<Fragment>> mFragmentArray = new SparseArray<WeakReference<Fragment>>();
+        int position = 0;
 
-        static final class TabInfo {
-            private final String tag;
-            private final Class<?> clss;
-            private final Bundle args;
-
-            TabInfo(String _tag, Class<?> _class, Bundle _args) {
-                tag = _tag;
-                clss = _class;
-                args = _args;
-            }
-        }
-
-        static class DummyTabFactory implements TabHost.TabContentFactory {
-            private final Context mContext;
-
-            public DummyTabFactory(Context context) {
-                mContext = context;
-            }
-
-            @Override
-            public View createTabContent(String tag) {
-                View v = new View(mContext);
-                v.setMinimumWidth(0);
-                v.setMinimumHeight(0);
-                return v;
-            }
-        }
-
-        public TabsAdapter(FragmentActivity activity, TabHost tabHost, ViewPager pager) {
+        public TabsAdapter(FragmentActivity activity) {
             super(activity.getSupportFragmentManager());
             mContext = activity;
-            mTabHost = tabHost;
-            mViewPager = pager;
-            mTabHost.setOnTabChangedListener(this);
-            mViewPager.setAdapter(this);
-            mViewPager.setOnPageChangeListener(this);
-        }
-
-        public void addTab(TabHost.TabSpec tabSpec, Class<?> clss, Bundle args) {
-            tabSpec.setContent(new DummyTabFactory(mContext));
-            String tag = tabSpec.getTag();
-
-            TabInfo info = new TabInfo(tag, clss, args);
-            mTabs.add(info);
-            mTabHost.addTab(tabSpec);
-            notifyDataSetChanged();
         }
 
         @Override
@@ -149,49 +199,34 @@ public class ChooseFileFragmentActivity extends FragmentActivity{
 
         @Override
         public Fragment getItem(int position) {
-        	final WeakReference<Fragment> mWeakFragment=mFragmentArray.get(position);
-            if (mWeakFragment!=null&&mWeakFragment.get()!=null) {
+            final WeakReference<Fragment> mWeakFragment = mFragmentArray.get(position);
+            if (mWeakFragment != null && mWeakFragment.get() != null) {
                 return mWeakFragment.get();
             }
-            
-            TabInfo info = mTabs.get(position);
+
+            SamplePagerItem info = mTabs.get(position);
             return Fragment.instantiate(mContext, info.clss.getName(), info.args);
         }
-        
+
         @Override
         public Object instantiateItem(final ViewGroup container, final int position) {
-            Log.v(TAG, "instantiateItem:"+position);
-            WeakReference<Fragment> mWeakFragment=mFragmentArray.get(position);
-            if (mWeakFragment!=null&&mWeakFragment.get()!=null) {
+            Log.v(TAG, "instantiateItem:" + position);
+            WeakReference<Fragment> mWeakFragment = mFragmentArray.get(position);
+            if (mWeakFragment != null && mWeakFragment.get() != null) {
                 //mWeakFragment.clear();
                 return mWeakFragment.get();
             }
 
-            final Fragment mFragment=(Fragment) super.instantiateItem(container, position);
+            final Fragment mFragment = (Fragment) super.instantiateItem(container, position);
             mFragmentArray.put(position, new WeakReference<Fragment>(mFragment));
             return mFragment;
         }
 
         @Override
-        public void onTabChanged(String tabId) {
-            int position = mTabHost.getCurrentTab();
-            mViewPager.setCurrentItem(position);
-			if (position == 0) {
-				APVApplication apvApplication = APVApplication.getInstance();
-				if (apvApplication.hasChanged) {
-					delayUpdate(position);
-					apvApplication.hasChanged = true;
-				}
-			} else if (position == 2) {
-                delayUpdate(position);
-			}
-        }
-        
-        @Override
         public void destroyItem(final ViewGroup container, final int position, final Object object) {
             super.destroyItem(container, position, object);
-            final WeakReference<Fragment> mWeakFragment=mFragmentArray.get(position);
-            if (mWeakFragment!=null) {
+            final WeakReference<Fragment> mWeakFragment = mFragmentArray.get(position);
+            if (mWeakFragment != null) {
                 mWeakFragment.clear();
             }
         }
@@ -202,20 +237,25 @@ public class ChooseFileFragmentActivity extends FragmentActivity{
 
         @Override
         public void onPageSelected(int position) {
-            // Unfortunately when TabHost changes the current tab, it kindly
-            // also takes care of putting focus on it when not in touch mode.
-            // The jerk.
-            // This hack tries to prevent this from pulling focus out of our
-            // ViewPager.
-            TabWidget widget = mTabHost.getTabWidget();
-            int oldFocusability = widget.getDescendantFocusability();
-            widget.setDescendantFocusability(ViewGroup.FOCUS_BLOCK_DESCENDANTS);
-            mTabHost.setCurrentTab(position);
-            widget.setDescendantFocusability(oldFocusability);
+            mViewPager.setCurrentItem(position);
+            if (position == 0) {
+                APVApplication apvApplication = APVApplication.getInstance();
+                if (apvApplication.hasChanged) {
+                    delayUpdate(position);
+                    apvApplication.hasChanged = true;
+                }
+            } else if (position == 2) {
+                delayUpdate(position);
+            }
         }
 
         @Override
         public void onPageScrollStateChanged(int state) {
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return mTabs.get(position).getTitle();
         }
 
         void delayUpdate(final int position) {

@@ -13,4 +13,8 @@
 	<color name="text_border_focused">#000000</color>
 	<color name="seek_thumb">#2572AC</color>
 	<color name="seek_progress">#FFFFFF</color>
+
+	<color name="tab_indicator_selected_color">#168de2</color>
+	<color name="tab_indicator_normal_color">#d9d9d9</color>
+	<color name="tab_divider_color">#dddddd</color>
 </resources>
