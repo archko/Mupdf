@@ -59,7 +59,7 @@ public class AKRecent implements Serializable {
      * @param bookmarkEntry 书签字符串,是一个合并形式的.
      */
     public void addAsync(final String path, final int page, final int numberOfPage, final String bookmarkEntry, final DataListener dataListener) {
-        Util.execute(false, new AsyncTask<Void, Void, Void>() {
+        Util.execute(true, new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
                 add(path, page, numberOfPage, bookmarkEntry);

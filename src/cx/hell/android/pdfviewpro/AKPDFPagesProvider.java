@@ -424,6 +424,9 @@ public class AKPDFPagesProvider extends PagesProvider {
     @Override
     public Bitmap getPageBitmap(Tile tile) {
         Bitmap b=null;
+        if (null == bitmapCache) {
+            return b;
+        }
         b=this.bitmapCache.get(tile);
         if (b!=null) return b;
         return null;

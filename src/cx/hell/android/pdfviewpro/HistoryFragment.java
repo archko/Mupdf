@@ -68,7 +68,7 @@ public class HistoryFragment extends BrowserFragment {
     private void backup() {
         final ProgressDialog progressDialog=new ProgressDialog(getActivity());
         final long now=System.currentTimeMillis();
-        Util.execute(false, new AsyncTask<Void, Void, String>() {
+        Util.execute(true, new AsyncTask<Void, Void, String>() {
             @Override
             protected void onPreExecute() {
                 super.onPreExecute();

@@ -2,7 +2,7 @@ package cx.hell.android.pdfviewpro;
 
 import android.app.Application;
 import android.util.Log;
-import cn.me.archko.pdf.VLCCrashHandler;
+import cn.me.archko.pdf.CrashHandler;
 //import cx.hell.android.lib.pdf.PDF;
 
 public class APVApplication extends Application {
@@ -20,7 +20,7 @@ public class APVApplication extends Application {
         super.onCreate();
         //PDF.setApplicationContext(this); // PDF class needs application context to load assets
         mInstance=this;
-        Thread.setDefaultUncaughtExceptionHandler(new VLCCrashHandler());
+        Thread.setDefaultUncaughtExceptionHandler(new CrashHandler());
     }
     
     /**
