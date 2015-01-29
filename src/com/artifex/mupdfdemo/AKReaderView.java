@@ -417,7 +417,7 @@ public class AKReaderView
 				}
 				break;
 			case MOVING_DOWN:
-				if (HORIZONTAL_SCROLLING && bounds.bottom <= 0) {
+				if (!HORIZONTAL_SCROLLING && bounds.bottom <= 0) {
 					// Fling off to the bottom bring previous view onto screen
 					View vr = mChildViews.get(mCurrent-1);
 

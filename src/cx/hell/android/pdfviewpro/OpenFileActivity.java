@@ -513,8 +513,7 @@ public class OpenFileActivity extends Activity implements SensorEventListener {
             this.pdf.onDestroy();//freeMemory(); /* gc is too slow, code must make sure double free is not possible */
         }
         if (null!=pdfPagesProvider) {
-            AKPDFPagesProvider pagesProvider=(AKPDFPagesProvider) pdfPagesProvider;
-            pagesProvider.release();
+            pdfPagesProvider.release();
         }
 	}
 
@@ -605,7 +604,7 @@ public class OpenFileActivity extends Activity implements SensorEventListener {
 	    /*this.pdfPagesProvider = new PDFPagesProvider(this, pdf,
 	    		options.getBoolean(Options.PREF_OMIT_IMAGES, false),
 	    		options.getBoolean(Options.PREF_RENDER_AHEAD, true));*/
-        this.pdfPagesProvider=new AKPDFPagesProvider(this, pdf,
+        this.pdfPagesProvider=new AKPDFPagesProvider(pdf,
             options.getBoolean(Options.PREF_OMIT_IMAGES, false),
             options.getBoolean(Options.PREF_RENDER_AHEAD, true));
         pagesView.setPagesProvider(pdfPagesProvider);

@@ -1,6 +1,6 @@
 package cx.hell.android.pdfviewpro;
 
-import android.app.Activity;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -9,6 +9,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
+import android.view.WindowManager;
 import com.artifex.mupdfdemo.MuPDFCore;
 import cx.hell.android.lib.pagesview.OnImageRenderedListener;
 import cx.hell.android.lib.pagesview.PagesProvider;
@@ -35,12 +36,10 @@ public class AKPDFPagesProvider extends PagesProvider {
      */
     private final static String TAG="cx.hell.android.pdfviewpro";
 
-    /* render a little more than twice the screen height, so the next page will be ready */
     private float renderAhead=2.1f;
     private boolean doRenderAhead=true;
     private int extraCache=0;
     private boolean omitImages;
-    Activity activity=null;
     private static final int MB=1024*1024;
     private Collection<Tile> tiles;
 
@@ -67,8 +66,9 @@ public class AKPDFPagesProvider extends PagesProvider {
         if (maxMax<minMax)
             maxMax=minMax;
 
-        int screenHeight=activity.getWindowManager().getDefaultDisplay().getHeight();
-        int screenWidth=activity.getWindowManager().getDefaultDisplay().getWidth();
+        WindowManager wm=(WindowManager) APVApplication.getInstance().getSystemService(Context.WINDOW_SERVICE);
+        int screenHeight=wm.getDefaultDisplay().getHeight();
+        int screenWidth=wm.getDefaultDisplay().getWidth();
         int displaySize=screenWidth*screenHeight;
 
         if (displaySize<=320*240)
@@ -115,20 +115,7 @@ public class AKPDFPagesProvider extends PagesProvider {
         }
     }
 
-    private static AKPDFPagesProvider pdfPagesProvider;
-
     Handler mHandler;
-
-    public static AKPDFPagesProvider getInstance() {
-        if (null==pdfPagesProvider) {
-            pdfPagesProvider=new AKPDFPagesProvider();
-        }
-
-        return pdfPagesProvider;
-    }
-
-    private AKPDFPagesProvider() {
-    }
 
     private void init() {
         initDecodeThread();
@@ -267,7 +254,6 @@ public class AKPDFPagesProvider extends PagesProvider {
 
     Collection<Tile> popTiles() {
         if (this.tiles==null||this.tiles.isEmpty()) {
-            //this.workerThread=null; /* returning null, so calling thread will finish it's work */
             return null;
         }
         Tile tile=this.tiles.iterator().next();
@@ -281,15 +267,12 @@ public class AKPDFPagesProvider extends PagesProvider {
         try {
             Map<Tile, Bitmap> renderedTiles=renderTiles(tiles, bitmapCache);
             if (renderedTiles.size()>0) {
-                //this.pdfPagesProvider.publishBitmaps(renderedTiles);
                 Message msg=Message.obtain();
                 msg.obj=renderedTiles;
                 msg.what=5;
                 mHandler.sendMessage(msg);
             }
         } catch (RenderingException e) {
-            //this.isFailed=true;
-            //this.pdfPagesProvider.publishRenderingException(e);
             Message msg=Message.obtain();
             msg.obj=e;
             msg.what=6;
@@ -301,19 +284,16 @@ public class AKPDFPagesProvider extends PagesProvider {
 
     private MuPDFCore pdf=null;
     private BitmapCache bitmapCache=null;
-    //private RendererWorker rendererWorker=null;
     private OnImageRenderedListener onImageRendererListener=null;
 
     public float getRenderAhead() {
         return this.renderAhead;
     }
 
-    public AKPDFPagesProvider(Activity activity, MuPDFCore pdf, boolean skipImages, boolean doRenderAhead) {
+    public AKPDFPagesProvider(MuPDFCore pdf, boolean skipImages, boolean doRenderAhead) {
         this.pdf=pdf;
         this.omitImages=skipImages;
         this.bitmapCache=new BitmapCache();
-        //this.rendererWorker=new RendererWorker(this);
-        this.activity=activity;
         this.doRenderAhead=doRenderAhead;
         setMaxCacheSize();
         init();
@@ -339,7 +319,6 @@ public class AKPDFPagesProvider extends PagesProvider {
 
         while (i.hasNext()) {
             tile=i.next();
-            //System.out.println("tile:"+tile.toString());
             Bitmap bitmap=this.renderBitmap(tile);
             if (bitmap!=null)
                 renderedTiles.put(tile, bitmap);
@@ -357,18 +336,7 @@ public class AKPDFPagesProvider extends PagesProvider {
             /* last minute check to make sure some other thread hasn't rendered this tile */
             if (this.bitmapCache.contains(tile))
                 return null;
-            
-			/*PDF.Size size = new PDF.Size(tile.getPrefXSize(), tile.getPrefYSize());
-            int[] pagebytes = null;
 
-			pagebytes = pdf.renderPage(tile.getPage(), tile.getZoom(), tile.getX(), tile.getY(), 
-					tile.getRotation(), omitImages, size);  native 
-
-			if (pagebytes == null) throw new RenderingException("Couldn't render page " + tile.getPage());*/
-            
-			/* create a bitmap from the 32-bit color array */			
-            /*Bitmap b = Bitmap.createBitmap(pagebytes, size.width, size.height,
-                    Bitmap.Config.RGB_565);*/
             Bitmap b=Bitmap.createBitmap(tile.getPrefXSize(), tile.getPrefYSize(), Bitmap.Config.ARGB_8888);
             PointF size=pdf.getPageSize(tile.getPage());
             pdf.renderPage(b, tile.getPage(),
@@ -424,7 +392,7 @@ public class AKPDFPagesProvider extends PagesProvider {
     @Override
     public Bitmap getPageBitmap(Tile tile) {
         Bitmap b=null;
-        if (null == bitmapCache) {
+        if (null==bitmapCache) {
             return b;
         }
         b=this.bitmapCache.get(tile);
@@ -453,17 +421,8 @@ public class AKPDFPagesProvider extends PagesProvider {
     public int[][] getPageSizes() {
         int cnt=this.getPageCount();
         int[][] sizes=new int[cnt][];
-        //MuPDFCore.Size size = new MuPDFCore.Size();
-        int err;
         PointF pointF;
         for (int i=0; i<cnt; ++i) {
-			/*err = this.pdf.getPageSize(i, size);
-			if (err != 0) {
-				throw new RuntimeException("failed to getPageSize(" + i + ",...), error: " + err);
-			}
-			sizes[i] = new int[2];
-			sizes[i][0] = size.width;
-			sizes[i][1] = size.height;*/
             pointF=pdf.getPageSize2(i);
             sizes[i]=new int[2];
             sizes[i][0]=(int) pointF.x;
@@ -487,7 +446,6 @@ public class AKPDFPagesProvider extends PagesProvider {
             }
         }
         if (newtiles!=null) {
-            //this.rendererWorker.setTiles(newtiles, this.bitmapCache);
             Message msg=Message.obtain();
             msg.obj=newtiles;
             msg.what=0;

@@ -63,4 +63,6 @@ public abstract class PagesProvider {
     public abstract void setOmitImages(boolean aBoolean);
 
     public abstract void setRenderAhead(boolean aBoolean);
+
+    public void release(){}
 }
