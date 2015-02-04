@@ -1,20 +1,10 @@
 package com.artifex.mupdfdemo;
-import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 import android.content.Context;
-import android.content.res.AssetManager;
 import android.graphics.Bitmap;
-import android.graphics.Bitmap.Config;
 import android.graphics.PointF;
 import android.graphics.RectF;
-import android.util.Log;
-import cx.hell.android.pdfviewpro.APVApplication;
 
 public class MuPDFCore
 {

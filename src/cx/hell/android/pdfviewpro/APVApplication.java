@@ -11,9 +11,28 @@ public class APVApplication extends Application {
     
     public boolean hasChanged=false;
     private static APVApplication mInstance=null;
+
+    int threadCount=2;
+    int threadPriority=3;
     
     public static APVApplication getInstance(){
     	return mInstance;
+    }
+
+    public int getThreadCount() {
+        return threadCount;
+    }
+
+    public void setThreadCount(int threadCount) {
+        this.threadCount=threadCount;
+    }
+
+    public int getThreadPriority() {
+        return threadPriority;
+    }
+
+    public void setThreadPriority(int threadPriority) {
+        this.threadPriority=threadPriority;
     }
 
     public void onCreate() {

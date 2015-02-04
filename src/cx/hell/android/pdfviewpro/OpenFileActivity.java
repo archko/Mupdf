@@ -604,7 +604,7 @@ public class OpenFileActivity extends Activity implements SensorEventListener {
 	    /*this.pdfPagesProvider = new PDFPagesProvider(this, pdf,
 	    		options.getBoolean(Options.PREF_OMIT_IMAGES, false),
 	    		options.getBoolean(Options.PREF_RENDER_AHEAD, true));*/
-        this.pdfPagesProvider=new AKPDFPagesProvider(pdf,
+        this.pdfPagesProvider=new AKDecodeService(pdf,
             options.getBoolean(Options.PREF_OMIT_IMAGES, false),
             options.getBoolean(Options.PREF_RENDER_AHEAD, true));
         pagesView.setPagesProvider(pdfPagesProvider);
