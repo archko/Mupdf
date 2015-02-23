@@ -50,7 +50,7 @@ public class AKDecodeService extends PagesProvider {
 
     /* also calculates renderAhead */
     private void setMaxCacheSize() {
-        long availLong=(long) (Runtime.getRuntime().maxMemory()*3/5-4*MB);
+        long availLong=(long) (Runtime.getRuntime().maxMemory()/2-4*MB);
 
         int avail;
         if (availLong>256*MB)
@@ -125,6 +125,7 @@ public class AKDecodeService extends PagesProvider {
         if (null!=mDecodeHandler) {
             mDecodeHandler.sendEmptyMessage(2);
         }
+        executor.shutdown();
         if (null!=bitmapCache) {
             bitmapCache.clearCache();
         }
@@ -163,32 +164,17 @@ public class AKDecodeService extends PagesProvider {
      * Calls native code (through PDF object).
      */
     private Bitmap renderBitmap(Tile tile) throws RenderingException {
-        //synchronized (tile) {
-            /* last minute check to make sure some other thread hasn't rendered this tile */
-            /*if (this.bitmapCache.contains(tile)) {
-                return null;
-            }*/
+        Bitmap b=Bitmap.createBitmap(tile.getPrefXSize(), tile.getPrefYSize(), Bitmap.Config.ARGB_8888);
+        PointF size=pdf.getPageSize(tile.getPage());
+        pdf.renderPage(b, tile.getPage(),
+            (int) size.x*tile.getZoom()/1000, (int) size.y*tile.getZoom()/1000,
+            tile.getX(), tile.getY(),
+            tile.getPrefXSize(), tile.getPrefYSize(), pdf.new Cookie());
 
-            Bitmap b=Bitmap.createBitmap(tile.getPrefXSize(), tile.getPrefYSize(), Bitmap.Config.ARGB_8888);
-            PointF size=pdf.getPageSize(tile.getPage());
-            pdf.renderPage(b, tile.getPage(),
-                (int) size.x*tile.getZoom()/1000, (int) size.y*tile.getZoom()/1000,
-                tile.getX(), tile.getY(),
-                tile.getPrefXSize(), tile.getPrefYSize(), pdf.new Cookie());
-
-            /*Bitmap maskBitmap=Bitmap.createBitmap(b.getWidth(), b.getHeight(), Bitmap.Config.RGB_565);
-            Canvas c=new Canvas();
-            c.setBitmap(maskBitmap);
-            Paint p=new Paint();
-            //p.setFilterBitmap(true); // possibly not nessecary as there is no scaling
-            c.drawBitmap(b, 0, 0, p);
-            b.recycle();
-
-            this.bitmapCache.put(tile, maskBitmap);
-            return maskBitmap;*/
+        if (null!=bitmapCache) {
             this.bitmapCache.put(tile, b);
-            return b;
-        //}
+        }
+        return b;
     }
 
     /**
@@ -324,7 +310,7 @@ public class AKDecodeService extends PagesProvider {
 
         }
     }
-    
+
     //====================================================
 
     private void updateImage(final Tile node, final Bitmap bitmap) {
@@ -725,7 +711,9 @@ public class AKDecodeService extends PagesProvider {
 
         @Override
         public void run() {
-            performDecode(this);
+            if (executor.run.get()) {
+                performDecode(this);
+            }
         }
 
         @Override
