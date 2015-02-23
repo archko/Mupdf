@@ -89,12 +89,16 @@
 	<item>不变</item>
 	<item>锁定竖屏</item>
 	<item>锁定横屏</item>
+        <item>反向竖屏</item>
+        <item>反向横屏</item>
 	</string-array>
 	<string-array name="orientations">
 	<item>0</item>
 	<item>3</item>
 	<item>1</item>
 	<item>2</item>
+        <item>4</item>
+        <item>5</item>
 	</string-array>
 	<string name="viewer">PDF 查看器</string>
 	<string name="selector">文件选择器</string>

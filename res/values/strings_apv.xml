@@ -93,12 +93,16 @@
 	<item>harder to change</item>
 	<item>lock to portrait</item>
 	<item>lock to landscape</item>
+        <item>reverse portrait</item>
+        <item>reverse landscape</item>
 	</string-array>
 	<string-array name="orientations">
 	<item>0</item>
 	<item>3</item>
 	<item>1</item>
 	<item>2</item>
+        <item>4</item>
+        <item>5</item>
 	</string-array>
 	<string name="viewer">PDF Viewer</string>
 	<string name="selector">File Chooser</string>
