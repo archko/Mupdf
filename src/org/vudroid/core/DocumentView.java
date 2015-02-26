@@ -218,10 +218,10 @@ public class DocumentView extends View implements ZoomListener {
                 if (lockedVertically) {
                     velocityX=0;
                 }
-                final float excursionY=Math.abs(ev.getY()-downY);
-                if (excursionY>getHeight()/10) {
+                //final float excursionY=Math.abs(ev.getY()-downY);
+                //if (excursionY>getHeight()/10) {
                     scroller.fling(getScrollX(), getScrollY(), (int) velocityX, (int) -velocityTracker.getYVelocity(), getLeftLimit(), getRightLimit(), getTopLimit(), getBottomLimit());
-                }
+                //}
                 velocityTracker.recycle();
                 velocityTracker=null;
 
