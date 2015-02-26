@@ -2,6 +2,7 @@ package org.vudroid.core;
 
 import android.content.Context;
 import android.graphics.*;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.GestureDetector;
 import android.view.KeyEvent;
@@ -9,18 +10,12 @@ import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
 import android.widget.Scroller;
-import cx.hell.android.pdfviewpro.Bookmark;
-import cx.hell.android.pdfviewpro.BookmarkEntry;
 import org.vudroid.core.events.CurrentPageListener;
 import org.vudroid.core.events.ZoomListener;
 import org.vudroid.core.models.CurrentPageModel;
 import org.vudroid.core.models.DecodingProgressModel;
 import org.vudroid.core.models.ZoomModel;
 import org.vudroid.core.multitouch.MultiTouchZoom;
-import org.vudroid.core.multitouch.MultiTouchZoomImpl;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class DocumentView extends View implements ZoomListener {
     final ZoomModel zoomModel;
@@ -30,6 +25,7 @@ public class DocumentView extends View implements ZoomListener {
     private final SparseArray<Page> pages = new SparseArray<Page>();
     private boolean isInitialized = false;
     private int pageToGoTo;
+    private int xToScroll;
     private float lastX;
     private float lastY;
     private VelocityTracker velocityTracker;
@@ -95,7 +91,13 @@ public class DocumentView extends View implements ZoomListener {
     }
 
     private void goToPageImpl(final int toPage) {
-        scrollTo(getScrollX(), pages.get(toPage).getTop());
+        int scroll=getScrollX();
+        Log.d(VIEW_LOG_TAG, "goToPageImpl:"+xToScroll+" scroll:"+scroll);
+        if (xToScroll!=0) {
+            scroll=xToScroll;
+            xToScroll=0;
+        }
+        scrollTo(scroll, pages.get(toPage).getTop());
     }
 
     @Override
@@ -152,6 +154,15 @@ public class DocumentView extends View implements ZoomListener {
     }
 
     public void goToPage(int toPage) {
+        if (isInitialized) {
+            goToPageImpl(toPage);
+        } else {
+            pageToGoTo = toPage;
+        }
+    }
+
+    public void goToPage(int toPage, int scrollX) {
+        xToScroll=scrollX;
         if (isInitialized) {
             goToPageImpl(toPage);
         } else {

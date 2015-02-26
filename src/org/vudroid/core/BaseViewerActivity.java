@@ -310,7 +310,7 @@ public abstract class BaseViewerActivity extends Activity implements DecodingPro
 
         if (0<bookmarkToRestore.page) {
             int currentPage = bookmarkToRestore.page;
-            documentView.goToPage(currentPage);
+            documentView.goToPage(currentPage, bookmarkToRestore.offsetX);
         }
     }
 
