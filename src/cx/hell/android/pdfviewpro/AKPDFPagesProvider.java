@@ -51,7 +51,7 @@ public class AKPDFPagesProvider extends PagesProvider {
 
     /* also calculates renderAhead */
     private void setMaxCacheSize() {
-        long availLong=(long) (Runtime.getRuntime().maxMemory()*3/5-4*MB);
+        long availLong=(long) (Runtime.getRuntime().maxMemory()/2-4*MB);
 
         int avail;
         if (availLong>256*MB)
@@ -179,10 +179,8 @@ public class AKPDFPagesProvider extends PagesProvider {
                 internalRelease();
                 return;
             case 3:
-                //internalSeekTo(msg.arg1);
                 return;
             case 4:
-                //internalPause();
                 return;
             case 5:
                 Map<Tile, Bitmap> renderedTiles=(Map<Tile, Bitmap>) msg.obj;
@@ -332,7 +330,7 @@ public class AKPDFPagesProvider extends PagesProvider {
      * Calls native code (through PDF object).
      */
     private Bitmap renderBitmap(Tile tile) throws RenderingException {
-        synchronized (tile) {
+        //synchronized (tile) {
             /* last minute check to make sure some other thread hasn't rendered this tile */
             if (this.bitmapCache.contains(tile))
                 return null;
@@ -343,18 +341,9 @@ public class AKPDFPagesProvider extends PagesProvider {
                 (int) size.x*tile.getZoom()/1000, (int) size.y*tile.getZoom()/1000,
                 tile.getX(), tile.getY(),
                 tile.getPrefXSize(), tile.getPrefYSize(), pdf.new Cookie());
-
-            Bitmap maskBitmap=Bitmap.createBitmap(b.getWidth(), b.getHeight(), Bitmap.Config.RGB_565);
-            Canvas c=new Canvas();
-            c.setBitmap(maskBitmap);
-            Paint p=new Paint();
-            //p.setFilterBitmap(true); // possibly not nessecary as there is no scaling
-            c.drawBitmap(b, 0, 0, p);
-            b.recycle();
-
-            this.bitmapCache.put(tile, maskBitmap);
-            return maskBitmap;
-        }
+            this.bitmapCache.put(tile, b);
+            return b;
+        //}
     }
 
     /**
