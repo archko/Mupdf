@@ -47,6 +47,7 @@ public class DocumentView extends View implements ZoomListener {
     private boolean verticalScrollLock = true;
     private boolean lockedVertically = true;
     private final GestureDetector mGestureDetector;
+    int mMargin=16;
 
     public void setPageModel(CurrentPageModel mPageModel) {
         this.mPageModel=mPageModel;
@@ -57,7 +58,7 @@ public class DocumentView extends View implements ZoomListener {
         this.zoomModel = zoomModel;
         this.progressModel = progressModel;
         this.currentPageModel = currentPageModel;
-        setKeepScreenOn(true);
+        //setKeepScreenOn(true);
         scroller = new Scroller(getContext());
         setFocusable(true);
         setFocusableInTouchMode(true);
@@ -420,39 +421,6 @@ public class DocumentView extends View implements ZoomListener {
         }
 
         return dx > getWidth()/10 || dx > getHeight()/10;
-    }
-
-    /*@Override
-    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-        super.onSizeChanged(w, h, oldw, oldh);
-        if (oldw == 0 && oldh == 0) {
-            goToBookmark();
-        }
-    }*/
-
-
-    private BookmarkEntry bookmarkToRestore = null;
-    int mMargin=10;
-
-    public void setBookmarkToRestore(BookmarkEntry bookmarkToRestore) {
-        this.bookmarkToRestore=bookmarkToRestore;
-    }
-
-    public void goToBookmark() {
-        if (bookmarkToRestore == null || bookmarkToRestore.absoluteZoomLevel == 0
-            || bookmarkToRestore.page < 0
-            || bookmarkToRestore.page >= decodeService.getPageCount()) {
-            //int top  = height / 2;
-            //int left = width / 2;
-        }
-        else {
-            float zoomLevel = bookmarkToRestore.absoluteZoomLevel;
-            zoomModel.setZoom(zoomLevel/1000);
-            int rotation = bookmarkToRestore.rotation;
-            int currentPage = bookmarkToRestore.page;
-            int top = bookmarkToRestore.offsetY;
-            int left = bookmarkToRestore.offsetX;
-        }
     }
 
     public void setScrollMargin(int margin) {

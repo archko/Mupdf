@@ -232,6 +232,9 @@ public class DecodeServiceBase implements DecodeService
 
     public int getPageCount()
     {
+        if (document==null) {
+            return 0;
+        }
         return document.getPageCount();
     }
 

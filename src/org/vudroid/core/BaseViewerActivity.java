@@ -67,6 +67,10 @@ public abstract class BaseViewerActivity extends Activity implements DecodingPro
         super.onCreate(savedInstanceState);
         initDecodeService();
         final ZoomModel zoomModel = new ZoomModel();
+        setStartBookmark();
+        if (null!=bookmarkToRestore) {
+            zoomModel.setZoom(bookmarkToRestore.absoluteZoomLevel/1000);
+        }
         final DecodingProgressModel progressModel = new DecodingProgressModel();
         progressModel.addEventListener(this);
         currentPageModel = new CurrentPageModel();
@@ -92,10 +96,7 @@ public abstract class BaseViewerActivity extends Activity implements DecodingPro
 
         /*final SharedPreferences sharedPreferences = getSharedPreferences(DOCUMENT_VIEW_STATE_PREFERENCES, 0);
         documentView.goToPage(sharedPreferences.getInt(getIntent().getData().toString(), 0));*/
-        Bookmark b = new Bookmark(getApplicationContext()).open();
-        Uri uri=getIntent().getData();
-        setStartBookmark(b, Uri.decode(uri.getEncodedPath()));
-        b.close();
+        restoreBookmark();
         documentView.showDocument();
 
         //viewerPreferences.addRecent(getIntent().getData());
@@ -286,24 +287,30 @@ public abstract class BaseViewerActivity extends Activity implements DecodingPro
 
     //--------------------------------------
 
-    public void setStartBookmark(Bookmark b, String bookmarkName) {
+    public void setStartBookmark() {
+        Bookmark b = new Bookmark(getApplicationContext()).open();
+        Uri uri=getIntent().getData();
+        String bookmarkName=Uri.decode(uri.getEncodedPath());
         if (b != null) {
             bookmarkToRestore = b.getLast(bookmarkName);
             Log.d(TAG, "setStartBookmark:"+bookmarkToRestore);
+        }
+        b.close();
+    }
 
-            if (bookmarkToRestore == null)
-                return;
+    void restoreBookmark(){
+        if (bookmarkToRestore == null) {
+            return;
+        }
 
-            if (bookmarkToRestore.numberOfPages != decodeService.getPageCount()) {
-                bookmarkToRestore = null;
-                return;
-            }
+        if (bookmarkToRestore.numberOfPages!=decodeService.getPageCount()&&decodeService.getPageCount()!=0) {
+            bookmarkToRestore = null;
+            return;
+        }
 
-            if (0<bookmarkToRestore.page) {
-                int currentPage = bookmarkToRestore.page;
-                documentView.setBookmarkToRestore(bookmarkToRestore);
-                documentView.goToPage(currentPage);
-            }
+        if (0<bookmarkToRestore.page) {
+            int currentPage = bookmarkToRestore.page;
+            documentView.goToPage(currentPage);
         }
     }
 
