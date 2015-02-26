@@ -13,13 +13,19 @@ import android.hardware.SensorManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.*;
 import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
+import android.widget.SeekBar;
+import android.widget.TextView;
 import android.widget.Toast;
 import cn.me.archko.pdf.AKRecent;
 import cn.me.archko.pdf.DataListener;
+import com.artifex.mupdfdemo.OutlineActivity;
+import com.artifex.mupdfdemo.OutlineActivityData;
 import com.artifex.mupdfdemo.R;
 import cx.hell.android.pdfviewpro.Bookmark;
 import cx.hell.android.pdfviewpro.BookmarkEntry;
@@ -37,6 +43,7 @@ public abstract class BaseViewerActivity extends Activity implements DecodingPro
     private static final int MENU_GOTO = 1;
     private static final int MENU_FULL_SCREEN = 2;
     private static final int MENU_OPTIONS = 3;
+    private static final int MENU_OUTLINE = 4;
     private static final int DIALOG_GOTO = 0;
     private static final String TAG="BaseViewer";
     //private static final String DOCUMENT_VIEW_STATE_PREFERENCES = "DjvuDocumentViewState";
@@ -93,6 +100,8 @@ public abstract class BaseViewerActivity extends Activity implements DecodingPro
         documentView.showDocument();
 
         //viewerPreferences.addRecent(getIntent().getData());
+
+        init(frameLayout);
     }
 
     public void decodingProgressChanged(final int currentlyDecoding)
@@ -113,7 +122,7 @@ public abstract class BaseViewerActivity extends Activity implements DecodingPro
         }
         else
         {
-            pageNumberToast = Toast.makeText(this, pageText, 200);
+            pageNumberToast = Toast.makeText(this, pageText, 80);
         }
         pageNumberToast.setGravity(Gravity.BOTTOM | Gravity.LEFT,0,0);
         pageNumberToast.show();
@@ -195,7 +204,8 @@ public abstract class BaseViewerActivity extends Activity implements DecodingPro
     {
         menu.add(0, MENU_EXIT, 0, "Exit");
         menu.add(1, MENU_GOTO, 0, getString(R.string.goto_page));
-        menu.add(2, MENU_OPTIONS, 0, getString(R.string.options));
+        menu.add(2, MENU_OUTLINE, 0, getString(R.string.table_of_contents));
+        menu.add(3, MENU_OPTIONS, 0, getString(R.string.options));
         /*final MenuItem menuItem = menu.add(0, MENU_FULL_SCREEN, 0, "Full screen").setCheckable(true).setChecked(viewerPreferences.isFullScreen());
         setFullScreenMenuItemText(menuItem);*/
         return true;
@@ -215,7 +225,8 @@ public abstract class BaseViewerActivity extends Activity implements DecodingPro
                 finish();
                 return true;
             case MENU_GOTO:
-                showDialog(DIALOG_GOTO);
+                //showDialog(DIALOG_GOTO);
+                showGotoPageView();
                 return true;
             case MENU_FULL_SCREEN: {
                 item.setChecked(!item.isChecked());
@@ -224,6 +235,14 @@ public abstract class BaseViewerActivity extends Activity implements DecodingPro
 
                 finish();
                 startActivity(getIntent());
+                return true;
+            }
+            case MENU_OUTLINE:{
+                if (OutlineActivityData.get().items!=null) {
+                    Intent intent=new Intent(this, OutlineActivity.class);
+                    intent.putExtra("cp", documentView.getCurrentPage());
+                    startActivityForResult(intent, OUTLINE_REQUEST);
+                }
                 return true;
             }
             case MENU_OPTIONS:
@@ -370,6 +389,7 @@ public abstract class BaseViewerActivity extends Activity implements DecodingPro
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
         }
         mControls.hide();
+        documentView.setScrollMargin(new ViewConfiguration().getScaledTouchSlop()*2);
     }
 
     @Override
@@ -431,5 +451,104 @@ public abstract class BaseViewerActivity extends Activity implements DecodingPro
             else if (gravity[0] < -4 && Integer.parseInt(Build.VERSION.SDK) >= 9)
                 setOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
         }
+    }
+
+    //--------------------------------
+
+    private void init(FrameLayout frameLayout) {
+        this.pageHandler = new Handler();
+        this.gotoPageRunnable = new Runnable() {
+            public void run() {
+                fadePageSlider();
+            }
+        };
+        mPageSlider=new SeekBar(this);
+        //mPageSlider.setId(10000);
+        mPageSlider.setThumb(getResources().getDrawable(R.drawable.seek_thumb));
+        mPageSlider.setProgressDrawable(getResources().getDrawable(R.drawable.seek_progress));
+        mPageSlider.setBackgroundResource(R.color.toolbar);
+        FrameLayout.LayoutParams lp=new FrameLayout.LayoutParams(
+            RelativeLayout.LayoutParams.MATCH_PARENT,
+            RelativeLayout.LayoutParams.WRAP_CONTENT);
+        lp.gravity=Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL;
+        lp.leftMargin=16;
+        lp.rightMargin=16;
+        lp.topMargin=8;
+        lp.bottomMargin=16;
+        frameLayout.addView(this.mPageSlider, lp);
+        mPageSlider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                documentView.goToPage((seekBar.getProgress()+mPageSliderRes/2)/mPageSliderRes);
+                showPageSlider(false);
+            }
+
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (null!=decodeService) {
+                    int index=(progress+mPageSliderRes/2)/mPageSliderRes;
+                    mPageNumberView.setText(String.format("%d / %d", index+1, decodeService.getPageCount()));
+                    showPageSlider(false);
+                }
+            }
+        });
+        mPageNumberView=new TextView(this);
+        mPageNumberView.setBackgroundResource(R.drawable.page_num);
+        mPageNumberView.setTextColor(getResources().getColor(android.R.color.white));
+        //mPageNumberView.setTextAppearance(this, android.R.attr.textAppearanceMedium);
+        lp=new FrameLayout.LayoutParams(
+            RelativeLayout.LayoutParams.WRAP_CONTENT,
+            RelativeLayout.LayoutParams.WRAP_CONTENT);
+        lp.gravity=Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL;
+        frameLayout.addView(this.mPageNumberView, lp);
+        mPageSlider.setVisibility(View.GONE);
+        mPageNumberView.setVisibility(View.GONE);
+    }
+
+    private final int OUTLINE_REQUEST=0;
+    private SeekBar mPageSlider;
+    private int mPageSliderRes;
+    private TextView mPageNumberView;
+    private Runnable gotoPageRunnable=null;
+    private Handler pageHandler = null;
+
+    private void fadePageSlider() {
+        mPageSlider.setVisibility(View.GONE);
+        mPageNumberView.setVisibility(View.GONE);
+    }
+
+    public void showPageSlider(boolean force) {
+        mPageSlider.setVisibility(View.VISIBLE);
+        mPageNumberView.setVisibility(View.VISIBLE);
+
+        pageHandler.removeCallbacks(gotoPageRunnable);
+        pageHandler.postDelayed(gotoPageRunnable, 2000);
+
+        if (!force){
+            return;
+        }
+
+        int index=documentView.getCurrentPage();
+        mPageNumberView.setText(String.format("%d / %d", index+1, decodeService.getPageCount()));
+        mPageSlider.setMax((decodeService.getPageCount()-1)*mPageSliderRes);
+        mPageSlider.setProgress(index*mPageSliderRes);
+    }
+
+    private void showGotoPageView() {
+        int smax=Math.max(decodeService.getPageCount()-1, 1);
+        mPageSliderRes=((10+smax-1)/smax)*2;
+        showPageSlider(true);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case OUTLINE_REQUEST:
+                if (resultCode >= 0)
+                    documentView.goToPage(resultCode);
+                break;
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 }

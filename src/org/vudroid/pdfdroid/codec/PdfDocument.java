@@ -14,6 +14,13 @@ public class PdfDocument implements CodecDocument
 
     public void setCore(MuPDFCore core) {
         this.core=core;
+        if (null!=core) {
+            OutlineActivityData.get().items=core.getOutline();
+        }
+    }
+
+    public MuPDFCore getCore() {
+        return core;
     }
 
     private PdfDocument(long docHandle)

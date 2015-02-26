@@ -104,7 +104,7 @@ public class DecodeServiceBase implements DecodeService
             Log.d(DECODE_SERVICE, "Skipping decode task for page " + currentDecodeTask.pageNumber);
             return;
         }
-        Log.d(DECODE_SERVICE, "Starting decode of page: " + currentDecodeTask.pageNumber+" slice:"+currentDecodeTask.pageSliceBounds);
+        //Log.d(DECODE_SERVICE, "Starting decode of page: " + currentDecodeTask.pageNumber+" slice:"+currentDecodeTask.pageSliceBounds);
         CodecPage vuPage = getPage(currentDecodeTask.pageNumber);
         preloadNextPage(currentDecodeTask.pageNumber);
 
@@ -114,7 +114,7 @@ public class DecodeServiceBase implements DecodeService
         }
         //Log.d(DECODE_SERVICE, "Start converting map to bitmap");
         float scale = calculateScale(vuPage) * currentDecodeTask.zoom;
-        Log.d(DECODE_SERVICE, "scale:"+scale+" vuPage.getWidth():"+vuPage.getWidth());
+        //Log.d(DECODE_SERVICE, "scale:"+scale+" vuPage.getWidth():"+vuPage.getWidth());
         final Bitmap bitmap = ((PdfPage)vuPage).renderBitmap(getScaledWidth(currentDecodeTask, vuPage, scale),
             getScaledHeight(currentDecodeTask, vuPage, scale), currentDecodeTask.pageSliceBounds, scale);
         //Log.d(DECODE_SERVICE, "Converting map to bitmap finished");

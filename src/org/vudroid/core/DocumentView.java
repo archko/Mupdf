@@ -2,7 +2,8 @@ package org.vudroid.core;
 
 import android.content.Context;
 import android.graphics.*;
-import android.net.Uri;
+import android.util.SparseArray;
+import android.view.GestureDetector;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
@@ -10,6 +11,7 @@ import android.view.View;
 import android.widget.Scroller;
 import cx.hell.android.pdfviewpro.Bookmark;
 import cx.hell.android.pdfviewpro.BookmarkEntry;
+import org.vudroid.core.events.CurrentPageListener;
 import org.vudroid.core.events.ZoomListener;
 import org.vudroid.core.models.CurrentPageModel;
 import org.vudroid.core.models.DecodingProgressModel;
@@ -24,7 +26,7 @@ public class DocumentView extends View implements ZoomListener {
     final ZoomModel zoomModel;
     private final CurrentPageModel currentPageModel;
     DecodeService decodeService;
-    private final HashMap<Integer, Page> pages = new HashMap<Integer, Page>();
+    private final SparseArray<Page> pages = new SparseArray<Page>();
     private boolean isInitialized = false;
     private int pageToGoTo;
     private float lastX;
@@ -43,6 +45,7 @@ public class DocumentView extends View implements ZoomListener {
     private float maxExcursionY = 0;
     private boolean verticalScrollLock = true;
     private boolean lockedVertically = true;
+    private final GestureDetector mGestureDetector;
 
     public DocumentView(Context context, final ZoomModel zoomModel, DecodingProgressModel progressModel, CurrentPageModel currentPageModel) {
         super(context);
@@ -54,6 +57,7 @@ public class DocumentView extends View implements ZoomListener {
         setFocusable(true);
         setFocusableInTouchMode(true);
         initMultiTouchZoomIfAvailable(zoomModel);
+        mGestureDetector=new GestureDetector(new MySimpleOnGestureListener());
     }
 
     private void initMultiTouchZoomIfAvailable(ZoomModel zoomModel) {
@@ -92,11 +96,7 @@ public class DocumentView extends View implements ZoomListener {
     protected void onScrollChanged(int l, int t, int oldl, int oldt) {
         super.onScrollChanged(l, t, oldl, oldt);
         // bounds could be not updated
-        post(new Runnable() {
-            public void run() {
-                currentPageModel.setCurrentPageIndex(getCurrentPage());
-            }
-        });
+        currentPageChanged();
         if (inZoom) {
             return;
         }
@@ -108,14 +108,28 @@ public class DocumentView extends View implements ZoomListener {
         });
     }
 
+    private void currentPageChanged() {
+        post(new Runnable() {
+            public void run() {
+                currentPageModel.setCurrentPageIndex(getCurrentPage());
+            }
+        });
+    }
+
     private void updatePageVisibility() {
-        for (Page page : pages.values()) {
+        //for (Page page : pages.values()) {
+        Page page;
+        for(int i = 0; i < pages.size(); i++){
+            page=pages.valueAt(i);
             page.updateVisibility();
         }
     }
 
     public void commitZoom() {
-        for (Page page : pages.values()) {
+        //for (Page page : pages.values()) {
+        Page page;
+        for(int i = 0; i < pages.size(); i++){
+            page=pages.valueAt(i);
             page.invalidate();
         }
         inZoom = false;
@@ -140,9 +154,12 @@ public class DocumentView extends View implements ZoomListener {
     }
 
     public int getCurrentPage() {
-        for (Map.Entry<Integer, Page> entry : pages.entrySet()) {
-            if (entry.getValue().isVisible()) {
-                return entry.getKey();
+        //for (Map.Entry<Integer, Page> entry : pages.entrySet()) {
+        Page page;
+        for(int i = 0; i < pages.size(); i++){
+            page=pages.valueAt(i);
+            if (page.isVisible()) {
+                return pages.keyAt(i);
             }
         }
         return 0;
@@ -160,6 +177,10 @@ public class DocumentView extends View implements ZoomListener {
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
         super.onTouchEvent(ev);
+
+        if (mGestureDetector.onTouchEvent(ev)) {
+            //return true;
+        }
 
         if (multiTouchZoom != null) {
             if (multiTouchZoom.onTouchEvent(ev)) {
@@ -258,7 +279,7 @@ public class DocumentView extends View implements ZoomListener {
     }
 
     private void verticalDpadScroll(int direction) {
-        scroller.startScroll(getScrollX(), getScrollY(), 0, direction * getHeight() / 2);
+        scroller.startScroll(getScrollX(), getScrollY(), 0, direction*getHeight()/2);
         invalidate();
     }
 
@@ -310,7 +331,10 @@ public class DocumentView extends View implements ZoomListener {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        for (Page page : pages.values()) {
+        //for (Page page : pages.values()) {
+        Page page;
+        for(int i = 0; i < pages.size(); i++){
+            page=pages.valueAt(i);
             page.draw(canvas);
         }
     }
@@ -348,7 +372,7 @@ public class DocumentView extends View implements ZoomListener {
         if (page == null || page.bounds == null) {
             return;
         }
-        scrollTo((int) (getScrollX() * ratio), (int) (getScrollY() * ratio));
+        scrollTo((int) (getScrollX()*ratio), (int) (getScrollY()*ratio));
     }
 
     private float getScrollScaleRatio() {
@@ -398,6 +422,7 @@ public class DocumentView extends View implements ZoomListener {
 
 
     private BookmarkEntry bookmarkToRestore = null;
+    int mMargin=10;
 
     public void setBookmarkToRestore(BookmarkEntry bookmarkToRestore) {
         this.bookmarkToRestore=bookmarkToRestore;
@@ -417,6 +442,79 @@ public class DocumentView extends View implements ZoomListener {
             int currentPage = bookmarkToRestore.page;
             int top = bookmarkToRestore.offsetY;
             int left = bookmarkToRestore.offsetX;
+        }
+    }
+
+    public void setScrollMargin(int margin) {
+        mMargin=margin;
+    }
+
+    class MySimpleOnGestureListener extends GestureDetector.SimpleOnGestureListener {
+
+        @Override
+        public boolean onSingleTapConfirmed(MotionEvent e) {
+            int height=getHeight();
+            int top=height/4;
+            int bottom=height*3/4;
+            //Log.d(VIEW_LOG_TAG, "height:"+height+" y:"+e.getY()+" mMargin:"+mMargin);
+
+            height=height-mMargin;
+            if ((int) e.getY()<top) {
+                scroller.startScroll(getScrollX(), getScrollY(), 0, -height, 0);
+                invalidate();
+                return true;
+            } else if ((int) e.getY()>bottom) {
+                scroller.startScroll(getScrollX(), getScrollY(), 0, height, 0);
+                invalidate();
+                return true;
+            } else {
+                currentPageModel.dispatch(new CurrentPageListener.CurrentPageChangedEvent(getCurrentPage()));
+            }
+            return false;
+        }
+
+        @Override
+        public boolean onDoubleTap(MotionEvent motionEvent) {
+            return false;
+        }
+
+        @Override
+        public boolean onDoubleTapEvent(MotionEvent motionEvent) {
+            return false;
+        }
+
+        public boolean onDown(MotionEvent arg0) {
+            return false;
+        }
+
+        /**
+         * 控件高大于图片高,则在垂直方向不可以移动,控件宽大于图片宽则水平方向不可移动.
+         * 移动时,图片左上角为例,不可以向下移出控件左顶点.右上角,右下角,左下角一样.这只会在图片已经大于控件时才地出现.
+         * 以图片移动方向的宽度大于控件,左右上下边界为限制.左右移动时,图片左边不可以在达到边界后继续向右移动.
+         * 右边界同理.
+         *
+         * @param e1
+         * @param e2
+         * @param velocityX
+         * @param velocityY
+         * @return
+         */
+        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+            return false;
+        }
+
+        public void onLongPress(MotionEvent e) {
+        }
+
+        public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+            return false;
+        }
+
+        public void onShowPress(MotionEvent e) {
+        }
+
+        public boolean onSingleTapUp(MotionEvent e) {
+            return false;
         }
     }
 }
