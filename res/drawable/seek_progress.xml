@@ -2,5 +2,5 @@
 
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
 	android:shape="line" >
-	<stroke android:width="6dp" android:color="@color/seek_progress" />
+	<stroke android:width="4dp" android:color="@color/seek_progress" />
 </shape>

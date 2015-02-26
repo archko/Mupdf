@@ -13,17 +13,14 @@ import android.hardware.SensorManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.*;
 import android.widget.FrameLayout;
-import android.widget.RelativeLayout;
-import android.widget.SeekBar;
-import android.widget.TextView;
 import android.widget.Toast;
 import cn.me.archko.pdf.AKRecent;
 import cn.me.archko.pdf.DataListener;
+import org.vudroid.core.views.PageSeekBarControls;
 import com.artifex.mupdfdemo.OutlineActivity;
 import com.artifex.mupdfdemo.OutlineActivityData;
 import com.artifex.mupdfdemo.R;
@@ -53,6 +50,8 @@ public abstract class BaseViewerActivity extends Activity implements DecodingPro
     private Toast pageNumberToast;
     private CurrentPageModel currentPageModel;
     PageViewZoomControls mControls;
+    private CurrentPageModel mPageModel;
+    PageSeekBarControls mPageSeekBarControls;
 
     /**
      * Bookmarked page to go to.
@@ -101,7 +100,20 @@ public abstract class BaseViewerActivity extends Activity implements DecodingPro
 
         //viewerPreferences.addRecent(getIntent().getData());
 
-        init(frameLayout);
+        mPageModel=new CurrentPageModel();
+        mPageModel.addEventListener(new CurrentPageListener() {
+            @Override
+            public void currentPageChanged(int pageIndex) {
+                Log.d(TAG, "currentPageChanged:"+pageIndex);
+                if (documentView.getCurrentPage()!=pageIndex) {
+                    documentView.goToPage(pageIndex);
+                }
+            }
+        });
+        documentView.setPageModel(mPageModel);
+        mPageSeekBarControls=createSeekControls(mPageModel);
+        frameLayout.addView(mPageSeekBarControls);
+        mPageSeekBarControls.hide();
     }
 
     public void decodingProgressChanged(final int currentlyDecoding)
@@ -160,6 +172,14 @@ public abstract class BaseViewerActivity extends Activity implements DecodingPro
         final PageViewZoomControls controls = new PageViewZoomControls(this, zoomModel);
         controls.setGravity(Gravity.RIGHT | Gravity.BOTTOM);
         zoomModel.addEventListener(controls);
+        return controls;
+    }
+
+    private PageSeekBarControls createSeekControls(CurrentPageModel pageModel)
+    {
+        final PageSeekBarControls controls = new PageSeekBarControls(this, pageModel);
+        controls.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.TOP);
+        pageModel.addEventListener(controls);
         return controls;
     }
 
@@ -226,7 +246,9 @@ public abstract class BaseViewerActivity extends Activity implements DecodingPro
                 return true;
             case MENU_GOTO:
                 //showDialog(DIALOG_GOTO);
-                showGotoPageView();
+                mPageModel.setCurrentPage(currentPageModel.getCurrentPageIndex());
+                mPageModel.setPageCount(decodeService.getPageCount());
+                mPageSeekBarControls.fade();
                 return true;
             case MENU_FULL_SCREEN: {
                 item.setChecked(!item.isChecked());
@@ -389,7 +411,13 @@ public abstract class BaseViewerActivity extends Activity implements DecodingPro
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
         }
         mControls.hide();
-        documentView.setScrollMargin(new ViewConfiguration().getScaledTouchSlop()*2);
+        int height=documentView.getHeight();
+        if (height<=0) {
+            height=new ViewConfiguration().getScaledTouchSlop()*2;
+        } else {
+            height=(int) (height*0.97);
+        }
+        documentView.setScrollMargin(height);
     }
 
     @Override
@@ -404,7 +432,7 @@ public abstract class BaseViewerActivity extends Activity implements DecodingPro
             SharedPreferences.Editor edit = PreferenceManager.getDefaultSharedPreferences(this).edit();
             edit.putInt(Options.PREF_PREV_ORIENTATION, prevOrientation);
             //Log.v(TAG, "prevOrientation saved: "+prevOrientation);
-            edit.commit();
+            edit.apply();
         }
     }
 
@@ -455,91 +483,7 @@ public abstract class BaseViewerActivity extends Activity implements DecodingPro
 
     //--------------------------------
 
-    private void init(FrameLayout frameLayout) {
-        this.pageHandler = new Handler();
-        this.gotoPageRunnable = new Runnable() {
-            public void run() {
-                fadePageSlider();
-            }
-        };
-        mPageSlider=new SeekBar(this);
-        //mPageSlider.setId(10000);
-        mPageSlider.setThumb(getResources().getDrawable(R.drawable.seek_thumb));
-        mPageSlider.setProgressDrawable(getResources().getDrawable(R.drawable.seek_progress));
-        mPageSlider.setBackgroundResource(R.color.toolbar);
-        FrameLayout.LayoutParams lp=new FrameLayout.LayoutParams(
-            RelativeLayout.LayoutParams.MATCH_PARENT,
-            RelativeLayout.LayoutParams.WRAP_CONTENT);
-        lp.gravity=Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL;
-        lp.leftMargin=16;
-        lp.rightMargin=16;
-        lp.topMargin=8;
-        lp.bottomMargin=16;
-        frameLayout.addView(this.mPageSlider, lp);
-        mPageSlider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            public void onStopTrackingTouch(SeekBar seekBar) {
-                documentView.goToPage((seekBar.getProgress()+mPageSliderRes/2)/mPageSliderRes);
-                showPageSlider(false);
-            }
-
-            public void onStartTrackingTouch(SeekBar seekBar) {
-            }
-
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if (null!=decodeService) {
-                    int index=(progress+mPageSliderRes/2)/mPageSliderRes;
-                    mPageNumberView.setText(String.format("%d / %d", index+1, decodeService.getPageCount()));
-                    showPageSlider(false);
-                }
-            }
-        });
-        mPageNumberView=new TextView(this);
-        mPageNumberView.setBackgroundResource(R.drawable.page_num);
-        mPageNumberView.setTextColor(getResources().getColor(android.R.color.white));
-        //mPageNumberView.setTextAppearance(this, android.R.attr.textAppearanceMedium);
-        lp=new FrameLayout.LayoutParams(
-            RelativeLayout.LayoutParams.WRAP_CONTENT,
-            RelativeLayout.LayoutParams.WRAP_CONTENT);
-        lp.gravity=Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL;
-        frameLayout.addView(this.mPageNumberView, lp);
-        mPageSlider.setVisibility(View.GONE);
-        mPageNumberView.setVisibility(View.GONE);
-    }
-
     private final int OUTLINE_REQUEST=0;
-    private SeekBar mPageSlider;
-    private int mPageSliderRes;
-    private TextView mPageNumberView;
-    private Runnable gotoPageRunnable=null;
-    private Handler pageHandler = null;
-
-    private void fadePageSlider() {
-        mPageSlider.setVisibility(View.GONE);
-        mPageNumberView.setVisibility(View.GONE);
-    }
-
-    public void showPageSlider(boolean force) {
-        mPageSlider.setVisibility(View.VISIBLE);
-        mPageNumberView.setVisibility(View.VISIBLE);
-
-        pageHandler.removeCallbacks(gotoPageRunnable);
-        pageHandler.postDelayed(gotoPageRunnable, 2000);
-
-        if (!force){
-            return;
-        }
-
-        int index=documentView.getCurrentPage();
-        mPageNumberView.setText(String.format("%d / %d", index+1, decodeService.getPageCount()));
-        mPageSlider.setMax((decodeService.getPageCount()-1)*mPageSliderRes);
-        mPageSlider.setProgress(index*mPageSliderRes);
-    }
-
-    private void showGotoPageView() {
-        int smax=Math.max(decodeService.getPageCount()-1, 1);
-        mPageSliderRes=((10+smax-1)/smax)*2;
-        showPageSlider(true);
-    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {

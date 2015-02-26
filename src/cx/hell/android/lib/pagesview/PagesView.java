@@ -1863,14 +1863,28 @@ public class PagesView extends View implements
 		case Actions.ACTION_NEXT_PAGE:
 			scrollToPage(currentPage + 1);
 			return true;
-		case Actions.ACTION_SCREEN_DOWN:
-			this.top += this.getHeight() - 16;
-			this.invalidate();
-			return true;
-		case Actions.ACTION_SCREEN_UP:
-			this.top -= this.getHeight() - 16;
-			this.invalidate();
-			return true;
+		case Actions.ACTION_SCREEN_DOWN: {
+            int height=getHeight();
+            if (height<=0) {
+                height=16;
+            } else {
+                height=(int) (height*0.97);
+            }
+            this.top+=this.getHeight()-height;
+            this.invalidate();
+            return true;
+        }
+		case Actions.ACTION_SCREEN_UP: {
+            int height=getHeight();
+            if (height<=0) {
+                height=16;
+            } else {
+                height=(int) (height*0.97);
+            }
+            this.top-=this.getHeight()-height;
+            this.invalidate();
+            return true;
+        }
 		default:
 			return false;
 		}

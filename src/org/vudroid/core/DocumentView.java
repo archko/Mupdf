@@ -25,6 +25,7 @@ import java.util.Map;
 public class DocumentView extends View implements ZoomListener {
     final ZoomModel zoomModel;
     private final CurrentPageModel currentPageModel;
+    private CurrentPageModel mPageModel;
     DecodeService decodeService;
     private final SparseArray<Page> pages = new SparseArray<Page>();
     private boolean isInitialized = false;
@@ -46,6 +47,10 @@ public class DocumentView extends View implements ZoomListener {
     private boolean verticalScrollLock = true;
     private boolean lockedVertically = true;
     private final GestureDetector mGestureDetector;
+
+    public void setPageModel(CurrentPageModel mPageModel) {
+        this.mPageModel=mPageModel;
+    }
 
     public DocumentView(Context context, final ZoomModel zoomModel, DecodingProgressModel progressModel, CurrentPageModel currentPageModel) {
         super(context);
@@ -89,7 +94,7 @@ public class DocumentView extends View implements ZoomListener {
     }
 
     private void goToPageImpl(final int toPage) {
-        scrollTo(0, pages.get(toPage).getTop());
+        scrollTo(getScrollX(), pages.get(toPage).getTop());
     }
 
     @Override
@@ -208,6 +213,11 @@ public class DocumentView extends View implements ZoomListener {
                 setLastPosition(ev);
                 if (ev.getEventTime() - lastDownEventTime < DOUBLE_TAP_TIME) {
                     zoomModel.toggleZoomControls();
+                    if (null!=mPageModel) {
+                        mPageModel.setCurrentPage(currentPageModel.getCurrentPageIndex());
+                        mPageModel.setPageCount(decodeService.getPageCount());
+                        mPageModel.toggleSeekControls();
+                    }
                 } else {
                     lastDownEventTime = ev.getEventTime();
                 }
@@ -462,11 +472,9 @@ public class DocumentView extends View implements ZoomListener {
             if ((int) e.getY()<top) {
                 scroller.startScroll(getScrollX(), getScrollY(), 0, -height, 0);
                 invalidate();
-                return true;
             } else if ((int) e.getY()>bottom) {
                 scroller.startScroll(getScrollX(), getScrollY(), 0, height, 0);
                 invalidate();
-                return true;
             } else {
                 currentPageModel.dispatch(new CurrentPageListener.CurrentPageChangedEvent(getCurrentPage()));
             }
