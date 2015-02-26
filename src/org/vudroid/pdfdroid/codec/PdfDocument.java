@@ -1,6 +1,8 @@
 package org.vudroid.pdfdroid.codec;
 
 import com.artifex.mupdfdemo.MuPDFCore;
+import com.artifex.mupdfdemo.OutlineActivityData;
+import cx.hell.android.pdfviewpro.APVApplication;
 import org.vudroid.core.codec.CodecDocument;
 import org.vudroid.core.codec.CodecPage;
 
@@ -21,18 +23,32 @@ public class PdfDocument implements CodecDocument
 
     public CodecPage getPage(int pageNumber)
     {
-        return PdfPage.createPage(docHandle, pageNumber + 1);
-        //return AKPdfPage.createPage(docHandle, pageNumber);
+        //return PdfPage.createPage(docHandle, pageNumber + 1);
+        return PdfPage.createPage(core, pageNumber+1);
     }
 
     public int getPageCount()
     {
-        return getPageCount(docHandle);
+        //return getPageCount(docHandle);
+        return core.countPages();
     }
 
     static PdfDocument openDocument(String fname, String pwd)
     {
-        return new PdfDocument(open(FITZMEMORY, fname, pwd));
+        //return new PdfDocument(open(FITZMEMORY, fname, pwd));
+        PdfDocument document= new PdfDocument(0);
+        MuPDFCore core=null;
+        System.out.println("Trying to open "+fname);
+        try {
+            core=new MuPDFCore(APVApplication.getInstance(), fname);
+            // New file: drop the old outline data
+            OutlineActivityData.set(null);
+            document.setCore(core);
+        } catch (Exception e) {
+            System.out.println(e);
+            return null;
+    }
+        return document;
     }
 
     private static native long open(int fitzmemory, String fname, String pwd);
@@ -49,9 +65,12 @@ public class PdfDocument implements CodecDocument
     }
 
     public synchronized void recycle() {
-        if (docHandle != 0) {
+        /*if (docHandle != 0) {
             free(docHandle);
             docHandle = 0;
+        }*/
+        if (null!=core){
+            core.onDestroy();
         }
     }
 }

@@ -10,7 +10,7 @@ public class VuDroidLibraryLoader
         {
             return;
         }
-        System.loadLibrary("vudroid");
+        //System.loadLibrary("vudroid");
         alreadyLoaded = true;
     }
 }

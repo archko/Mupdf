@@ -370,7 +370,7 @@ public class BrowserFragment extends RefreshableFragment implements OnItemClickL
         	else*/ if (entry.getType() == FileListEntry.RECENT) {
                 apvContextMenuItem=menu.add(R.string.menu_apv);
                 mupdfContextMenuItem=menu.add(R.string.menu_mupdf);
-                //vudroidContextMenuItem=menu.add(R.string.menu_vudroid);
+                vudroidContextMenuItem=menu.add(R.string.menu_vudroid);
 
         		//openContextMenuItem = menu.add(R.string.open);
         		removeContextMenuItem = menu.add(R.string.remove_from_recent);
@@ -378,7 +378,7 @@ public class BrowserFragment extends RefreshableFragment implements OnItemClickL
         	else if (! entry.isDirectory()&&entry.getType() != FileListEntry.HOME) {
                 apvContextMenuItem=menu.add(R.string.menu_apv);
                 mupdfContextMenuItem=menu.add(R.string.menu_mupdf);
-                //vudroidContextMenuItem=menu.add(R.string.menu_vudroid);
+                vudroidContextMenuItem=menu.add(R.string.menu_vudroid);
 
         		//openContextMenuItem = menu.add(R.string.open);
         		deleteContextMenuItem = menu.add(R.string.delete);

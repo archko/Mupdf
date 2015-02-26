@@ -14,6 +14,14 @@ public class PdfPage implements CodecPage
 
     private long pageHandle;
     private long docHandle;
+    MuPDFCore core;
+    int pdfPageWidth;
+    int pdfPageHeight;
+
+    public PdfPage(MuPDFCore core, long pageHandle) {
+        this.core=core;
+        this.pageHandle=pageHandle;
+    }
 
     private PdfPage(long pageHandle, long docHandle)
     {
@@ -33,14 +41,20 @@ public class PdfPage implements CodecPage
 
     public int getWidth()
     {
-        return (int) getMediaBox().width();
-        //return (int) (core.getPDFPageWidth()/2);
+        //return (int) getMediaBox().width();
+        if (pdfPageWidth==0) {
+            pdfPageWidth=(int) (core.getPDFPageWidth());
+        }
+        return pdfPageWidth;
     }
 
     public int getHeight()
     {
-        return (int) getMediaBox().height();
-        //return (int) (core.getPDFPageHeight()/2);
+        //return (int) getMediaBox().height();
+        if (pdfPageHeight==0) {
+            pdfPageHeight=(int) (core.getPDFPageHeight());
+        }
+        return pdfPageHeight;
     }
 
     public Bitmap renderBitmap(int width, int height, RectF pageSliceBounds)
@@ -53,10 +67,57 @@ public class PdfPage implements CodecPage
         return render(new Rect(0,0,width,height), matrix);
     }
 
+    /**
+     * 渲染位图
+     *
+     * @param width           图块宽
+     * @param height          图块高
+     * @param pageSliceBounds 切割的矩形,切割4份则为1/4,8份为1/8,类推.
+     * @param scale           缩放级别
+     * @return 位置
+     */
+    public Bitmap renderBitmap(int width, int height, RectF pageSliceBounds, float scale)
+    {
+        //Matrix matrix=new Matrix();
+        //matrix.postScale(width/getWidth(), -height/getHeight());
+        //matrix.postTranslate(0, height);
+        //matrix.postTranslate(-pageSliceBounds.left*width, -pageSliceBounds.top*height);
+        //matrix.postScale(1/pageSliceBounds.width(), 1/pageSliceBounds.height());
+
+        int pageW;
+        int pageH;
+        int patchX;
+        int patchY;
+        int patchW;
+        int patchH;
+        pageW=(int) (getWidth()*scale);
+        pageH=(int) (getHeight()*scale);
+        //PointF size=core.getPageSize((int) pageHandle);
+        //pageW=(int) (size.x*scale);
+        //pageH=(int) (size.y*scale);
+
+        patchX=(int) (pageSliceBounds.left*pageW);
+        patchY=(int) (pageSliceBounds.top*pageH);
+        patchW=width;
+        patchH=height;
+        Bitmap bitmap=Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        core.renderPage(bitmap, (int) pageHandle,
+            pageW, pageH,
+            patchX, patchY,
+            patchW, patchH, core.new Cookie());
+        return bitmap;
+    }
+
     static PdfPage createPage(long dochandle, int pageno)
     {
         return new PdfPage(open(dochandle, pageno), dochandle);
-        //return new PdfPage(pageno);
+    }
+
+    static PdfPage createPage(MuPDFCore core, int pageno)
+    {
+        PdfPage pdfPage=new PdfPage(core, pageno);
+        core.gotoPage(pageno);
+        return pdfPage;
     }
 
     @Override
@@ -67,19 +128,20 @@ public class PdfPage implements CodecPage
     }
 
     public synchronized void recycle() {
-        if (pageHandle != 0) {
+        /*if (pageHandle != 0) {
             free(pageHandle);
             pageHandle = 0;
+        }*/
         }
-    }
 
     private RectF getMediaBox()
     {
         float[] box = new float[4];
-        getMediaBox(pageHandle, box);
+        //getMediaBox(pageHandle, box);
         RectF rectF= new RectF(box[0], box[1], box[2], box[3]);
         //RectF rectF= new RectF(0, 0, core.getPDFPageWidth()/2, core.getPDFPageHeight()/2);
         //System.out.println("getMediaBox:"+rectF);
+        rectF=core.getMediaBox(0);
         return rectF;
     }
 

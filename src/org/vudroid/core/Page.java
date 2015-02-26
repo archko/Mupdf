@@ -14,11 +14,12 @@ class Page {
     private final TextPaint textPaint = textPaint();
     private final Paint fillPaint = fillPaint();
     private final Paint strokePaint = strokePaint();
+    public static final int ZOOM_THRESHOLD = 2;
 
     Page(DocumentView documentView, int index) {
         this.documentView = documentView;
         this.index = index;
-        node = new PageTreeNode(documentView, new RectF(0, 0, 1, 1), this, 1, null);
+        node = new PageTreeNode(documentView, new RectF(0, 0, 1, 1), this, ZOOM_THRESHOLD, null);
     }
 
     private float aspectRatio;
@@ -36,7 +37,7 @@ class Page {
             return;
         }
         canvas.drawRect(bounds, fillPaint);
-        //System.out.println("page draw:"+index+" node:"+node);
+
         canvas.drawText("Page " + (index + 1), bounds.centerX(), bounds.centerY(), textPaint);
         node.draw(canvas);
         canvas.drawLine(bounds.left, bounds.top, bounds.right, bounds.top, strokePaint);
@@ -79,7 +80,6 @@ class Page {
     }
 
     public boolean isVisible() {
-        //System.out.println("isVisible,getViewRect:"+documentView.getViewRect()+" bounds:"+bounds);
         return RectF.intersects(documentView.getViewRect(), bounds);
     }
 
@@ -98,5 +98,15 @@ class Page {
 
     public void invalidate() {
         node.invalidate();
+    }
+
+    @Override
+    public String toString() {
+        return "Page{"+
+            "index="+index+
+            ", bounds="+bounds+
+            ", node="+node+
+            ", aspectRatio="+aspectRatio+
+            '}';
     }
 }

@@ -135,7 +135,8 @@
 			</intent-filter>
 		</activity>
         <activity android:name="cx.hell.android.pdfviewpro.Options" android:label="@string/options" />
-        <activity android:name="org.vudroid.pdfdroid.PdfViewerActivity" android:screenOrientation="landscape"/>
+        <activity android:name="org.vudroid.pdfdroid.PdfViewerActivity" android:screenOrientation="landscape"
+            android:configChanges="orientation|keyboardHidden|screenSize"/>
 		<activity
 			android:name="OutlineActivity"
 			android:configChanges="orientation|keyboardHidden|screenSize"

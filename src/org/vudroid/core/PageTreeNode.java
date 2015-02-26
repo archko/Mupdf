@@ -6,7 +6,7 @@ import java.lang.ref.SoftReference;
 import java.util.Arrays;
 
 class PageTreeNode {
-    private static final int SLICE_SIZE = 65535;
+    private static final int SLICE_SIZE = 65535*4;
     private Bitmap bitmap;
     private SoftReference<Bitmap> bitmapWeakReference;
     private boolean decodingNow;
@@ -61,7 +61,6 @@ class PageTreeNode {
         if (children != null) {
             for (PageTreeNode child : children) {
                 child.invalidateRecursive();
-                break;
             }
         }
         stopDecodingThisNode();
@@ -104,15 +103,13 @@ class PageTreeNode {
     private void invalidateChildren() {
         if (thresholdHit() && children == null && isVisible()) {
             final int newThreshold = treeNodeDepthLevel * 2;
-            if (treeNodeDepthLevel<=4) {
-                children = new PageTreeNode[]
-                        {
-                                new PageTreeNode(documentView, new RectF(0, 0, 0.5f, 0.5f), page, newThreshold, this),
-                                new PageTreeNode(documentView, new RectF(0.5f, 0, 1.0f, 0.5f), page, newThreshold, this),
-                                new PageTreeNode(documentView, new RectF(0, 0.5f, 0.5f, 1.0f), page, newThreshold, this),
-                                new PageTreeNode(documentView, new RectF(0.5f, 0.5f, 1.0f, 1.0f), page, newThreshold, this)
-                        };
-            }
+            children = new PageTreeNode[]
+                    {
+                            new PageTreeNode(documentView, new RectF(0, 0, 0.5f, 0.5f), page, newThreshold, this),
+                            new PageTreeNode(documentView, new RectF(0.5f, 0, 1.0f, 0.5f), page, newThreshold, this),
+                            new PageTreeNode(documentView, new RectF(0, 0.5f, 0.5f, 1.0f), page, newThreshold, this),
+                            new PageTreeNode(documentView, new RectF(0.5f, 0.5f, 1.0f, 1.0f), page, newThreshold, this)
+                    };
         }
         if (!thresholdHit() && getBitmap() != null || !isVisible()) {
             recycleChildren();
@@ -274,26 +271,14 @@ class PageTreeNode {
     @Override
     public String toString() {
         return "PageTreeNode{"+
-            "pageSliceBounds="+pageSliceBounds+
+            "treeNodeDepthLevel="+treeNodeDepthLevel+
+            ", children="+Arrays.toString(children)+
+            ", pageSliceBounds="+pageSliceBounds+
+            ", bitmap="+bitmap+
+            ", bitmapWeakReference="+bitmapWeakReference+
             ", targetRectF="+targetRectF+
-            ", treeNodeDepthLevel="+treeNodeDepthLevel+
+            ", targetRect="+targetRect+
+            ", matrix="+matrix+
             '}';
     }
-/*@Override
-    public String toString() {
-        String s= "PageTreeNode{"+
-            "decodingNow="+decodingNow+
-            ", pageSliceBounds="+pageSliceBounds+
-            ", treeNodeDepthLevel="+treeNodeDepthLevel+
-            ", matrix="+matrix+
-            ", invalidateFlag="+invalidateFlag+
-            ", targetRect="+targetRect+
-            ", targetRectF="+targetRectF+
-            ", children="+(children==null ? "0" : children.length)+
-            '}';
-        if (null!=children) {
-            System.out.println("-->children="+Arrays.toString(children));
-        }
-        return s;
-    }*/
 }

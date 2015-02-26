@@ -1,5 +1,6 @@
 package cx.hell.android.lib.pagesview;
 
+import android.graphics.Rect;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -27,6 +28,7 @@ public class Tile implements Parcelable{
 	private int prefYSize;
 
     public boolean isVisible=false;
+    Rect rect;
 	
 	//int _hashCode;
 	
@@ -41,8 +43,16 @@ public class Tile implements Parcelable{
         //System.out.println("ctor :"+toString());
         isVisible=true;
     }
-	
-	public String toString() {
+
+    public Rect getRect() {
+        return rect;
+    }
+
+    public void setRect(Rect rect) {
+        this.rect=rect;
+    }
+
+    public String toString() {
 		return "Tile(" +
 			this.page + ", " +
 			this.zoom + ", " +
@@ -50,6 +60,7 @@ public class Tile implements Parcelable{
 			this.y + ", " +
             this.prefXSize + ", " +
             this.prefYSize + ", " +
+            this.rect + ", " +
 			this.rotation + ")";
 	}
 	
@@ -75,15 +86,33 @@ public class Tile implements Parcelable{
     @Override
     public boolean equals(Object o) {
         if (this==o) return true;
-        if (o==null||getClass()!=o.getClass()) return false;
+        if (o==null||getClass()!=o.getClass()) {
+            //System.out.println("task :"+getClass()+" that:"+o.getClass());
+            return false;
+        }
 
         Tile tile=(Tile) o;
 
-        if (page!=tile.page) return false;
-        if (prefXSize!=tile.prefXSize) return false;
-        if (prefYSize!=tile.prefYSize) return false;
-        if (x!=tile.x) return false;
-        if (y!=tile.y) return false;
+        if (page!=tile.page){
+            //System.out.println("task :"+page+" that:"+tile.page);
+            return false;
+        }
+        if (prefXSize!=tile.prefXSize){
+            //System.out.println("task :"+prefXSize+" that:"+tile.prefXSize);
+            return false;
+        }
+        if (prefYSize!=tile.prefYSize){
+            //System.out.println("task :"+prefYSize+" that:"+tile.prefYSize);
+            return false;
+        }
+        if (x!=tile.x){
+            //System.out.println("task :"+x+" that:"+tile.x);
+            return false;
+        }
+        if (y!=tile.y){
+            //System.out.println("task :"+y+" that:"+tile.y);
+            return false;
+        }
 
         return true;
     }

@@ -345,9 +345,9 @@ public class AKDecodeService extends PagesProvider {
 
     void abortDecoding(final DecodeTask currentDecodeTask, final Bitmap bitmap) {
         stopDecoding(currentDecodeTask.node, "failed");
-        if (null!=bitmap) {
+        /*if (null!=bitmap) {
             updateImage(currentDecodeTask.node, bitmap);
-        }
+        }*/
     }
 
     public void stopDecoding(final Tile node, final String reason) {

@@ -2,11 +2,14 @@ package org.vudroid.core;
 
 import android.content.Context;
 import android.graphics.*;
+import android.net.Uri;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
 import android.widget.Scroller;
+import cx.hell.android.pdfviewpro.Bookmark;
+import cx.hell.android.pdfviewpro.BookmarkEntry;
 import org.vudroid.core.events.ZoomListener;
 import org.vudroid.core.models.CurrentPageModel;
 import org.vudroid.core.models.DecodingProgressModel;
@@ -34,6 +37,12 @@ public class DocumentView extends View implements ZoomListener {
     private long lastDownEventTime;
     private static final int DOUBLE_TAP_TIME = 500;
     private MultiTouchZoom multiTouchZoom;
+
+    private float downX = 0;
+    private float downY = 0;
+    private float maxExcursionY = 0;
+    private boolean verticalScrollLock = true;
+    private boolean lockedVertically = true;
 
     public DocumentView(Context context, final ZoomModel zoomModel, DecodingProgressModel progressModel, CurrentPageModel currentPageModel) {
         super(context);
@@ -65,11 +74,11 @@ public class DocumentView extends View implements ZoomListener {
         }
         final int width = decodeService.getEffectivePagesWidth();
         final int height = decodeService.getEffectivePagesHeight();
-        System.out.println(String.format("width:%d, height:%d, getPageCount:%d",width, height, decodeService.getPageCount()));
         for (int i = 0; i < decodeService.getPageCount(); i++) {
             pages.put(i, new Page(this, i));
             pages.get(i).setAspectRatio(width, height);
         }
+        System.out.println("ViewDroidDecodeService:"+pages.size()+" page:"+pageToGoTo);
         isInitialized = true;
         invalidatePageSizes();
         goToPageImpl(pageToGoTo);
@@ -108,7 +117,6 @@ public class DocumentView extends View implements ZoomListener {
     public void commitZoom() {
         for (Page page : pages.values()) {
             page.invalidate();
-            break;
         }
         inZoom = false;
     }
@@ -170,7 +178,11 @@ public class DocumentView extends View implements ZoomListener {
         velocityTracker.addMovement(ev);
 
         switch (ev.getAction()) {
-            case MotionEvent.ACTION_DOWN:
+            case MotionEvent.ACTION_DOWN: {
+                lockedVertically = verticalScrollLock;
+                downX = ev.getX();
+                downY = ev.getY();
+                maxExcursionY = 0;
                 stopScroller();
                 setLastPosition(ev);
                 if (ev.getEventTime() - lastDownEventTime < DOUBLE_TAP_TIME) {
@@ -179,17 +191,42 @@ public class DocumentView extends View implements ZoomListener {
                     lastDownEventTime = ev.getEventTime();
                 }
                 break;
-            case MotionEvent.ACTION_MOVE:
-                scrollBy((int) (lastX - ev.getX()), (int) (lastY - ev.getY()));
+            }
+            case MotionEvent.ACTION_MOVE: {
+                if (lockedVertically && unlocksVerticalLock(ev)) {
+                    lockedVertically = false;
+                }
+
+                float excursionY = Math.abs(ev.getY() - downY);
+
+                if (excursionY > maxExcursionY) {
+                    maxExcursionY = excursionY;
+                }
+
+                int scrollX=(int) (lastX - ev.getX());
+                if (lockedVertically) {
+                    scrollX=0;
+                }
+                scrollBy(scrollX, (int) (lastY - ev.getY()));
                 setLastPosition(ev);
                 break;
-            case MotionEvent.ACTION_UP:
+            }
+            case MotionEvent.ACTION_UP: {
                 velocityTracker.computeCurrentVelocity(1000);
-                scroller.fling(getScrollX(), getScrollY(), (int) -velocityTracker.getXVelocity(), (int) -velocityTracker.getYVelocity(), getLeftLimit(), getRightLimit(), getTopLimit(), getBottomLimit());
+
+                float velocityX=velocityTracker.getXVelocity();
+                if (lockedVertically) {
+                    velocityX=0;
+                }
+                final float excursionY=Math.abs(ev.getY()-downY);
+                if (excursionY>getHeight()/10) {
+                    scroller.fling(getScrollX(), getScrollY(), (int) velocityX, (int) -velocityTracker.getYVelocity(), getLeftLimit(), getRightLimit(), getTopLimit(), getBottomLimit());
+                }
                 velocityTracker.recycle();
-                velocityTracker = null;
+                velocityTracker=null;
 
                 break;
+            }
         }
         return true;
     }
@@ -296,8 +333,7 @@ public class DocumentView extends View implements ZoomListener {
         float zoom = zoomModel.getZoom();
         for (int i = 0; i < pages.size(); i++) {
             Page page = pages.get(i);
-            float pageHeight=page.getPageHeight(width, zoom);
-            //System.out.println(String.format("width:%d, zoom:%f, pageHeight:%f", width, zoom, pageHeight));
+            float pageHeight = page.getPageHeight(width, zoom);
             page.setBounds(new RectF(0, heightAccum, width * zoom, heightAccum + pageHeight));
             heightAccum += pageHeight;
         }
@@ -330,4 +366,57 @@ public class DocumentView extends View implements ZoomListener {
         }
     }
 
+    public ZoomModel getZoomModel() {
+        return zoomModel;
+    }
+
+    public void setVerticalScrollLock(boolean verticalScrollLock) {
+        this.verticalScrollLock = verticalScrollLock;
+    }
+
+    private boolean unlocksVerticalLock(MotionEvent e) {
+        float dx;
+        float dy;
+
+        dx = Math.abs(e.getX()-lastX);
+        dy = Math.abs(e.getY()-lastY);
+
+        if (dy > 0.25 * dx || maxExcursionY > 0.8 * dx) {
+            return false;
+        }
+
+        return dx > getWidth()/10 || dx > getHeight()/10;
+    }
+
+    /*@Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+        if (oldw == 0 && oldh == 0) {
+            goToBookmark();
+        }
+    }*/
+
+
+    private BookmarkEntry bookmarkToRestore = null;
+
+    public void setBookmarkToRestore(BookmarkEntry bookmarkToRestore) {
+        this.bookmarkToRestore=bookmarkToRestore;
+    }
+
+    public void goToBookmark() {
+        if (bookmarkToRestore == null || bookmarkToRestore.absoluteZoomLevel == 0
+            || bookmarkToRestore.page < 0
+            || bookmarkToRestore.page >= decodeService.getPageCount()) {
+            //int top  = height / 2;
+            //int left = width / 2;
+        }
+        else {
+            float zoomLevel = bookmarkToRestore.absoluteZoomLevel;
+            zoomModel.setZoom(zoomLevel/1000);
+            int rotation = bookmarkToRestore.rotation;
+            int currentPage = bookmarkToRestore.page;
+            int top = bookmarkToRestore.offsetY;
+            int left = bookmarkToRestore.offsetX;
+        }
+    }
 }

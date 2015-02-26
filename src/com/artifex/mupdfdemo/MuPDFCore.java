@@ -162,7 +162,7 @@ public class MuPDFCore
 	}
 
 	/* Shim function */
-	private void gotoPage(int page)
+	public void gotoPage(int page)
 	{
 		if (page > numPages-1)
 			page = numPages-1;

@@ -9,7 +9,7 @@
 <!--  #endif -->
     <string name="menu_vudroid">Open with Vudroid</string>
     <string name="menu_apv">Open with Apv</string>
-    <string name="menu_mupdf">Open with Mupad</string>
+    <string name="menu_mupdf">Open with Mupdf</string>
 
 	<string name="about">About</string>
 	<string name="goto_page">Go to page…</string>

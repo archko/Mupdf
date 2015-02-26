@@ -10,6 +10,7 @@ import org.vudroid.core.codec.CodecContext;
 import org.vudroid.core.codec.CodecDocument;
 import org.vudroid.core.codec.CodecPage;
 import org.vudroid.core.utils.PathFromUri;
+import org.vudroid.pdfdroid.codec.PdfPage;
 
 import java.io.IOException;
 import java.lang.ref.SoftReference;
@@ -114,8 +115,8 @@ public class DecodeServiceBase implements DecodeService
         //Log.d(DECODE_SERVICE, "Start converting map to bitmap");
         float scale = calculateScale(vuPage) * currentDecodeTask.zoom;
         Log.d(DECODE_SERVICE, "scale:"+scale+" vuPage.getWidth():"+vuPage.getWidth());
-        final Bitmap bitmap = vuPage.renderBitmap(getScaledWidth(currentDecodeTask, vuPage, scale),
-            getScaledHeight(currentDecodeTask, vuPage, scale), currentDecodeTask.pageSliceBounds);
+        final Bitmap bitmap = ((PdfPage)vuPage).renderBitmap(getScaledWidth(currentDecodeTask, vuPage, scale),
+            getScaledHeight(currentDecodeTask, vuPage, scale), currentDecodeTask.pageSliceBounds, scale);
         //Log.d(DECODE_SERVICE, "Converting map to bitmap finished");
         if (isTaskDead(currentDecodeTask))
         {

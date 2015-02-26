@@ -39,12 +39,12 @@ public class PageViewZoomControls extends LinearLayout implements BringUpZoomCon
         }
     }
 
-    private void show()
+    public void show()
     {
         fade(View.VISIBLE, getWidth(), 0.0f);
     }
 
-    private void hide()
+    public void hide()
     {
         fade(View.GONE, 0.0f, getWidth());
     }
