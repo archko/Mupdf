@@ -422,7 +422,7 @@ public abstract class BaseViewerActivity extends Activity implements DecodingPro
         if (height<=0) {
             height=new ViewConfiguration().getScaledTouchSlop()*2;
         } else {
-            height=(int) (height*0.97);
+            height=(int) (height*0.03);
         }
         documentView.setScrollMargin(height);
     }
