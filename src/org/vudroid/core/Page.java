@@ -54,7 +54,8 @@ class Page {
 
     private Paint fillPaint() {
         final Paint fillPaint = new Paint();
-        fillPaint.setColor(Color.GRAY);
+        //fillPaint.setColor(Color.GRAY);
+        fillPaint.setColor(Color.WHITE);
         fillPaint.setStyle(Paint.Style.FILL);
         return fillPaint;
     }
@@ -63,7 +64,7 @@ class Page {
         final TextPaint paint = new TextPaint();
         paint.setColor(Color.BLACK);
         paint.setAntiAlias(true);
-        paint.setTextSize(24);
+        paint.setTextSize(32);
         paint.setTextAlign(Paint.Align.CENTER);
         return paint;
     }

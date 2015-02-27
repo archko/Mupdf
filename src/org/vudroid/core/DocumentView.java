@@ -28,7 +28,7 @@ public class DocumentView extends View implements ZoomListener {
     private int xToScroll;
     private float lastX;
     private float lastY;
-    private VelocityTracker velocityTracker;
+    //private VelocityTracker velocityTracker;
     private final Scroller scroller;
     DecodingProgressModel progressModel;
     private RectF viewRect;
@@ -197,7 +197,7 @@ public class DocumentView extends View implements ZoomListener {
         super.onTouchEvent(ev);
 
         if (mGestureDetector.onTouchEvent(ev)) {
-            //return true;
+            return true;
         }
 
         if (multiTouchZoom != null) {
@@ -211,10 +211,10 @@ public class DocumentView extends View implements ZoomListener {
             }
         }
 
-        if (velocityTracker == null) {
+        /*if (velocityTracker == null) {
             velocityTracker = VelocityTracker.obtain();
         }
-        velocityTracker.addMovement(ev);
+        velocityTracker.addMovement(ev);*/
 
         switch (ev.getAction()) {
             case MotionEvent.ACTION_DOWN: {
@@ -246,7 +246,7 @@ public class DocumentView extends View implements ZoomListener {
                 break;
             }
             case MotionEvent.ACTION_UP: {
-                velocityTracker.computeCurrentVelocity(1000);
+                /*velocityTracker.computeCurrentVelocity(1000);
 
                 float velocityX=velocityTracker.getXVelocity();
                 if (lockedVertically) {
@@ -254,10 +254,10 @@ public class DocumentView extends View implements ZoomListener {
                 }
                 //final float excursionY=Math.abs(ev.getY()-downY);
                 //if (excursionY>getHeight()/10) {
-                    scroller.fling(getScrollX(), getScrollY(), (int) velocityX, (int) -velocityTracker.getYVelocity(), getLeftLimit(), getRightLimit(), getTopLimit(), getBottomLimit());
+                    //scroller.fling(getScrollX(), getScrollY(), (int) velocityX, (int) -velocityTracker.getYVelocity(), getLeftLimit(), getRightLimit(), getTopLimit(), getBottomLimit());
                 //}
                 velocityTracker.recycle();
-                velocityTracker=null;
+                velocityTracker=null;*/
 
                 break;
             }
@@ -477,7 +477,13 @@ public class DocumentView extends View implements ZoomListener {
         }
 
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-            return false;
+            //float velocityX=velocityTracker.getXVelocity();
+            if (lockedVertically) {
+                velocityX=0;
+            }
+
+            scroller.fling(getScrollX(), getScrollY(), (int) velocityX, (int) -velocityY, getLeftLimit(), getRightLimit(), getTopLimit(), getBottomLimit());
+            return true;
         }
 
         public void onLongPress(MotionEvent e) {
