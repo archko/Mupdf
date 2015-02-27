@@ -391,6 +391,9 @@ public class PagesView extends View implements
 				|| this.bookmarkToRestore.page >= this.pageSizes.length ) {
 			this.top  = this.height / 2;
 			this.left = this.width / 2;
+            if (zoomLevel==1000) {
+                zoomWidth();
+            }
 		}
 		else {
 			this.zoomLevel = (int)(this.bookmarkToRestore.absoluteZoomLevel / this.scaling0);
@@ -1868,7 +1871,7 @@ public class PagesView extends View implements
             if (height<=0) {
                 height=16;
             } else {
-                height=(int) (height*0.97);
+                height=(int) (height*0.03);
             }
             this.top+=this.getHeight()-height;
             this.invalidate();
@@ -1879,7 +1882,7 @@ public class PagesView extends View implements
             if (height<=0) {
                 height=16;
             } else {
-                height=(int) (height*0.97);
+                height=(int) (height*0.03);
             }
             this.top-=this.getHeight()-height;
             this.invalidate();

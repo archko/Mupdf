@@ -119,7 +119,8 @@ public class DocumentView extends View implements ZoomListener {
     private void currentPageChanged() {
         post(new Runnable() {
             public void run() {
-                currentPageModel.setCurrentPageIndex(getCurrentPage());
+                //currentPageModel.setCurrentPageIndex(getCurrentPage());
+                currentPageModel.setCurrentPage(getCurrentPage());
             }
         });
     }
@@ -223,16 +224,6 @@ public class DocumentView extends View implements ZoomListener {
                 maxExcursionY = 0;
                 stopScroller();
                 setLastPosition(ev);
-                if (ev.getEventTime() - lastDownEventTime < DOUBLE_TAP_TIME) {
-                    zoomModel.toggleZoomControls();
-                    if (null!=mPageModel) {
-                        mPageModel.setCurrentPage(currentPageModel.getCurrentPageIndex());
-                        mPageModel.setPageCount(decodeService.getPageCount());
-                        mPageModel.toggleSeekControls();
-                    }
-                } else {
-                    lastDownEventTime = ev.getEventTime();
-                }
                 break;
             }
             case MotionEvent.ACTION_MOVE: {
@@ -457,16 +448,27 @@ public class DocumentView extends View implements ZoomListener {
             } else {
                 currentPageModel.dispatch(new CurrentPageListener.CurrentPageChangedEvent(getCurrentPage()));
             }
+            return true;
+        }
+
+        @Override
+        public boolean onDoubleTap(MotionEvent ev) {
             return false;
         }
 
         @Override
-        public boolean onDoubleTap(MotionEvent motionEvent) {
-            return false;
-        }
-
-        @Override
-        public boolean onDoubleTapEvent(MotionEvent motionEvent) {
+        public boolean onDoubleTapEvent(MotionEvent ev) {
+            if (ev.getEventTime() - lastDownEventTime < DOUBLE_TAP_TIME) {
+                zoomModel.toggleZoomControls();
+                if (null!=mPageModel) {
+                    mPageModel.setCurrentPage(currentPageModel.getCurrentPageIndex());
+                    mPageModel.setPageCount(decodeService.getPageCount());
+                    mPageModel.toggleSeekControls();
+                }
+                return true;
+            } else {
+                lastDownEventTime = ev.getEventTime();
+            }
             return false;
         }
 
@@ -474,18 +476,6 @@ public class DocumentView extends View implements ZoomListener {
             return false;
         }
 
-        /**
-         * 控件高大于图片高,则在垂直方向不可以移动,控件宽大于图片宽则水平方向不可移动.
-         * 移动时,图片左上角为例,不可以向下移出控件左顶点.右上角,右下角,左下角一样.这只会在图片已经大于控件时才地出现.
-         * 以图片移动方向的宽度大于控件,左右上下边界为限制.左右移动时,图片左边不可以在达到边界后继续向右移动.
-         * 右边界同理.
-         *
-         * @param e1
-         * @param e2
-         * @param velocityX
-         * @param velocityY
-         * @return
-         */
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
             return false;
         }
