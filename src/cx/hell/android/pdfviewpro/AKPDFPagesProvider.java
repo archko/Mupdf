@@ -54,15 +54,15 @@ public class AKPDFPagesProvider extends PagesProvider {
         long availLong=(long) (Runtime.getRuntime().maxMemory()/2-4*MB);
 
         int avail;
-        if (availLong>256*MB)
-            avail=256*MB;
+        if (availLong>64*MB)
+            avail=64*MB;
         else
             avail=(int) availLong;
 
         int maxMax=7*MB+this.extraCache; /* at most allocate this much unless absolutely necessary */
         if (maxMax<avail)
             maxMax=avail;
-        int minMax=4*MB; /* at least allocate this much */
+        int minMax=8*MB; /* at least allocate this much */
         if (maxMax<minMax)
             maxMax=minMax;
 
@@ -91,8 +91,8 @@ public class AKPDFPagesProvider extends PagesProvider {
         if (m<minMax)
             m=minMax;
 
-        if (m+20*MB<=maxMax)
-            m=maxMax-20*MB;
+        if (m+10*MB<=maxMax)
+            m=maxMax-10*MB;
 
         if (m<maxMax) {
             m+=this.extraCache;
@@ -100,7 +100,7 @@ public class AKPDFPagesProvider extends PagesProvider {
                 m=maxMax;
         }
 
-        Log.v(TAG, "Setting cache size="+m+" renderAhead="+renderAhead+" for "+screenWidth+"x"+screenHeight+" (avail="+avail+")");
+        Log.v(TAG, "Setting cache size="+m+" renderAhead="+renderAhead+" for "+screenWidth+"x"+screenHeight+" (avail="+avail+")"+" extraCache:"+extraCache);
 
         this.bitmapCache.setMaxCacheSizeBytes((int) m);
     }
@@ -214,10 +214,6 @@ public class AKPDFPagesProvider extends PagesProvider {
         if (null!=mHandler) {
             mHandler.sendEmptyMessage(2);
         }
-        if (null!=bitmapCache) {
-            bitmapCache.clearCache();
-        }
-        bitmapCache=null;
     }
 
     public void internalRelease() {
@@ -225,6 +221,10 @@ public class AKPDFPagesProvider extends PagesProvider {
             this.mHandler.removeCallbacksAndMessages(null);
         }
         quitLooper();
+        if (null!=bitmapCache) {
+            bitmapCache.clearCache();
+        }
+        bitmapCache=null;
     }
 
     private void quitLooper() {
