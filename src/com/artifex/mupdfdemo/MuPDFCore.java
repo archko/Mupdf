@@ -85,7 +85,9 @@ public class MuPDFCore
 
 	public native boolean javascriptSupported();
 
-	public class Cookie
+    public native void freePage(int pageHandle);
+
+    public class Cookie
 	{
 		private final long cookiePtr;
 
