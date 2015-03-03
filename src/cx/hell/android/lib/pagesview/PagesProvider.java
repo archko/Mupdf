@@ -65,4 +65,6 @@ public abstract class PagesProvider {
     public abstract void setRenderAhead(boolean aBoolean);
 
     public void release(){}
+
+    public void setCacheSize(int i){}
 }

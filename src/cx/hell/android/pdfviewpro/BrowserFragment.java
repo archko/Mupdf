@@ -427,7 +427,7 @@ public class BrowserFragment extends RefreshableFragment implements OnItemClickL
     			/*Recent recent=new Recent(getActivity());
     			recent.remove(entry.getRecentNumber());
     			recent.commit();*/
-                AKRecent.getInstance(getActivity().getApplicationContext()).remove(entry.getFile().getAbsolutePath());
+                AKRecent.getInstance(getActivity().getApplicationContext()).removeFromDb(entry.getFile().getAbsolutePath());
     			update();
     		}
     	} else if (item == openContextMenuItem) {

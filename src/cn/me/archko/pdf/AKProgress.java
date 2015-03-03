@@ -10,6 +10,7 @@ import java.util.Comparator;
 public class AKProgress implements Serializable, Comparator<AKProgress> {
 
     private static final long serialVersionUID=4899452726203839409L;
+    public int _id; //db id
     /**
      * 索引
      */
@@ -47,9 +48,23 @@ public class AKProgress implements Serializable, Comparator<AKProgress> {
         }
     }
 
+    public AKProgress(int _id, int index, String path, int progress, int numberOfPages, int page, long size, String ext, long timestampe, String bookmarkEntry) {
+        this._id=_id;
+        this.index=index;
+        this.path=path;
+        this.progress=progress;
+        this.numberOfPages=numberOfPages;
+        this.page=page;
+        this.size=size;
+        this.ext=ext;
+        this.timestampe=timestampe;
+        this.bookmarkEntry=bookmarkEntry;
+    }
+
     @Override
     public String toString() {
         return "AKProgress{"+
+            ", _id='"+_id+'\''+
             ", path='"+path+'\''+
             ", numberOfPages="+numberOfPages+
             ", page="+page+

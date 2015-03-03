@@ -1,10 +1,5 @@
 package cx.hell.android.pdfviewpro;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -23,6 +18,9 @@ import cn.me.archko.pdf.AKRecent;
 import cn.me.archko.pdf.LengthUtils;
 import cn.me.archko.pdf.Util;
 import com.artifex.mupdfdemo.R;
+
+import java.io.File;
+import java.util.ArrayList;
 
 /**
  * @version 1.00.00
@@ -78,7 +76,7 @@ public class HistoryFragment extends BrowserFragment {
 
             @Override
             protected String doInBackground(Void... params) {
-                String filepath=AKRecent.getInstance(APVApplication.getInstance()).backup();
+                String filepath=AKRecent.getInstance(APVApplication.getInstance()).backupFromDb();
                 long newTime=System.currentTimeMillis()-now;
                 if (newTime<1500l) {
                     newTime=1500l-newTime;
@@ -104,7 +102,7 @@ public class HistoryFragment extends BrowserFragment {
                     Log.d("", "file:"+s);
                     Toast.makeText(APVApplication.getInstance(), "备份成功:"+s, Toast.LENGTH_LONG).show();
                 } else {
-                    Toast.makeText(APVApplication.getInstance(), "未备份成功", Toast.LENGTH_LONG).show();
+                    Toast.makeText(APVApplication.getInstance(), "备份失败", Toast.LENGTH_LONG).show();
                 }
             }
         }, (Void[]) null);
@@ -125,7 +123,7 @@ public class HistoryFragment extends BrowserFragment {
             protected Boolean doInBackground(Void... params) {
                 String filepath=null;
                 String[] filenames=Environment.getExternalStorageDirectory().list();
-                if (null==filenames){
+                if (null==filenames) {
                     return false;
                 }
 
@@ -136,10 +134,10 @@ public class HistoryFragment extends BrowserFragment {
                     }
                 }
 
-                if (null==filepath){
+                if (null==filepath) {
                     return false;
                 }
-                boolean flag=AKRecent.getInstance(APVApplication.getInstance()).restore(filepath);
+                boolean flag=AKRecent.getInstance(APVApplication.getInstance()).restoreToDb(filepath);
                 long newTime=System.currentTimeMillis()-now;
                 if (newTime<1500l) {
                     newTime=1500l-newTime;
@@ -165,7 +163,7 @@ public class HistoryFragment extends BrowserFragment {
                     Toast.makeText(APVApplication.getInstance(), "恢复成功:"+s, Toast.LENGTH_LONG).show();
                     update();
                 } else {
-                    Toast.makeText(APVApplication.getInstance(), "未恢复成功", Toast.LENGTH_LONG).show();
+                    Toast.makeText(APVApplication.getInstance(), "恢复失败", Toast.LENGTH_LONG).show();
                 }
             }
         }, (Void[]) null);
@@ -186,35 +184,21 @@ public class HistoryFragment extends BrowserFragment {
         }
         this.fileListAdapter.setMode(AKAdapter.TYPE_RENCENT);
 
-        /*FileListEntry entry;
-
-		recent = new Recent(getActivity());
-
-		for (int i = 0; i < recent.size(); i++) {
-			File file = new File(recent.get(i));
-
-			entry = new FileListEntry(FileListEntry.RECENT, i, file, showExtension);
-			this.fileList.add(entry);
-		}
-    	    	
-    	this.filesListView.setSelection(0);*/
         Util.execute(true, new AsyncTask<Void, Void, ArrayList<FileListEntry>>() {
             @Override
             protected ArrayList<FileListEntry> doInBackground(Void... params) {
                 AKRecent recent=AKRecent.getInstance(HistoryFragment.this.getActivity());
-                recent.readRecent();
-                ArrayList<AKProgress> progresses=recent.getAkProgresses();
+                ArrayList<AKProgress> progresses=recent.readRecentFromDb();
                 //Log.d(TAG, "progresses:"+progresses);
                 ArrayList<FileListEntry> entryList=new ArrayList<FileListEntry>();
                 if (null!=progresses&&progresses.size()>0) {
                     FileListEntry entry;
-                    entryList.clear();
                     for (AKProgress progress : progresses) {
                         entry=new FileListEntry(FileListEntry.RECENT, 0, new File(progress.path), showExtension);
                         entry.setAkProgress(progress);
                         entryList.add(entry);
                     }
-                    if (entryList.size()>0) {
+                    /*if (entryList.size()>0) {
                         try {
                             Collections.sort(entryList, new Comparator<FileListEntry>() {
                                 public int compare(FileListEntry f1, FileListEntry f2) {
@@ -230,7 +214,7 @@ public class HistoryFragment extends BrowserFragment {
                         } catch (NullPointerException e) {
                             throw new RuntimeException("failed to sort file list "+" for path ", e);
                         }
-                    }
+                    }*/
                 }
 
                 return entryList;

@@ -327,11 +327,11 @@ public abstract class BaseViewerActivity extends Activity implements DecodingPro
         b.setLast(filePath, entry);
         b.close();
         Log.i(TAG, "last page saved for "+filePath+" entry:"+entry);
-        AKRecent.getInstance(getApplicationContext()).addAsync(filePath, entry.page, entry.numberOfPages, entry.toString(),
+        AKRecent.getInstance(getApplicationContext()).addAsyncToDB(filePath, entry.page, entry.numberOfPages, entry.toString(),
             new DataListener() {
                 @Override
                 public void onSuccess(Object... args) {
-                    AKRecent.getInstance(getApplicationContext()).backup("mupdf_recent.jso");
+                    //AKRecent.getInstance(getApplicationContext()).backup("mupdf_recent.jso");
                 }
 
                 @Override

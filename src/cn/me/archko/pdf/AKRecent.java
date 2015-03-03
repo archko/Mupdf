@@ -8,6 +8,7 @@ import android.util.Log;
 import cx.hell.android.pdfviewpro.APVApplication;
 import cx.hell.android.pdfviewpro.Bookmark;
 import cx.hell.android.pdfviewpro.BookmarkEntry;
+import cx.hell.android.pdfviewpro.RecentManager;
 import cx.hell.android.pdfviewpro.StreamUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -297,5 +298,164 @@ public class AKRecent implements Serializable {
             e.printStackTrace();
         }
         return arraylist;
+    }
+
+    //------------------- opertion of db -------------------
+    public void addAsyncToDB(final String path, final int page, final int numberOfPage, final String bookmarkEntry, final DataListener dataListener) {
+        Util.execute(true, new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                addToDb(path, page, numberOfPage, bookmarkEntry);
+                if (null!=dataListener) {
+                    dataListener.onSuccess();
+                }
+                return null;
+            }
+        }, (Void[]) null);
+    }
+
+    public void addToDb(final String path, final int page, final int numberOfPage, String bookmarkEntry) {
+        if (TextUtils.isEmpty(path)||TextUtils.isEmpty(bookmarkEntry)) {
+            Log.d("", "path is null.");
+            return;
+        }
+
+        RecentManager recentManager=new RecentManager(APVApplication.getInstance());
+        try {
+            recentManager.open();
+            AKProgress progress=recentManager.getProgress(path);
+            if (progress==null) {
+                progress=new AKProgress();
+                progress.timestampe=System.currentTimeMillis();
+                progress.page=page;
+                progress.numberOfPages=numberOfPage;
+                progress.bookmarkEntry=bookmarkEntry;
+            } else {
+                progress.timestampe=System.currentTimeMillis();
+                progress.page=page;
+                progress.numberOfPages=numberOfPage;
+                progress.bookmarkEntry=bookmarkEntry;
+            }
+
+            recentManager.setProgress(progress);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            recentManager.close();
+        }
+    }
+
+    public ArrayList<AKProgress> removeFromDb(final String path) {
+        Log.d(TAG, "remove:"+path);
+        if (TextUtils.isEmpty(path)) {
+            Log.d("", "path is null.");
+            return null;
+        }
+
+        RecentManager recentManager=new RecentManager(APVApplication.getInstance());
+        try {
+            recentManager.open();
+            recentManager.deleteProgress(path);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            recentManager.close();
+        }
+        return null;
+    }
+
+    public ArrayList<AKProgress> readRecentFromDb() {
+        ArrayList<AKProgress> list=null;
+        RecentManager recentManager=new RecentManager(APVApplication.getInstance());
+        try {
+            recentManager.open();
+            list=recentManager.getProgresses();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            recentManager.close();
+        }
+        return list;
+    }
+
+    public String backupFromDb() {
+        String name="mupdf_"+DateUtil.formatTime(System.currentTimeMillis(), "yyyy-MM-dd-HH-mm-ss");
+        return backupFromDb(name);
+    }
+
+    public String backupFromDb(String name) {
+        RecentManager recentManager=new RecentManager(APVApplication.getInstance());
+        try {
+            recentManager.open();
+            ArrayList<AKProgress> list=recentManager.getProgresses();
+            JSONObject root=new JSONObject();
+            JSONArray ja=new JSONArray();
+            root.put("root", ja);
+            root.put("name", name);
+
+            JSONObject tmp;
+            int i=0;
+            for (AKProgress progress : list) {
+                tmp=new JSONObject();
+                try {
+                    tmp.put("index", progress.index);
+                    tmp.put("path", URLEncoder.encode(progress.path));
+                    tmp.put("numberOfPages", progress.numberOfPages);
+                    tmp.put("page", progress.page);
+                    tmp.put("size", progress.size);
+                    tmp.put("ext", progress.ext);
+                    tmp.put("timestampe", progress.timestampe);
+                    tmp.put("bookmarkEntry", progress.bookmarkEntry);
+                    ja.put(i, tmp);
+                    i++;
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+            name=Environment.getExternalStorageDirectory().getPath()+File.separator+name;
+            Log.d(TAG, "backup.name:"+name+" root:"+root);
+            StreamUtils.copyStringToFile(root.toString(), name);
+            return name;
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            recentManager.close();
+        }
+
+        return null;
+    }
+
+    public boolean restoreToDb(String filepath) {
+        boolean flag=false;
+        try {
+            RecentManager recentManager=new RecentManager(APVApplication.getInstance());
+            String content=StreamUtils.parseFile(filepath);
+            Log.d(TAG, "restore.file:"+filepath+" content:"+content);
+            ArrayList<AKProgress> akProgresses=parseProgresses(content);
+
+            try {
+                recentManager.open();
+                recentManager.getDb().beginTransaction();
+                recentManager.getDb().delete(RecentManager.ProgressTbl.TABLE_NAME, null, null);
+                for (AKProgress progress : akProgresses) {
+                    if (!TextUtils.isEmpty(progress.bookmarkEntry)) {
+                        recentManager.setProgress(progress);
+                        Log.d(TAG, "update progress:"+progress);
+                    }
+                }
+                flag=true;
+                recentManager.getDb().setTransactionSuccessful();
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                recentManager.getDb().endTransaction();
+                recentManager.close();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return flag;
     }
 }
