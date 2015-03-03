@@ -194,9 +194,13 @@ public class HistoryFragment extends BrowserFragment {
                 if (null!=progresses&&progresses.size()>0) {
                     FileListEntry entry;
                     for (AKProgress progress : progresses) {
-                        entry=new FileListEntry(FileListEntry.RECENT, 0, new File(progress.path), showExtension);
-                        entry.setAkProgress(progress);
-                        entryList.add(entry);
+                        try {
+                            entry=new FileListEntry(FileListEntry.RECENT, 0, new File(progress.path), showExtension);
+                            entry.setAkProgress(progress);
+                            entryList.add(entry);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
                     /*if (entryList.size()>0) {
                         try {
