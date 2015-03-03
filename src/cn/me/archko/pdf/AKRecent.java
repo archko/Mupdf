@@ -326,12 +326,14 @@ public class AKRecent implements Serializable {
             AKProgress progress=recentManager.getProgress(path);
             if (progress==null) {
                 progress=new AKProgress();
+                progress.path=path;
                 progress.timestampe=System.currentTimeMillis();
                 progress.page=page;
                 progress.numberOfPages=numberOfPage;
                 progress.bookmarkEntry=bookmarkEntry;
             } else {
                 progress.timestampe=System.currentTimeMillis();
+                progress.path=path;
                 progress.page=page;
                 progress.numberOfPages=numberOfPage;
                 progress.bookmarkEntry=bookmarkEntry;
