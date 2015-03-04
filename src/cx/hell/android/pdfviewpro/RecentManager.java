@@ -97,15 +97,7 @@ public class RecentManager {
         cv.put(ProgressTbl.KEY_EXT, progress.ext);
         cv.put(ProgressTbl.KEY_TIMESTAMP, progress.timestampe);
         cv.put(ProgressTbl.KEY_BOOKMARKENTRY, progress.bookmarkEntry);
-        long count=0;
-        if (progress._id>0) {
-            count=db.update(ProgressTbl.TABLE_NAME, cv, ProgressTbl._ID+"='"+progress._id+"'", null);
-        }
-        if (count==0) {
-            return db.insert(ProgressTbl.TABLE_NAME, null, cv);
-        } else {
-            return count;
-        }
+        return db.insert(ProgressTbl.TABLE_NAME, null, cv);
     }
 
     public long updateProgress(AKProgress progress) {
