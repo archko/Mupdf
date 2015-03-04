@@ -331,15 +331,15 @@ public class AKRecent implements Serializable {
                 progress.page=page;
                 progress.numberOfPages=numberOfPage;
                 progress.bookmarkEntry=bookmarkEntry;
+                recentManager.setProgress(progress);
             } else {
                 progress.timestampe=System.currentTimeMillis();
                 progress.path=path;
                 progress.page=page;
                 progress.numberOfPages=numberOfPage;
                 progress.bookmarkEntry=bookmarkEntry;
+                recentManager.updateProgress(progress);
             }
-
-            recentManager.setProgress(progress);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {

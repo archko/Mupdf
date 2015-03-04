@@ -108,6 +108,22 @@ public class RecentManager {
         }
     }
 
+    public long updateProgress(AKProgress progress) {
+        ContentValues cv=new ContentValues();
+        cv.put(ProgressTbl.KEY_INDEX, progress.index);
+        cv.put(ProgressTbl.KEY_PATH, progress.path);
+        cv.put(ProgressTbl.KEY_PROGRESS, progress.progress);
+        cv.put(ProgressTbl.KEY_NUMBEROFPAGES, progress.numberOfPages);
+        cv.put(ProgressTbl.KEY_PAGE, progress.page);
+        cv.put(ProgressTbl.KEY_SIZE, progress.size);
+        cv.put(ProgressTbl.KEY_EXT, progress.ext);
+        cv.put(ProgressTbl.KEY_TIMESTAMP, progress.timestampe);
+        cv.put(ProgressTbl.KEY_BOOKMARKENTRY, progress.bookmarkEntry);
+        long count=0;
+        count=db.update(ProgressTbl.TABLE_NAME, cv, ProgressTbl.KEY_PATH+"='"+progress.path+"'", null);
+        return count;
+    }
+
     public AKProgress getProgress(String path) {
         AKProgress entry=null;
 
