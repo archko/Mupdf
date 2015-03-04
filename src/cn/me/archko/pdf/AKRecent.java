@@ -326,20 +326,38 @@ public class AKRecent implements Serializable {
             AKProgress progress=recentManager.getProgress(path);
             if (progress==null) {
                 progress=new AKProgress();
-                progress.path=path;
                 progress.timestampe=System.currentTimeMillis();
+                progress.path=path;
                 progress.page=page;
                 progress.numberOfPages=numberOfPage;
                 progress.bookmarkEntry=bookmarkEntry;
+                if (progress.size==0) {
+                    File file=new File(progress.path);
+                    if (file.exists()) {
+                        progress.size=file.length();
+                    } else {
+                        Log.d(TAG, "file not exists."+path);
+                        return;
+                    }
+                }
+                recentManager.setProgress(progress);
             } else {
                 progress.timestampe=System.currentTimeMillis();
                 progress.path=path;
                 progress.page=page;
                 progress.numberOfPages=numberOfPage;
                 progress.bookmarkEntry=bookmarkEntry;
+                if (progress.size==0) {
+                    File file=new File(progress.path);
+                    if (file.exists()) {
+                        progress.size=file.length();
+                    } else {
+                        Log.d(TAG, "file not exists."+path);
+                        return;
+                    }
+                }
+                recentManager.updateProgress(progress);
             }
-
-            recentManager.setProgress(progress);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
