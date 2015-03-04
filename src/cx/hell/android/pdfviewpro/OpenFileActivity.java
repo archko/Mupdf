@@ -607,7 +607,7 @@ public class OpenFileActivity extends Activity implements SensorEventListener {
 	    		options.getBoolean(Options.PREF_RENDER_AHEAD, true));*/
         this.pdfPagesProvider=new AKPDFPagesProvider(pdf,
             options.getBoolean(Options.PREF_OMIT_IMAGES, false),
-            options.getBoolean(Options.PREF_RENDER_AHEAD, true));
+            options.getBoolean(Options.PREF_RENDER_AHEAD, true), pagesView);
         pagesView.setPagesProvider(pdfPagesProvider);
 	    Bookmark b = new Bookmark(this.getApplicationContext()).open();
 	    pagesView.setStartBookmark(b, filePath);

@@ -30,6 +30,7 @@ import cx.hell.android.pdfviewpro.BookmarkEntry;
 import cx.hell.android.pdfviewpro.OpenFileActivity;
 import cx.hell.android.pdfviewpro.Options;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Map;
 
@@ -218,7 +219,8 @@ public class PagesView extends View implements
         this.loadingPaint=new Paint();
         this.loadingPaint.setAntiAlias(true);
         this.loadingPaint.setStyle(Paint.Style.STROKE);
-        this.loadingPaint.setStrokeWidth(2);
+        this.loadingPaint.setColor(Color.GRAY);
+        this.loadingPaint.setStrokeWidth(4);
         this.loadingPaint.setTextSize(36);
         DisplayMetrics screen=new DisplayMetrics();
         activity.getWindowManager().getDefaultDisplay().getMetrics(screen);
@@ -732,9 +734,7 @@ public class PagesView extends View implements
     Rect tileRect;
 
     private void drawPages2(Canvas canvas) {
-        if (this.eink) {
-            canvas.drawColor(Color.WHITE);
-        }
+        canvas.drawColor(Color.WHITE);
 
         src=new Rect(); /* TODO: move out of drawPages */
         dst=new Rect(); /* TODO: move out of drawPages */
@@ -743,7 +743,7 @@ public class PagesView extends View implements
         float pagex0, pagey0, pagex1, pagey1; // in doc, counts zoom
         int x, y; // on screen
         int viewx0, viewy0; // view over doc
-        LinkedList<Tile> visibleTiles=new LinkedList<Tile>();
+        ArrayList<Tile> visibleTiles=new ArrayList<Tile>();
         float currentMarginX=this.getCurrentMarginX();
         float currentMarginY=this.getCurrentMarginY();
 
@@ -771,7 +771,7 @@ public class PagesView extends View implements
                 Log.v(TAG, "adj:"+adjScreenLeft+" "+adjScreenTop+" "+adjScreenWidth+" "+adjScreenHeight);
             } else {
                 /* We now adjust the position to make sure we don't scroll too
-				 * far away from the document text.
+                 * far away from the document text.
 				 */
                 int oldviewx0=viewx0;
                 int oldviewy0=viewy0;
@@ -832,6 +832,9 @@ public class PagesView extends View implements
 
                     x=(int) pagex0-viewx0-adjScreenLeft;
                     y=(int) pagey0-viewy0-adjScreenTop;
+                    if (i>0) {
+                        canvas.drawLine(0, y, getWidth(), y, loadingPaint);
+                    }
 
                     getGoodTileSizes(tileSizes, pageWidth, pageHeight);
 

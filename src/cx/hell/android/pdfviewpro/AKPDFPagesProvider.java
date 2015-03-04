@@ -13,6 +13,7 @@ import android.view.WindowManager;
 import com.artifex.mupdfdemo.MuPDFCore;
 import cx.hell.android.lib.pagesview.OnImageRenderedListener;
 import cx.hell.android.lib.pagesview.PagesProvider;
+import cx.hell.android.lib.pagesview.PagesView;
 import cx.hell.android.lib.pagesview.RenderingException;
 import cx.hell.android.lib.pagesview.Tile;
 
@@ -269,6 +270,8 @@ public class AKPDFPagesProvider extends PagesProvider {
                 msg.obj=renderedTiles;
                 msg.what=5;
                 mHandler.sendMessage(msg);
+            } else {
+                //Log.d(TAG, "drop:"+tiles);
             }
         } catch (RenderingException e) {
             Message msg=Message.obtain();
@@ -283,16 +286,18 @@ public class AKPDFPagesProvider extends PagesProvider {
     private MuPDFCore pdf=null;
     private BitmapCache bitmapCache=null;
     private OnImageRenderedListener onImageRendererListener=null;
+    PagesView mPagesView;
 
     public float getRenderAhead() {
         return this.renderAhead;
     }
 
-    public AKPDFPagesProvider(MuPDFCore pdf, boolean skipImages, boolean doRenderAhead) {
+    public AKPDFPagesProvider(MuPDFCore pdf, boolean skipImages, boolean doRenderAhead, PagesView pagesView) {
         this.pdf=pdf;
         this.omitImages=skipImages;
         this.bitmapCache=new BitmapCache();
         this.doRenderAhead=doRenderAhead;
+        this.mPagesView=pagesView;
         setMaxCacheSize();
         init();
     }
@@ -332,8 +337,16 @@ public class AKPDFPagesProvider extends PagesProvider {
     private Bitmap renderBitmap(Tile tile) throws RenderingException {
         //synchronized (tile) {
             /* last minute check to make sure some other thread hasn't rendered this tile */
-            if (this.bitmapCache.contains(tile))
+            if (this.bitmapCache.contains(tile)){
                 return null;
+            }
+            if (doRenderAhead&&Math.abs(mPagesView.getCurrentPage()-tile.getPage())>1){
+                return null;
+            }
+
+            if (!doRenderAhead&&Math.abs(mPagesView.getCurrentPage()-tile.getPage())>0){
+                return null;
+            }
 
             Bitmap b=Bitmap.createBitmap(tile.getPrefXSize(), tile.getPrefYSize(), Bitmap.Config.ARGB_8888);
             PointF size=pdf.getPageSize(tile.getPage());
