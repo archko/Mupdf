@@ -2,12 +2,11 @@ package cx.hell.android.pdfviewpro;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Paint;
 import android.graphics.PointF;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.support.v4.util.LruCache;
 import android.util.Log;
 import android.view.WindowManager;
 import com.artifex.mupdfdemo.MuPDFCore;
@@ -43,6 +42,7 @@ public class AKPDFPagesProvider extends PagesProvider {
     private boolean omitImages;
     private static final int MB=1024*1024;
     private Collection<Tile> tiles;
+    private static final int cacheSize=16;
 
     public void setExtraCache(int extraCache) {
         this.extraCache=extraCache;
@@ -51,8 +51,8 @@ public class AKPDFPagesProvider extends PagesProvider {
     }
 
     /* also calculates renderAhead */
-    private void setMaxCacheSize() {
-        long availLong=(long) (Runtime.getRuntime().maxMemory()/2-4*MB);
+    private int setMaxCacheSize() {
+        long availLong=(long) (Runtime.getRuntime().maxMemory()/3-4*MB);
 
         int avail;
         if (availLong>64*MB)
@@ -103,7 +103,22 @@ public class AKPDFPagesProvider extends PagesProvider {
 
         Log.v(TAG, "Setting cache size="+m+" renderAhead="+renderAhead+" for "+screenWidth+"x"+screenHeight+" (avail="+avail+")"+" extraCache:"+extraCache);
 
-        this.bitmapCache.setMaxCacheSizeBytes((int) m);
+        //this.bitmapCache.setMaxCacheSizeBytes((int) m);
+        return m;
+    }
+
+    public void setCacheSize(int len) {
+        int lruCacheSize=cacheSize;
+        if (len>0) {
+            lruCacheSize=setMaxCacheSize()/len/4;
+        }
+        if (lruCacheSize>cacheSize*2) {
+            lruCacheSize=cacheSize*2;
+        } else if (lruCacheSize<=cacheSize) {
+            lruCacheSize=cacheSize;
+        }
+        Log.v(TAG, "setCacheSize:"+len+" lru:"+lruCacheSize);
+        bitmapCache.resize(lruCacheSize*4/3);
     }
 
     public void setOmitImages(boolean skipImages) {
@@ -112,7 +127,7 @@ public class AKPDFPagesProvider extends PagesProvider {
         this.omitImages=skipImages;
 
         if (this.bitmapCache!=null) {
-            this.bitmapCache.clearCache();
+            this.bitmapCache.evictAll();
         }
     }
 
@@ -223,7 +238,7 @@ public class AKPDFPagesProvider extends PagesProvider {
         }
         quitLooper();
         if (null!=bitmapCache) {
-            bitmapCache.clearCache();
+            bitmapCache.evictAll();
         }
         bitmapCache=null;
     }
@@ -264,7 +279,7 @@ public class AKPDFPagesProvider extends PagesProvider {
         Collection<Tile> tiles=this.popTiles(); /* this can't block */
         if (tiles==null||tiles.size()==0) return;//break;
         try {
-            Map<Tile, Bitmap> renderedTiles=renderTiles(tiles, bitmapCache);
+            Map<Tile, Bitmap> renderedTiles=renderTiles(tiles, null);
             if (renderedTiles.size()>0) {
                 Message msg=Message.obtain();
                 msg.obj=renderedTiles;
@@ -284,7 +299,7 @@ public class AKPDFPagesProvider extends PagesProvider {
     //====================================================
 
     private MuPDFCore pdf=null;
-    private BitmapCache bitmapCache=null;
+    private LruCache<Tile, Bitmap> bitmapCache=null;
     private OnImageRenderedListener onImageRendererListener=null;
     PagesView mPagesView;
 
@@ -295,11 +310,41 @@ public class AKPDFPagesProvider extends PagesProvider {
     public AKPDFPagesProvider(MuPDFCore pdf, boolean skipImages, boolean doRenderAhead, PagesView pagesView) {
         this.pdf=pdf;
         this.omitImages=skipImages;
-        this.bitmapCache=new BitmapCache();
+        this.bitmapCache=new BCache(cacheSize);
         this.doRenderAhead=doRenderAhead;
         this.mPagesView=pagesView;
+        size=0;
         setMaxCacheSize();
         init();
+    }
+
+    static int size=0;
+
+    class BCache extends LruCache<Tile, Bitmap> {
+
+        public BCache(int maxSize) {
+            super(maxSize);
+        }
+
+        @Override
+        protected void entryRemoved(boolean evicted, Tile key, Bitmap oldValue, Bitmap newValue) {
+            //size+=oldValue.getWidth()*oldValue.getHeight()*4;
+            //Log.d(TAG, "entryRemoved:"+maxSize()+" evicted:"+evicted+" ==>"+size+" memsize:"+getAllSize());
+            if (evicted&&null!=oldValue) {
+                oldValue.recycle();
+            }
+        }
+
+        int getAllSize() {
+            Map<Tile, Bitmap> map=bitmapCache.snapshot();
+            Bitmap bitmap;
+            int size=0;
+            for (Tile tile : map.keySet()) {
+                bitmap=map.get(tile);
+                size+=bitmap.getWidth()*bitmap.getHeight()*4;
+            }
+            return size;
+        }
     }
 
     @Override
@@ -337,25 +382,25 @@ public class AKPDFPagesProvider extends PagesProvider {
     private Bitmap renderBitmap(Tile tile) throws RenderingException {
         //synchronized (tile) {
             /* last minute check to make sure some other thread hasn't rendered this tile */
-            if (this.bitmapCache.contains(tile)){
-                return null;
-            }
-            if (doRenderAhead&&Math.abs(mPagesView.getCurrentPage()-tile.getPage())>1){
-                return null;
-            }
+        if (this.bitmapCache.get(tile)!=null&&bitmapCache.get(tile)!=null) {
+            return null;
+        }
+        if (doRenderAhead&&Math.abs(mPagesView.getCurrentPage()-tile.getPage())>1) {
+            return null;
+        }
 
-            if (!doRenderAhead&&Math.abs(mPagesView.getCurrentPage()-tile.getPage())>0){
-                return null;
-            }
+        if (!doRenderAhead&&Math.abs(mPagesView.getCurrentPage()-tile.getPage())>0) {
+            return null;
+        }
 
-            Bitmap b=Bitmap.createBitmap(tile.getPrefXSize(), tile.getPrefYSize(), Bitmap.Config.ARGB_8888);
-            PointF size=pdf.getPageSize(tile.getPage());
-            pdf.renderPage(b, tile.getPage(),
-                (int) size.x*tile.getZoom()/1000, (int) size.y*tile.getZoom()/1000,
-                tile.getX(), tile.getY(),
-                tile.getPrefXSize(), tile.getPrefYSize(), pdf.new Cookie());
-            this.bitmapCache.put(tile, b);
-            return b;
+        Bitmap b=Bitmap.createBitmap(tile.getPrefXSize(), tile.getPrefYSize(), Bitmap.Config.ARGB_8888);
+        PointF size=pdf.getPageSize(tile.getPage());
+        pdf.renderPage(b, tile.getPage(),
+            (int) size.x*tile.getZoom()/1000, (int) size.y*tile.getZoom()/1000,
+            tile.getX(), tile.getY(),
+            tile.getPrefXSize(), tile.getPrefYSize(), pdf.new Cookie());
+        this.bitmapCache.put(tile, (b));
+        return b;
         //}
     }
 
@@ -394,7 +439,7 @@ public class AKPDFPagesProvider extends PagesProvider {
     @Override
     public Bitmap getPageBitmap(Tile tile) {
         Bitmap b=null;
-        if (null==bitmapCache) {
+        if (null==bitmapCache||null==bitmapCache.get(tile)) {
             return b;
         }
         b=this.bitmapCache.get(tile);
@@ -442,7 +487,7 @@ public class AKPDFPagesProvider extends PagesProvider {
     public void setVisibleTiles(Collection<Tile> tiles) {
         List<Tile> newtiles=null;
         for (Tile tile : tiles) {
-            if (!this.bitmapCache.contains(tile)) {
+            if (this.bitmapCache.get(tile)==null||bitmapCache.get(tile)==null) {
                 if (newtiles==null) newtiles=new LinkedList<Tile>();
                 newtiles.add(tile);
             }
