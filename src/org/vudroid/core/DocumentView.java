@@ -1,17 +1,16 @@
 package org.vudroid.core;
 
 import android.content.Context;
-import android.graphics.*;
+import android.graphics.Canvas;
+import android.graphics.RectF;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.GestureDetector;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
-import android.view.VelocityTracker;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.OverScroller;
-import android.widget.Scroller;
 import org.vudroid.core.events.CurrentPageListener;
 import org.vudroid.core.events.ZoomListener;
 import org.vudroid.core.models.CurrentPageModel;
@@ -30,13 +29,12 @@ public class DocumentView extends View implements ZoomListener {
     private int xToScroll;
     private float lastX;
     private float lastY;
-    //private VelocityTracker velocityTracker;
     private final OverScroller scroller;
     DecodingProgressModel progressModel;
     private RectF viewRect;
     private boolean inZoom;
     private long lastDownEventTime;
-    private static final int DOUBLE_TAP_TIME = 500;
+    private static final int DOUBLE_TAP_TIME = 600;
     private MultiTouchZoom multiTouchZoom;
 
     private float downX = 0;
@@ -46,6 +44,7 @@ public class DocumentView extends View implements ZoomListener {
     private boolean lockedVertically = true;
     private final GestureDetector mGestureDetector;
     int mMargin=16;
+    int preDecodePage=1;
 
     public void setPageModel(CurrentPageModel mPageModel) {
         this.mPageModel=mPageModel;
@@ -213,11 +212,6 @@ public class DocumentView extends View implements ZoomListener {
             }
         }
 
-        /*if (velocityTracker == null) {
-            velocityTracker = VelocityTracker.obtain();
-        }
-        velocityTracker.addMovement(ev);*/
-
         switch (ev.getAction()) {
             case MotionEvent.ACTION_DOWN: {
                 lockedVertically = verticalScrollLock;
@@ -248,19 +242,6 @@ public class DocumentView extends View implements ZoomListener {
                 break;
             }
             case MotionEvent.ACTION_UP: {
-                /*velocityTracker.computeCurrentVelocity(1000);
-
-                float velocityX=velocityTracker.getXVelocity();
-                if (lockedVertically) {
-                    velocityX=0;
-                }
-                //final float excursionY=Math.abs(ev.getY()-downY);
-                //if (excursionY>getHeight()/10) {
-                    //scroller.fling(getScrollX(), getScrollY(), (int) velocityX, (int) -velocityTracker.getYVelocity(), getLeftLimit(), getRightLimit(), getTopLimit(), getBottomLimit());
-                //}
-                velocityTracker.recycle();
-                velocityTracker=null;*/
-
                 break;
             }
         }
@@ -294,8 +275,6 @@ public class DocumentView extends View implements ZoomListener {
     }
 
     private void verticalDpadScroll(int direction) {
-        /*scroller.startScroll(getScrollX(), getScrollY(), 0, direction*getHeight()/2);
-        invalidate();*/
         mCurrentFlingRunnable=new FlingRunnable(getContext());
         mCurrentFlingRunnable.startScroll(getScrollX(), getScrollY(), 0, direction*getHeight()/2);
         post(mCurrentFlingRunnable);
@@ -303,17 +282,13 @@ public class DocumentView extends View implements ZoomListener {
 
     private void lineByLineMoveTo(int direction) {
         if (direction == 1 ? getScrollX() == getRightLimit() : getScrollX() == getLeftLimit()) {
-            //scroller.startScroll(getScrollX(), getScrollY(), direction * (getLeftLimit() - getRightLimit()), (int) (direction * pages.get(getCurrentPage()).bounds.height() / 50));
             mCurrentFlingRunnable=new FlingRunnable(getContext());
-            mCurrentFlingRunnable.startScroll(getScrollX(), getScrollY(), direction * (getLeftLimit() - getRightLimit()), (int) (direction * pages.get(getCurrentPage()).bounds.height() / 50));
-            post(mCurrentFlingRunnable);
+            mCurrentFlingRunnable.startScroll(getScrollX(), getScrollY(), direction*(getLeftLimit()-getRightLimit()), (int) (direction*pages.get(getCurrentPage()).bounds.height()/50));
         } else {
-            //scroller.startScroll(getScrollX(), getScrollY(), direction * getWidth() / 2, 0);
             mCurrentFlingRunnable=new FlingRunnable(getContext());
-            mCurrentFlingRunnable.startScroll(getScrollX(), getScrollY(), direction * getWidth() / 2, 0);
-            post(mCurrentFlingRunnable);
+            mCurrentFlingRunnable.startScroll(getScrollX(), getScrollY(), direction*getWidth()/2, 0);
         }
-        //invalidate();
+        post(mCurrentFlingRunnable);
     }
 
     private int getTopLimit() {
@@ -340,17 +315,10 @@ public class DocumentView extends View implements ZoomListener {
 
     RectF getViewRect() {
         if (viewRect == null) {
-            viewRect = new RectF(getScrollX(), getScrollY(), getScrollX() + getWidth(), getScrollY() + getHeight());
+            viewRect = new RectF(getScrollX(), getScrollY(), getScrollX() + getWidth(), getScrollY() + getHeight()*(preDecodePage+1));
         }
         return viewRect;
     }
-
-    /*@Override
-    public void computeScroll() {
-        if (scroller.computeScrollOffset()) {
-            scrollTo(scroller.getCurrX(), scroller.getCurrY());
-        }
-    }*/
 
     @Override
     protected void onDraw(Canvas canvas) {
@@ -409,9 +377,6 @@ public class DocumentView extends View implements ZoomListener {
     }
 
     private void stopScroller() {
-        /*if (!scroller.isFinished()) {
-            scroller.abortAnimation();
-        }*/
         cancelFling();
     }
 
@@ -452,14 +417,10 @@ public class DocumentView extends View implements ZoomListener {
 
             height=height-mMargin;
             if ((int) e.getY()<top) {
-                //scroller.startScroll(getScrollX(), getScrollY(), 0, -height, 0);
-                //invalidate();
                 mCurrentFlingRunnable=new FlingRunnable(getContext());
                 mCurrentFlingRunnable.startScroll(getScrollX(), getScrollY(), 0, -height, 0);
                 post(mCurrentFlingRunnable);
             } else if ((int) e.getY()>bottom) {
-                /*scroller.startScroll(getScrollX(), getScrollY(), 0, height, 0);
-                invalidate();*/
                 mCurrentFlingRunnable=new FlingRunnable(getContext());
                 mCurrentFlingRunnable.startScroll(getScrollX(), getScrollY(), 0,  height, 0);
                 post(mCurrentFlingRunnable);
@@ -495,12 +456,10 @@ public class DocumentView extends View implements ZoomListener {
         }
 
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-            //float velocityX=velocityTracker.getXVelocity();
             if (lockedVertically) {
                 velocityX=0;
             }
 
-            //scroller.fling(getScrollX(), getScrollY(), (int) velocityX, (int) -velocityY, getLeftLimit(), getRightLimit(), getTopLimit(), getBottomLimit());
             mCurrentFlingRunnable=new FlingRunnable(getContext());
             mCurrentFlingRunnable.fling(getScrollX(), getScrollY(), (int) velocityX, (int) -velocityY, getLeftLimit(), getRightLimit(), getTopLimit(), getBottomLimit());
             post(mCurrentFlingRunnable);

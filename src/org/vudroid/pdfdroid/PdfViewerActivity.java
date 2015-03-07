@@ -1,5 +1,6 @@
 package org.vudroid.pdfdroid;
 
+import org.vudroid.core.AKDecodeService;
 import org.vudroid.core.BaseViewerActivity;
 import org.vudroid.core.DecodeService;
 import org.vudroid.core.DecodeServiceBase;
@@ -10,6 +11,6 @@ public class PdfViewerActivity extends BaseViewerActivity
     @Override
     protected DecodeService createDecodeService()
     {
-        return new DecodeServiceBase(new PdfContext());
+        return new AKDecodeService(new PdfContext());
     }
 }

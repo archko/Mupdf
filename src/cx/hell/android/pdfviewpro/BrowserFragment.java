@@ -321,10 +321,11 @@ public class BrowserFragment extends RefreshableFragment implements OnItemClickL
     }
 	
 	public void pdfView(File f) {
-		Log.i(TAG, "post intent to open file " + f);
+		Log.i(TAG, "post intent to open file "+f);
 		Intent intent = new Intent();
 		intent.setDataAndType(Uri.fromFile(f), "application/pdf");
-		intent.setClass(getActivity(), OpenFileActivity.class);
+		//intent.setClass(getActivity(), OpenFileActivity.class);
+        intent.setClass(getActivity(), PdfViewerActivity.class);
 		intent.setAction("android.intent.action.VIEW");
 		getActivity().startActivity(intent);
     }
