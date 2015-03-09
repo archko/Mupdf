@@ -8,6 +8,7 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.View;
 import org.vudroid.core.codec.CodecContext;
 import org.vudroid.core.codec.CodecDocument;
@@ -35,7 +36,7 @@ public class AKDecodeService implements DecodeService
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
     public static final String DECODE_SERVICE = "ViewDroidDecodeService";
     private final Map<Object, Future<?>> decodingFutures = new ConcurrentHashMap<Object, Future<?>>();
-    private final HashMap<Integer, SoftReference<CodecPage>> pages = new HashMap<Integer, SoftReference<CodecPage>>();
+    private final SparseArray<SoftReference<CodecPage>> pages = new SparseArray<SoftReference<CodecPage>>();
     private ContentResolver contentResolver;
     private Queue<Integer> pageEvictionQueue = new LinkedList<Integer>();
     private boolean isRecycled;
@@ -46,7 +47,7 @@ public class AKDecodeService implements DecodeService
             if (what==MSG_DECODE_START) {
                 final DecodeTask decodeTask=(DecodeTask) msg.obj;
                 if (null!=decodeTask) {
-                    //synchronized (decodingFutures) {
+                    synchronized (decodingFutures) {
                         if (isRecycled) {
                             return true;
                         }
@@ -64,7 +65,7 @@ public class AKDecodeService implements DecodeService
                         if (removed!=null) {
                             removed.cancel(false);
                         }
-                    //}
+                    }
                 }
             } else if (what==MSG_DECODE_FINISH) {
 
@@ -219,14 +220,15 @@ public class AKDecodeService implements DecodeService
     }
 
     private CodecPage getPage(int pageIndex) {
-        if (!pages.containsKey(pageIndex) || pages.get(pageIndex).get() == null)
+        if (null==pages.get(pageIndex) || pages.get(pageIndex).get() == null)
         {
             pages.put(pageIndex, new SoftReference<CodecPage>(document.getPage(pageIndex)));
             pageEvictionQueue.remove(pageIndex);
             pageEvictionQueue.offer(pageIndex);
             if (pageEvictionQueue.size() > PAGE_POOL_SIZE) {
                 Integer evictedPageIndex = pageEvictionQueue.poll();
-                CodecPage evictedPage = pages.remove(evictedPageIndex).get();
+                CodecPage evictedPage = pages.get(evictedPageIndex).get();
+                pages.remove(evictedPageIndex);
                 if (evictedPage != null) {
                     evictedPage.recycle();
                 }
@@ -274,7 +276,7 @@ public class AKDecodeService implements DecodeService
 
     private boolean isTaskDead(DecodeTask currentDecodeTask)
     {
-        //synchronized (decodingFutures)
+        synchronized (decodingFutures)
         {
             return !decodingFutures.containsKey(currentDecodeTask.decodeKey);
         }
@@ -319,9 +321,13 @@ public class AKDecodeService implements DecodeService
         }
         executorService.submit(new Runnable() {
             public void run() {
-                for (SoftReference<CodecPage> codecPageSoftReference : pages.values()) {
-                    CodecPage page = codecPageSoftReference.get();
-                    if (page != null) {
+                //for (SoftReference<CodecPage> codecPageSoftReference : pages.values()) {
+                int len=pages.size();
+                SoftReference<CodecPage> codecPageSoftReference;
+                for (int i=0; i<len; i++) {
+                    codecPageSoftReference=pages.valueAt(i);
+                    CodecPage page=codecPageSoftReference.get();
+                    if (page!=null) {
                         page.recycle();
                     }
                 }
