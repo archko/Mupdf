@@ -64,6 +64,9 @@ import com.artifex.mupdfdemo.R;
 // #ifdef pro
 import android.view.ViewGroup.LayoutParams;
 import android.widget.ScrollView;
+import org.vudroid.core.events.CurrentPageListener;
+import org.vudroid.core.models.CurrentPageModel;
+import org.vudroid.core.views.PageSeekBarControls;
 
 // #endif
 
@@ -191,10 +194,8 @@ public class OpenFileActivity extends Activity implements SensorEventListener {
 	private boolean textReflowMode = false;
 // #endif
     private final int    OUTLINE_REQUEST=0;
-    private SeekBar mPageSlider;
-    private int          mPageSliderRes;
-    private TextView     mPageNumberView;
-    private Runnable gotoPageRunnable = null;
+    private CurrentPageModel mPageModel;
+    PageSeekBarControls mPageSeekBarControls;
 
 	/**
      * Called when the activity is first created.
@@ -302,52 +303,6 @@ public class OpenFileActivity extends Activity implements SensorEventListener {
         lp.addRule(RelativeLayout.ALIGN_PARENT_TOP);
         activityLayout.addView(this.pageNumberTextView, lp);
 
-        mPageSlider=new SeekBar(this);
-        mPageSlider.setId(10000);
-        mPageSlider.setThumb(getResources().getDrawable(R.drawable.seek_thumb));
-        mPageSlider.setProgressDrawable(getResources().getDrawable(R.drawable.seek_progress));
-        mPageSlider.setBackgroundResource(R.color.toolbar);
-        lp=new RelativeLayout.LayoutParams(
-            RelativeLayout.LayoutParams.MATCH_PARENT,
-            RelativeLayout.LayoutParams.WRAP_CONTENT);
-        lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-        lp.leftMargin=16;
-        lp.rightMargin=16;
-        lp.topMargin=8;
-        lp.bottomMargin=16;
-        activityLayout.addView(this.mPageSlider, lp);
-        mPageSlider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            public void onStopTrackingTouch(SeekBar seekBar) {
-                OpenFileActivity.this.gotoPage((seekBar.getProgress()+mPageSliderRes/2)/mPageSliderRes);
-                showPageSlider(false);
-            }
-
-            public void onStartTrackingTouch(SeekBar seekBar) {
-            }
-
-            public void onProgressChanged(SeekBar seekBar, int progress,
-                boolean fromUser) {
-                if (null!=pdf) {
-                    int index=(progress+mPageSliderRes/2)/mPageSliderRes;
-                    mPageNumberView.setText(String.format("%d / %d", index+1, pdf.countPages()));
-                    showPageSlider(false);
-                }
-            }
-        });
-        mPageNumberView=new TextView(this);
-        mPageNumberView.setBackgroundResource(R.drawable.page_num);
-        mPageNumberView.setTextColor(getResources().getColor(android.R.color.white));
-        mPageNumberView.setTextAppearance(this, android.R.attr.textAppearanceMedium);
-        lp=new RelativeLayout.LayoutParams(
-            RelativeLayout.LayoutParams.WRAP_CONTENT,
-            RelativeLayout.LayoutParams.WRAP_CONTENT);
-        lp.addRule(RelativeLayout.ABOVE, 10000);
-        lp.addRule(RelativeLayout.CENTER_IN_PARENT);
-        lp.bottomMargin=16;
-        activityLayout.addView(this.mPageNumberView, lp);
-        mPageSlider.setVisibility(View.GONE);
-        mPageNumberView.setVisibility(View.GONE);
-
 		// display this
         this.setContentView(activityLayout);
         
@@ -370,11 +325,27 @@ public class OpenFileActivity extends Activity implements SensorEventListener {
         		fadePage();
         	}
         };
-        this.gotoPageRunnable = new Runnable() {
-            public void run() {
-                fadePageSlider();
+
+        mPageModel=new CurrentPageModel();
+        mPageModel.addEventListener(new CurrentPageListener() {
+            @Override
+            public void currentPageChanged(int pageIndex) {
+                Log.d(TAG, "currentPageChanged:"+pageIndex);
+                if (pagesView.getCurrentPage()!=pageIndex) {
+                    gotoPage(pageIndex);
+                }
             }
-        };
+        });
+        mPageSeekBarControls=createSeekControls(mPageModel);
+        activityLayout.addView(mPageSeekBarControls, new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
+        mPageSeekBarControls.hide();
+    }
+
+    private PageSeekBarControls createSeekControls(CurrentPageModel pageModel) {
+        final PageSeekBarControls controls=new PageSeekBarControls(this, pageModel);
+        controls.setGravity(Gravity.CENTER_HORIZONTAL|Gravity.TOP);
+        pageModel.addEventListener(controls);
+        return controls;
     }
 
 	/** 
@@ -759,7 +730,9 @@ public class OpenFileActivity extends Activity implements SensorEventListener {
             pdf.getMediaBox(pagesView.getCurrentPage());
     	} else if (menuItem == this.gotoPageMenuItem) {
     		//this.showGotoPageDialog();
-            showGotoPageView();
+            mPageModel.setCurrentPage(pagesView.getCurrentPage());
+            mPageModel.setPageCount(pdf.countPages());
+            mPageModel.toggleSeekControls();
     	} else if (menuItem == this.rotateLeftMenuItem) {
     		this.pagesView.rotate(-1);
     	} else if (menuItem == this.rotateRightMenuItem) {
@@ -815,21 +788,6 @@ public class OpenFileActivity extends Activity implements SensorEventListener {
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-	/**
-     * Intercept touch events to handle the zoom buttons animation
-     */
-    /*@Override
-    public boolean dispatchTouchEvent(MotionEvent event) {
-    	int action = event.getAction();
-    	if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_DOWN) {
-	    	showPageNumber(true);
-    		if (showZoomOnScroll) {
-		    	showZoom();
-	    	}
-    	}
-		return super.dispatchTouchEvent(event);    	
-    };*/
-    
     public boolean dispatchKeyEvent(KeyEvent event) {
     	int action = event.getAction();
     	if (action == KeyEvent.ACTION_UP || action == KeyEvent.ACTION_DOWN) {
@@ -934,34 +892,6 @@ public class OpenFileActivity extends Activity implements SensorEventListener {
     	dialog.show();
     }
 
-    private void fadePageSlider() {
-        mPageSlider.setVisibility(View.GONE);
-        mPageNumberView.setVisibility(View.GONE);
-    }
-
-    public void showPageSlider(boolean force) {
-        mPageSlider.setVisibility(View.VISIBLE);
-        mPageNumberView.setVisibility(View.VISIBLE);
-
-        pageHandler.removeCallbacks(gotoPageRunnable);
-        pageHandler.postDelayed(gotoPageRunnable, 4000);
-
-        if (!force){
-            return;
-        }
-
-        int index=pagesView.getCurrentPage();
-        mPageNumberView.setText(String.format("%d / %d", index+1, pdf.countPages()));
-        mPageSlider.setMax((pdf.countPages()-1)*mPageSliderRes);
-        mPageSlider.setProgress(index*mPageSliderRes);
-    }
-
-    private void showGotoPageView() {
-        int smax=Math.max(pdf.countPages()-1, 1);
-        mPageSliderRes=((10+smax-1)/smax)*2;
-        showPageSlider(true);
-    }
-    
     /**
      * Called from menu when user want to go to specific page.
      */
@@ -1229,7 +1159,7 @@ public class OpenFileActivity extends Activity implements SensorEventListener {
             intent.setClass(this, AboutPDFViewActivity.class);
             this.startActivity(intent);*/
         } else if (menuItem == this.gotoPageMenuItem) {
-            this.showGotoPageDialog();
+            //this.showGotoPageDialog();
         } else if (menuItem == this.rotateLeftMenuItem) {
             this.pagesView.rotate(-1);
         } else if (menuItem == this.rotateRightMenuItem) {
