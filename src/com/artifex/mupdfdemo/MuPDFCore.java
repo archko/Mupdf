@@ -1,4 +1,5 @@
 package com.artifex.mupdfdemo;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
 import android.content.Context;
@@ -39,6 +40,17 @@ public class MuPDFCore
 			int patchW, int patchH,
             long cookiePtr);
     public native void drawPage3(Bitmap bitmap,
+        int pageW, int pageH,
+        int patchX, int patchY,
+        int patchW, int patchH,
+        long cookiePtr);
+    public native void drawPageWithNumber(
+        int page, Bitmap bitmap,
+        int pageW, int pageH,
+        int patchX, int patchY,
+        int patchW, int patchH,
+        long cookiePtr);
+    public native void renderPageDirect(ByteBuffer buffer,
         int pageW, int pageH,
         int patchX, int patchY,
         int patchW, int patchH,
@@ -249,19 +261,21 @@ public class MuPDFCore
         int patchX, int patchY,
         int patchW, int patchH,
         MuPDFCore.Cookie cookie) {
-        //getMediaBox(page);
         gotoPage(page);
         /*System.out.println(String.format("renderPage pageW-:%d, pageH-:%d, patchX:%d, patchY:%d, patchW:%d, patchH:%d",
             pageW, pageH, patchX, patchY, patchW, patchH));*/
         drawPage3(bm, pageW, pageH, patchX, patchY, patchW, patchH, cookie.cookiePtr);
+        //drawPageWithNumber(page, bm, pageW, pageH, patchX, patchY, patchW, patchH, cookie.cookiePtr);
     }
 
-    /*public synchronized void drawPage(Bitmap bm,
-        int n, int zoom, int left, int top,
-        int rotation, boolean skipImages, int width, int height) {
-        gotoPage(n);
-        //drawPage2(bm, n, zoom, left, top, rotation, skipImages, width, height);
-    }*/
+    public synchronized void renderPageDirect(ByteBuffer buffer, int page,
+        int pageW, int pageH,
+        int patchX, int patchY,
+        int patchW, int patchH,
+        MuPDFCore.Cookie cookie) {
+        gotoPage(page);
+        renderPageDirect(buffer, pageW, pageH, patchX, patchY, patchW, patchH, cookie.cookiePtr);
+    }
 
 	public synchronized void updatePage(Bitmap bm, int page,
 			int pageW, int pageH,

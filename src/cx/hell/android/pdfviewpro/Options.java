@@ -251,6 +251,12 @@ public class Options extends PreferenceActivity implements OnSharedPreferenceCha
         case 5:
             activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
             break;
+        case 6:
+            activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
+            break;
+        case 7:
+            activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
+            break;
 		default:
 			break;
 		}

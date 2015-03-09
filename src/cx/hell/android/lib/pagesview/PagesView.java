@@ -20,7 +20,7 @@ import android.view.GestureDetector.OnDoubleTapListener;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.animation.DecelerateInterpolator;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.LinearLayout;
 import android.widget.OverScroller;
 import cx.hell.android.pdfviewpro.Actions;
@@ -220,7 +220,7 @@ public class PagesView extends View implements
         this.loadingPaint.setAntiAlias(true);
         this.loadingPaint.setStyle(Paint.Style.STROKE);
         this.loadingPaint.setColor(Color.GRAY);
-        this.loadingPaint.setStrokeWidth(4);
+        this.loadingPaint.setStrokeWidth(2);
         this.loadingPaint.setTextSize(36);
         DisplayMetrics screen=new DisplayMetrics();
         activity.getWindowManager().getDefaultDisplay().getMetrics(screen);
@@ -232,7 +232,7 @@ public class PagesView extends View implements
         this.mtZoomActive=false;
         this.mtDebounce=0;
 
-        mScroller=new OverScroller(activity, new DecelerateInterpolator());
+        mScroller=new OverScroller(activity, new AccelerateDecelerateInterpolator());
         this.gestureDetector=new GestureDetector(activity,
             new GestureDetector.OnGestureListener() {
                 public boolean onDown(MotionEvent e) {

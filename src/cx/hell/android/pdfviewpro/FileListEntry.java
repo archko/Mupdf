@@ -46,8 +46,8 @@ public class FileListEntry {
 	private static String getLabel(File file, boolean showPDFExtension) {
 		String label = file.getName();
 		
-		if (!showPDFExtension && label.length() > 4 && ! file.isDirectory() &&
-			label.substring(label.length()-4, label.length()).equalsIgnoreCase(".pdf")) {
+		if (!showPDFExtension && label.length() > 4 && ! file.isDirectory()
+            /*&& label.substring(label.length()-4, label.length()).equalsIgnoreCase(".pdf")*/) {
 			return label.substring(0, label.length()-4);
 		}
 		else {

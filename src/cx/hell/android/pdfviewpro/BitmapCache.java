@@ -101,7 +101,7 @@ public class BitmapCache {
      * Estimate bitmap memory size.
      * This is just a guess.
      */
-    private static int getBitmapSizeInCache(Bitmap bitmap) {
+    public static int getBitmapSizeInCache(Bitmap bitmap) {
         int numPixels=bitmap.getWidth()*bitmap.getHeight();
         if (bitmap.getConfig()==Bitmap.Config.RGB_565) {
             return numPixels*2;

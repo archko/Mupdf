@@ -425,6 +425,7 @@ public abstract class BaseViewerActivity extends Activity implements DecodingPro
             height=(int) (height*0.03);
         }
         documentView.setScrollMargin(height);
+        documentView.setDecodePage(options.getBoolean(Options.PREF_RENDER_AHEAD, true) ? 1 : 0);
     }
 
     @Override

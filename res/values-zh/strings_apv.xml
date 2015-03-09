@@ -34,12 +34,6 @@
     <string name="options_back">备份历史</string>
     <string name="options_restore">恢复历史</string>
 	<string name="zoom_animation">缩放按钮</string>
-	<string-array name="zoom_animations">
-		<item>100</item>
-		<item>0</item>
-		<item>1</item>
-		<item>2</item>
-	</string-array>
 	<string-array name="zoom_animation_labels">
 		<item>禁用</item>
 		<item>隐藏</item>
@@ -47,13 +41,6 @@
 		<item>渐变</item>
 	</string-array>
 	<string name="page_animation">页码/总页数</string>
-	<string-array name="page_animations">
-		<item>100</item>
-		<item>0</item>
-		<item>1</item>
-		<item>2</item>
-		<item>3</item>
-	</string-array>
 	<string-array name="page_animation_labels">
 		<item>禁用</item>
 		<item>隐藏</item>
@@ -62,15 +49,6 @@
 		<item>显示</item>
 	</string-array>
 	<string name="fade_speed">页面缩放渐变等待</string>
-	<string-array name="fade_speeds">
-		<item>1</item>
-		<item>2</item>
-		<item>3</item>
-		<item>4</item>
-		<item>5</item>
-		<item>6</item>
-		<item>7</item>
-	</string-array>
 	<string-array name="fade_speed_labels">
 		<item>1 second</item>
 		<item>2 seconds</item>
@@ -89,16 +67,10 @@
 	<item>不变</item>
 	<item>锁定竖屏</item>
 	<item>锁定横屏</item>
-        <item>反向竖屏</item>
-        <item>反向横屏</item>
-	</string-array>
-	<string-array name="orientations">
-	<item>0</item>
-	<item>3</item>
-	<item>1</item>
-	<item>2</item>
-        <item>4</item>
-        <item>5</item>
+    <item>反向竖屏</item>
+    <item>反向横屏</item>
+    <item>感应竖屏</item>
+    <item>感应横屏</item>
 	</string-array>
 	<string name="viewer">PDF 查看器</string>
 	<string name="selector">文件选择器</string>
@@ -140,24 +112,8 @@
 		<item>MediaBox</item>
 		<item>TrimBox</item>
 	</string-array>
-	<string-array name="boxes">
-		<item>0</item>
-		<item>1</item>
-		<item>2</item>
-		<item>3</item>
-		<item>4</item>
-	</string-array>
 	<string name="extra_cache">额外的内存缓存</string>
-	<string name="extra_cache_sub">使用额外的内存缓存提高流畅性.</string> 
-	<string-array name="extra_caches">
-		<item>0</item>
-		<item>1</item>
-		<item>2</item>
-		<item>4</item>
-		<item>6</item>
-		<item>8</item>
-		<item>10</item>
-	</string-array>
+	<string name="extra_cache_sub">使用额外的内存缓存提高流畅性.</string>
 	<string-array name="extra_cache_labels">
 		<item>无</item>
 		<item>1 MB</item>
@@ -168,17 +124,15 @@
 		<item>10 MB</item>
 	</string-array>
 	<string name="side_margin">额外的间距</string>
-		<string-array name="margins">
-	<item>0</item>
-	<item>5</item>
-	<item>10</item>
-	<item>20</item>
-	</string-array>
 		<string-array name="margin_labels">
 	<item>none</item>
 	<item>small</item>
 	<item>medium</item>
 	<item>large</item>
+    <item>-20</item>
+    <item>-15</item>
+    <item>-10</item>
+    <item>-5</item>
 	</string-array>
 	<string name="top_margin">页面间距</string>
 	<string name="remove_from_recent">从最近中移出</string>
@@ -194,21 +148,6 @@
 	<item>zoom in or back out</item>
 	</string-array>
 	<string name="double_tap_action">双击行为</string>
-	<string-array name = "action_pairs">
-	<item>0</item>
-	<item>1</item>
-	<item>2</item>
-	<item>9</item>
-	<item>3</item>
-	<item>4</item>
-	<item>5</item>
-	<item>6</item>
-	<item>7</item>
-	<item>8</item>
-	<item>10</item>
-	<item>11</item>
-	<item>12</item>
-	</string-array>
 	<string-array name = "action_pair_labels">
 	<item>无</item>
 	<item>屏幕上/下</item>

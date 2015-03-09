@@ -8,8 +8,9 @@
 
 # Version X+1: armeabi-v7a (Much faster due to the availability of hardware
 # FP, but cannot be run in the emulator).
-APP_PLATFORM=android-8
+APP_PLATFORM=android-14
 APP_ABI := armeabi-v7a
+APP_CFLAGS := -O3
 
 # Version X+2: x86 (Requires android-9, so a change needs to be made in
 # AndroidManifest.xml too)
@@ -18,7 +19,7 @@ APP_ABI := armeabi-v7a
 
 # Version X+3: mips (Requires android-9, so a change needs to be made in
 # AndroidManifest.xml too)
-#APP_PLATFORM=android-9
+APP_PLATFORM=android-9
 #APP_ABI := mips
 
 ifdef NDK_PROFILER
@@ -26,7 +27,7 @@ ifdef NDK_PROFILER
 # Accordingly, we need to build as debug - but this turns optimisations
 # off, which is less than ideal.
 APP_OPTIM := debug
-APP_CFLAGS := -O2
+APP_CFLAGS := -O3
 else
 APP_OPTIM := release
 endif
@@ -42,3 +43,4 @@ endif
 
 # If the ndk is newer than r8c, try using clang.
 #NDK_TOOLCHAIN_VERSION=clang3.1
+#NDK_TOOLCHAIN_VERSION=arm-linux-androideabi-4.8

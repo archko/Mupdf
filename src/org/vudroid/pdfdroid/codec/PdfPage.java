@@ -68,13 +68,13 @@ public class PdfPage implements CodecPage
     }
 
     /**
-     * äÖÈ¾Î»Í¼
+     * ï¿½ï¿½È¾Î»Í¼
      *
-     * @param width           Í¼¿é¿í
-     * @param height          Í¼¿é¸ß
-     * @param pageSliceBounds ÇÐ¸îµÄ¾ØÐÎ,ÇÐ¸î4·ÝÔòÎª1/4,8·ÝÎª1/8,ÀàÍÆ.
-     * @param scale           Ëõ·Å¼¶±ð
-     * @return Î»ÖÃ
+     * @param width           Í¼ï¿½ï¿½ï¿½
+     * @param height          Í¼ï¿½ï¿½ï¿½
+     * @param pageSliceBounds ï¿½Ð¸ï¿½Ä¾ï¿½ï¿½ï¿½,ï¿½Ð¸ï¿½4ï¿½ï¿½ï¿½ï¿½Îª1/4,8ï¿½ï¿½Îª1/8,ï¿½ï¿½ï¿½ï¿½.
+     * @param scale           ï¿½ï¿½ï¿½Å¼ï¿½ï¿½ï¿½
+     * @return Î»ï¿½ï¿½
      */
     public Bitmap renderBitmap(int width, int height, RectF pageSliceBounds, float scale)
     {
@@ -128,11 +128,11 @@ public class PdfPage implements CodecPage
     }
 
     public synchronized void recycle() {
-        /*if (pageHandle != 0) {
-            free(pageHandle);
+        if (pageHandle != 0) {
+            //core.freePage((int) pageHandle);
             pageHandle = 0;
-        }*/
         }
+    }
 
     private RectF getMediaBox()
     {

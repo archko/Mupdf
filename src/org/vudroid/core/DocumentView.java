@@ -406,6 +406,10 @@ public class DocumentView extends View implements ZoomListener {
         mMargin=margin;
     }
 
+    public void setDecodePage(int decodePage) {
+        preDecodePage=decodePage;
+    }
+
     class MySimpleOnGestureListener extends GestureDetector.SimpleOnGestureListener {
 
         @Override

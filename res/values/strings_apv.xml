@@ -82,7 +82,7 @@
 		<item>6 seconds</item>
 		<item>7 seconds</item>
 	</string-array>
-	<string name="default_fade_speed">3</string>
+	<string name="default_fade_speed">0</string>
 	<string name="invert">Invert colors</string>
 	<string name="dirs_first">List directories first</string>
 	<string name="show_extension">Show .pdf extension</string>
@@ -93,16 +93,20 @@
 	<item>harder to change</item>
 	<item>lock to portrait</item>
 	<item>lock to landscape</item>
-        <item>reverse portrait</item>
-        <item>reverse landscape</item>
+    <item>reverse portrait</item>
+    <item>reverse landscape</item>
+    <item>sensor portrait</item>
+    <item>sensor landscape</item>
 	</string-array>
 	<string-array name="orientations">
 	<item>0</item>
 	<item>3</item>
 	<item>1</item>
 	<item>2</item>
-        <item>4</item>
-        <item>5</item>
+    <item>4</item>
+    <item>5</item>
+    <item>6</item>
+    <item>7</item>
 	</string-array>
 	<string name="viewer">PDF Viewer</string>
 	<string name="selector">File Chooser</string>
@@ -181,12 +185,20 @@
 	<item>5</item>
 	<item>10</item>
 	<item>20</item>
+    <item>-20</item>
+    <item>-15</item>
+    <item>-10</item>
+    <item>-5</item>
 	</string-array>
 		<string-array name="margin_labels">
 	<item>none</item>
 	<item>small</item>
 	<item>medium</item>
 	<item>large</item>
+    <item>-20</item>
+    <item>-15</item>
+    <item>-10</item>
+    <item>-5</item>
 	</string-array>
 	<string name="top_margin">Space between pages</string>
 	<string name="default_top_margin">0</string>

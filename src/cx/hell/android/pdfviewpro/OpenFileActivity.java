@@ -393,7 +393,7 @@ public class OpenFileActivity extends Activity implements SensorEventListener {
 			edit.putInt(Options.PREF_PREV_ORIENTATION, prevOrientation);
 			Log.v(TAG, "prevOrientation saved: "+prevOrientation);
 			edit.commit();
-		}		
+		}
 	}
 	
 	@Override

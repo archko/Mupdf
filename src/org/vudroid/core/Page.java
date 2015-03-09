@@ -38,7 +38,7 @@ class Page {
         }
         canvas.drawRect(bounds, fillPaint);
 
-        canvas.drawText("Page " + (index + 1), bounds.centerX(), bounds.centerY(), textPaint);
+        //canvas.drawText("Page " + (index + 1), bounds.centerX(), bounds.centerY(), textPaint);
         node.draw(canvas);
         canvas.drawLine(bounds.left, bounds.top, bounds.right, bounds.top, strokePaint);
         canvas.drawLine(bounds.left, bounds.bottom, bounds.right, bounds.bottom, strokePaint);

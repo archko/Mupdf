@@ -16,11 +16,13 @@ import cx.hell.android.lib.pagesview.PagesView;
 import cx.hell.android.lib.pagesview.RenderingException;
 import cx.hell.android.lib.pagesview.Tile;
 
+import java.lang.ref.SoftReference;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -118,7 +120,7 @@ public class AKPDFPagesProvider extends PagesProvider {
             lruCacheSize=cacheSize;
         }
         Log.v(TAG, "setCacheSize:"+len+" lru:"+lruCacheSize);
-        bitmapCache.resize(lruCacheSize*4/3);
+        bitmapCache.resize(lruCacheSize);
     }
 
     public void setOmitImages(boolean skipImages) {
@@ -329,7 +331,7 @@ public class AKPDFPagesProvider extends PagesProvider {
         @Override
         protected void entryRemoved(boolean evicted, Tile key, Bitmap oldValue, Bitmap newValue) {
             //size+=oldValue.getWidth()*oldValue.getHeight()*4;
-            //Log.d(TAG, "entryRemoved:"+maxSize()+" evicted:"+evicted+" ==>"+size+" memsize:"+getAllSize());
+            //Log.d(TAG, "entryRemoved:"+maxSize()+" evicted:"+evicted+" ==>"+size+" memsize:"+getAllSize()+" size:"+size());
             if (evicted&&null!=oldValue) {
                 oldValue.recycle();
             }
