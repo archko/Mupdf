@@ -27,6 +27,7 @@ public class DocumentView extends View implements ZoomListener {
     private boolean isInitialized = false;
     private int pageToGoTo;
     private int xToScroll;
+    private int yToScroll;
     private float lastX;
     private float lastY;
     private final OverScroller scroller;
@@ -92,13 +93,21 @@ public class DocumentView extends View implements ZoomListener {
     }
 
     private void goToPageImpl(final int toPage) {
-        int scroll=getScrollX();
-        Log.d(VIEW_LOG_TAG, "goToPageImpl:"+xToScroll+" scroll:"+scroll);
+        int scrollX=getScrollX();
+        Page page=pages.get(toPage);
+        int scrollY=page.getTop();
+        Log.d(VIEW_LOG_TAG, "goToPageImpl:"+xToScroll+" scroll:"+scrollX+" yToScroll:"+yToScroll+" scrollY:"+scrollY+" page:"+page);
         if (xToScroll!=0) {
-            scroll=xToScroll;
+            scrollX=xToScroll;
             xToScroll=0;
         }
-        scrollTo(scroll, pages.get(toPage).getTop());
+        if (yToScroll!=0) {
+            if (page.getBottom()>yToScroll) {
+                scrollY=yToScroll;
+            }
+            yToScroll=0;
+        }
+        scrollTo(scrollX, scrollY);
     }
 
     @Override
@@ -163,8 +172,9 @@ public class DocumentView extends View implements ZoomListener {
         }
     }
 
-    public void goToPage(int toPage, int scrollX) {
+    public void goToPage(int toPage, int scrollX, int scrollY) {
         xToScroll=scrollX;
+        yToScroll=scrollY;
         if (isInitialized) {
             goToPageImpl(toPage);
         } else {

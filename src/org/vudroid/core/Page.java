@@ -32,6 +32,10 @@ class Page {
         return Math.round(bounds.top);
     }
 
+    public int getBottom() {
+        return Math.round(bounds.bottom);
+    }
+
     public void draw(Canvas canvas) {
         if (!isVisible()) {
             return;

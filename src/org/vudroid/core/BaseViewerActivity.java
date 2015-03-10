@@ -310,7 +310,7 @@ public abstract class BaseViewerActivity extends Activity implements DecodingPro
 
         if (0<bookmarkToRestore.page) {
             int currentPage = bookmarkToRestore.page;
-            documentView.goToPage(currentPage, bookmarkToRestore.offsetX);
+            documentView.goToPage(currentPage, bookmarkToRestore.offsetX, bookmarkToRestore.offsetY);
         }
     }
 
@@ -344,7 +344,7 @@ public abstract class BaseViewerActivity extends Activity implements DecodingPro
     public BookmarkEntry toBookmarkEntry() {
         return new BookmarkEntry(decodeService.getPageCount(),
             documentView.getCurrentPage(), documentView.getZoomModel().getZoom()*1000, 0,
-            documentView.getScrollX(), documentView.getScrollY()-documentView.getHeight()/2);
+            documentView.getScrollX(), documentView.getScrollY());
     }
 
     @Override
