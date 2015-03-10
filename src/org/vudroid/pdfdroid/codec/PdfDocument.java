@@ -31,7 +31,7 @@ public class PdfDocument implements CodecDocument
     public CodecPage getPage(int pageNumber)
     {
         //return PdfPage.createPage(docHandle, pageNumber + 1);
-        return PdfPage.createPage(core, pageNumber);
+        return PdfPage.createPage(core, pageNumber+1);
     }
 
     public int getPageCount()

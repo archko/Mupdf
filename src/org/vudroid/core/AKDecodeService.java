@@ -63,6 +63,7 @@ public class AKDecodeService implements DecodeService
                         });
                         final Future<?> removed=decodingFutures.put(decodeTask.decodeKey, future);
                         if (removed!=null) {
+                            Log.e(DECODE_SERVICE, "cancel Decode"+decodeTask);
                             removed.cancel(false);
                         }
                     }
@@ -152,15 +153,16 @@ public class AKDecodeService implements DecodeService
     {
         if (isTaskDead(currentDecodeTask))
         {
-            Log.d(DECODE_SERVICE, "Skipping decode task for page " + currentDecodeTask.pageNumber);
+            //Log.d(DECODE_SERVICE, "Skipping decode task for page " + currentDecodeTask);
             return;
         }
-        //Log.d(DECODE_SERVICE, "Starting decode of page: " + currentDecodeTask.pageNumber+" slice:"+currentDecodeTask.pageSliceBounds);
+        //Log.d(DECODE_SERVICE, "Starting decode of page: " + currentDecodeTask +" slice:"+currentDecodeTask.pageSliceBounds);
         CodecPage vuPage = getPage(currentDecodeTask.pageNumber);
         preloadNextPage(currentDecodeTask.pageNumber);
 
         if (isTaskDead(currentDecodeTask))
         {
+            //Log.d(DECODE_SERVICE, "Skipping decode when decoding task for page " + currentDecodeTask);
             return;
         }
         //Log.d(DECODE_SERVICE, "Start converting map to bitmap");
@@ -305,6 +307,16 @@ public class AKDecodeService implements DecodeService
             this.zoom = zoom;
             this.decodeKey = decodeKey;
             this.pageSliceBounds = pageSliceBounds;
+        }
+
+        @Override
+        public String toString() {
+            return "DecodeTask{"+
+                "decodeKey="+decodeKey+
+                ", pageNumber="+pageNumber+
+                ", zoom="+zoom+
+                ", pageSliceBounds="+pageSliceBounds+
+                '}';
         }
     }
 
