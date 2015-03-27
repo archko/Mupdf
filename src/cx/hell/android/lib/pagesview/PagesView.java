@@ -12,6 +12,7 @@ import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.os.SystemClock;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -200,6 +201,7 @@ public class PagesView extends View implements
     float dpi=160;
     private final Paint bitmapPaint=new Paint();
     private final OverScroller mScroller;
+    private RectF viewRect;
 
     public PagesView(Activity activity) {
         super(activity);
@@ -358,6 +360,14 @@ public class PagesView extends View implements
             if (0<this.bookmarkToRestore.page) {
                 this.currentPage=this.bookmarkToRestore.page;
             }
+        }
+    }
+
+    public void setBookmarkToRestore(BookmarkEntry bookmarkToRestore) {
+        this.bookmarkToRestore=bookmarkToRestore;
+
+        if (null!=bookmarkToRestore&&0<this.bookmarkToRestore.page) {
+            this.currentPage=this.bookmarkToRestore.page;
         }
     }
 
@@ -935,6 +945,13 @@ public class PagesView extends View implements
         }
     }
 
+    RectF getViewRect() {
+        if (viewRect==null) {
+            viewRect=new RectF(getScrollX(), getScrollY(), getScrollX()+getWidth(), getScrollY()+getHeight());
+        }
+        return viewRect;
+    }
+
     /**
      * Draw find results.
      * TODO prettier icons
@@ -1095,7 +1112,7 @@ public class PagesView extends View implements
      */
     public boolean onKey(View v, int keyCode, KeyEvent event) {
         if (this.pageWithVolume&&event.getAction()==KeyEvent.ACTION_UP) {
-			/* repeat is a little too fast sometimes, so trap these on up */
+            /* repeat is a little too fast sometimes, so trap these on up */
             switch (keyCode) {
                 case KeyEvent.KEYCODE_VOLUME_UP:
                     volumeUpIsDown=false;

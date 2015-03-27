@@ -18,6 +18,7 @@ import android.util.Log;
 import android.view.*;
 import android.widget.FrameLayout;
 import android.widget.Toast;
+import cn.me.archko.pdf.AKProgress;
 import cn.me.archko.pdf.AKRecent;
 import cn.me.archko.pdf.DataListener;
 import org.vudroid.core.views.PageSeekBarControls;
@@ -288,14 +289,20 @@ public abstract class BaseViewerActivity extends Activity implements DecodingPro
     //--------------------------------------
 
     public void setStartBookmark() {
-        Bookmark b = new Bookmark(getApplicationContext()).open();
+        /*Bookmark b = new Bookmark(getApplicationContext()).open();
         Uri uri=getIntent().getData();
         String bookmarkName=Uri.decode(uri.getEncodedPath());
         if (b != null) {
             bookmarkToRestore = b.getLast(bookmarkName);
             Log.d(TAG, "setStartBookmark:"+bookmarkToRestore);
         }
-        b.close();
+        b.close();*/
+        Uri uri=getIntent().getData();
+        AKProgress progress=AKRecent.getInstance(getApplicationContext()).readRecentFromDb(Uri.decode(uri.getEncodedPath()));
+        if (null!=progress) {
+            BookmarkEntry entry=new BookmarkEntry(progress.bookmarkEntry);
+            bookmarkToRestore=entry;
+        }
     }
 
     void restoreBookmark(){

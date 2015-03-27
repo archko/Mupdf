@@ -398,6 +398,20 @@ public class AKRecent implements Serializable {
         return list;
     }
 
+    public AKProgress readRecentFromDb(String path) {
+        AKProgress progress=null;
+        RecentManager recentManager=new RecentManager(APVApplication.getInstance());
+        try {
+            recentManager.open();
+            progress=recentManager.getProgress(path);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            recentManager.close();
+        }
+        return progress;
+    }
+
     public String backupFromDb() {
         String name="mupdf_"+DateUtil.formatTime(System.currentTimeMillis(), "yyyy-MM-dd-HH-mm-ss");
         return backupFromDb(name);

@@ -49,6 +49,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 //import cx.hell.android.lib.pagesview.FindResult;
+import cn.me.archko.pdf.AKProgress;
 import cn.me.archko.pdf.AKRecent;
 import cn.me.archko.pdf.DataListener;
 import com.artifex.mupdfdemo.ChoosePDFActivity;
@@ -580,9 +581,14 @@ public class OpenFileActivity extends Activity implements SensorEventListener {
             options.getBoolean(Options.PREF_OMIT_IMAGES, false),
             options.getBoolean(Options.PREF_RENDER_AHEAD, true), pagesView);
         pagesView.setPagesProvider(pdfPagesProvider);
-	    Bookmark b = new Bookmark(this.getApplicationContext()).open();
+	    /*Bookmark b = new Bookmark(this.getApplicationContext()).open();
 	    pagesView.setStartBookmark(b, filePath);
-	    b.close();
+	    b.close();*/
+        AKProgress progress=AKRecent.getInstance(getApplicationContext()).readRecentFromDb(filePath);
+        if (null!=progress) {
+            BookmarkEntry entry=new BookmarkEntry(progress.bookmarkEntry);
+            pagesView.setBookmarkToRestore(entry);
+        }
     }
 
     /**
