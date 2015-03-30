@@ -9,8 +9,7 @@ import android.view.GestureDetector;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.animation.AccelerateDecelerateInterpolator;
-import android.widget.OverScroller;
+import cn.me.archko.pdf.Flinger;
 import org.vudroid.core.events.CurrentPageListener;
 import org.vudroid.core.events.ZoomListener;
 import org.vudroid.core.models.CurrentPageModel;
@@ -30,7 +29,7 @@ public class DocumentView extends View implements ZoomListener {
     private int yToScroll;
     private float lastX;
     private float lastY;
-    private final OverScroller scroller;
+    private final Flinger scroller;
     DecodingProgressModel progressModel;
     private RectF viewRect;
     private boolean inZoom;
@@ -44,11 +43,11 @@ public class DocumentView extends View implements ZoomListener {
     private boolean verticalScrollLock = true;
     private boolean lockedVertically = true;
     private final GestureDetector mGestureDetector;
-    int mMargin=16;
-    int preDecodePage=1;
+    int mMargin = 16;
+    int preDecodePage = 1;
 
     public void setPageModel(CurrentPageModel mPageModel) {
-        this.mPageModel=mPageModel;
+        this.mPageModel = mPageModel;
     }
 
     public DocumentView(Context context, final ZoomModel zoomModel, DecodingProgressModel progressModel, CurrentPageModel currentPageModel) {
@@ -57,11 +56,11 @@ public class DocumentView extends View implements ZoomListener {
         this.progressModel = progressModel;
         this.currentPageModel = currentPageModel;
         //setKeepScreenOn(true);
-        scroller = new OverScroller(getContext(), new AccelerateDecelerateInterpolator());
+        scroller = new Flinger();
         setFocusable(true);
         setFocusableInTouchMode(true);
         initMultiTouchZoomIfAvailable(zoomModel);
-        mGestureDetector=new GestureDetector(new MySimpleOnGestureListener());
+        mGestureDetector = new GestureDetector(new MySimpleOnGestureListener());
     }
 
     private void initMultiTouchZoomIfAvailable(ZoomModel zoomModel) {
@@ -86,26 +85,26 @@ public class DocumentView extends View implements ZoomListener {
             pages.put(i, new Page(this, i));
             pages.get(i).setAspectRatio(width, height);
         }
-        System.out.println("ViewDroidDecodeService:"+pages.size()+" page:"+pageToGoTo);
+        System.out.println("ViewDroidDecodeService:" + pages.size() + " page:" + pageToGoTo);
         isInitialized = true;
         invalidatePageSizes();
         goToPageImpl(pageToGoTo);
     }
 
     private void goToPageImpl(final int toPage) {
-        int scrollX=getScrollX();
-        Page page=pages.get(toPage);
-        int scrollY=page.getTop();
-        Log.d(VIEW_LOG_TAG, "goToPageImpl:"+xToScroll+" scroll:"+scrollX+" yToScroll:"+yToScroll+" scrollY:"+scrollY+" page:"+page);
-        if (xToScroll!=0) {
-            scrollX=xToScroll;
-            xToScroll=0;
+        int scrollX = getScrollX();
+        Page page = pages.get(toPage);
+        int scrollY = page.getTop();
+        Log.d(VIEW_LOG_TAG, "goToPageImpl:" + xToScroll + " scroll:" + scrollX + " yToScroll:" + yToScroll + " scrollY:" + scrollY + " page:" + page);
+        if (xToScroll != 0) {
+            scrollX = xToScroll;
+            xToScroll = 0;
         }
-        if (yToScroll!=0) {
-            if (page.getBottom()>yToScroll) {
-                scrollY=yToScroll;
+        if (yToScroll != 0) {
+            if (page.getBottom() > yToScroll) {
+                scrollY = yToScroll;
             }
-            yToScroll=0;
+            yToScroll = 0;
         }
         scrollTo(scrollX, scrollY);
     }
@@ -138,8 +137,8 @@ public class DocumentView extends View implements ZoomListener {
     private void updatePageVisibility() {
         //for (Page page : pages.values()) {
         Page page;
-        for(int i = 0; i < pages.size(); i++){
-            page=pages.valueAt(i);
+        for (int i = 0; i < pages.size(); i++) {
+            page = pages.valueAt(i);
             page.updateVisibility();
         }
     }
@@ -147,8 +146,8 @@ public class DocumentView extends View implements ZoomListener {
     public void commitZoom() {
         //for (Page page : pages.values()) {
         Page page;
-        for(int i = 0; i < pages.size(); i++){
-            page=pages.valueAt(i);
+        for (int i = 0; i < pages.size(); i++) {
+            page = pages.valueAt(i);
             page.invalidate();
         }
         inZoom = false;
@@ -173,8 +172,8 @@ public class DocumentView extends View implements ZoomListener {
     }
 
     public void goToPage(int toPage, int scrollX, int scrollY) {
-        xToScroll=scrollX;
-        yToScroll=scrollY;
+        xToScroll = scrollX;
+        yToScroll = scrollY;
         if (isInitialized) {
             goToPageImpl(toPage);
         } else {
@@ -185,8 +184,8 @@ public class DocumentView extends View implements ZoomListener {
     public int getCurrentPage() {
         //for (Map.Entry<Integer, Page> entry : pages.entrySet()) {
         Page page;
-        for(int i = 0; i < pages.size(); i++){
-            page=pages.valueAt(i);
+        for (int i = 0; i < pages.size(); i++) {
+            page = pages.valueAt(i);
             if (page.isVisible()) {
                 return pages.keyAt(i);
             }
@@ -243,9 +242,9 @@ public class DocumentView extends View implements ZoomListener {
                     maxExcursionY = excursionY;
                 }
 
-                int scrollX=(int) (lastX - ev.getX());
+                int scrollX = (int) (lastX - ev.getX());
                 if (lockedVertically) {
-                    scrollX=0;
+                    scrollX = 0;
                 }
                 scrollBy(scrollX, (int) (lastY - ev.getY()));
                 setLastPosition(ev);
@@ -285,18 +284,18 @@ public class DocumentView extends View implements ZoomListener {
     }
 
     private void verticalDpadScroll(int direction) {
-        mCurrentFlingRunnable=new FlingRunnable(getContext());
-        mCurrentFlingRunnable.startScroll(getScrollX(), getScrollY(), 0, direction*getHeight()/2);
+        mCurrentFlingRunnable = new FlingRunnable(getContext());
+        mCurrentFlingRunnable.startScroll(getScrollX(), getScrollY(), 0, direction * getHeight() / 2);
         post(mCurrentFlingRunnable);
     }
 
     private void lineByLineMoveTo(int direction) {
         if (direction == 1 ? getScrollX() == getRightLimit() : getScrollX() == getLeftLimit()) {
-            mCurrentFlingRunnable=new FlingRunnable(getContext());
-            mCurrentFlingRunnable.startScroll(getScrollX(), getScrollY(), direction*(getLeftLimit()-getRightLimit()), (int) (direction*pages.get(getCurrentPage()).bounds.height()/50));
+            mCurrentFlingRunnable = new FlingRunnable(getContext());
+            mCurrentFlingRunnable.startScroll(getScrollX(), getScrollY(), direction * (getLeftLimit() - getRightLimit()), (int) (direction * pages.get(getCurrentPage()).bounds.height() / 50));
         } else {
-            mCurrentFlingRunnable=new FlingRunnable(getContext());
-            mCurrentFlingRunnable.startScroll(getScrollX(), getScrollY(), direction*getWidth()/2, 0);
+            mCurrentFlingRunnable = new FlingRunnable(getContext());
+            mCurrentFlingRunnable.startScroll(getScrollX(), getScrollY(), direction * getWidth() / 2, 0);
         }
         post(mCurrentFlingRunnable);
     }
@@ -325,7 +324,7 @@ public class DocumentView extends View implements ZoomListener {
 
     RectF getViewRect() {
         if (viewRect == null) {
-            viewRect = new RectF(getScrollX(), getScrollY(), getScrollX() + getWidth(), getScrollY() + getHeight()*(preDecodePage+1));
+            viewRect = new RectF(getScrollX(), getScrollY(), getScrollX() + getWidth(), getScrollY() + getHeight() * (preDecodePage + 1));
         }
         return viewRect;
     }
@@ -335,8 +334,8 @@ public class DocumentView extends View implements ZoomListener {
         super.onDraw(canvas);
         //for (Page page : pages.values()) {
         Page page;
-        for(int i = 0; i < pages.size(); i++){
-            page=pages.valueAt(i);
+        for (int i = 0; i < pages.size(); i++) {
+            page = pages.valueAt(i);
             page.draw(canvas);
         }
     }
@@ -374,7 +373,7 @@ public class DocumentView extends View implements ZoomListener {
         if (page == null || page.bounds == null) {
             return;
         }
-        scrollTo((int) (getScrollX()*ratio), (int) (getScrollY()*ratio));
+        scrollTo((int) (getScrollX() * ratio), (int) (getScrollY() * ratio));
     }
 
     private float getScrollScaleRatio() {
@@ -402,41 +401,41 @@ public class DocumentView extends View implements ZoomListener {
         float dx;
         float dy;
 
-        dx = Math.abs(e.getX()-lastX);
-        dy = Math.abs(e.getY()-lastY);
+        dx = Math.abs(e.getX() - lastX);
+        dy = Math.abs(e.getY() - lastY);
 
         if (dy > 0.25 * dx || maxExcursionY > 0.8 * dx) {
             return false;
         }
 
-        return dx > getWidth()/10 || dx > getHeight()/10;
+        return dx > getWidth() / 10 || dx > getHeight() / 10;
     }
 
     public void setScrollMargin(int margin) {
-        mMargin=margin;
+        mMargin = margin;
     }
 
     public void setDecodePage(int decodePage) {
-        preDecodePage=decodePage;
+        preDecodePage = decodePage;
     }
 
     class MySimpleOnGestureListener extends GestureDetector.SimpleOnGestureListener {
 
         @Override
         public boolean onSingleTapConfirmed(MotionEvent e) {
-            int height=getHeight();
-            int top=height/4;
-            int bottom=height*3/4;
+            int height = getHeight();
+            int top = height / 4;
+            int bottom = height * 3 / 4;
             //Log.d(VIEW_LOG_TAG, "height:"+height+" y:"+e.getY()+" mMargin:"+mMargin);
 
-            height=height-mMargin;
-            if ((int) e.getY()<top) {
-                mCurrentFlingRunnable=new FlingRunnable(getContext());
+            height = height - mMargin;
+            if ((int) e.getY() < top) {
+                mCurrentFlingRunnable = new FlingRunnable(getContext());
                 mCurrentFlingRunnable.startScroll(getScrollX(), getScrollY(), 0, -height, 0);
                 post(mCurrentFlingRunnable);
-            } else if ((int) e.getY()>bottom) {
-                mCurrentFlingRunnable=new FlingRunnable(getContext());
-                mCurrentFlingRunnable.startScroll(getScrollX(), getScrollY(), 0,  height, 0);
+            } else if ((int) e.getY() > bottom) {
+                mCurrentFlingRunnable = new FlingRunnable(getContext());
+                mCurrentFlingRunnable.startScroll(getScrollX(), getScrollY(), 0, height, 0);
                 post(mCurrentFlingRunnable);
             } else {
                 currentPageModel.dispatch(new CurrentPageListener.CurrentPageChangedEvent(getCurrentPage()));
@@ -453,7 +452,7 @@ public class DocumentView extends View implements ZoomListener {
         public boolean onDoubleTapEvent(MotionEvent ev) {
             if (ev.getEventTime() - lastDownEventTime < DOUBLE_TAP_TIME) {
                 zoomModel.toggleZoomControls();
-                if (null!=mPageModel) {
+                if (null != mPageModel) {
                     mPageModel.setCurrentPage(currentPageModel.getCurrentPageIndex());
                     mPageModel.setPageCount(decodeService.getPageCount());
                     mPageModel.toggleSeekControls();
@@ -471,10 +470,10 @@ public class DocumentView extends View implements ZoomListener {
 
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
             if (lockedVertically) {
-                velocityX=0;
+                velocityX = 0;
             }
 
-            mCurrentFlingRunnable=new FlingRunnable(getContext());
+            mCurrentFlingRunnable = new FlingRunnable(getContext());
             mCurrentFlingRunnable.fling(getScrollX(), getScrollY(), (int) velocityX, (int) -velocityY, getLeftLimit(), getRightLimit(), getTopLimit(), getBottomLimit());
             post(mCurrentFlingRunnable);
             return true;
@@ -499,9 +498,9 @@ public class DocumentView extends View implements ZoomListener {
     private FlingRunnable mCurrentFlingRunnable;
 
     private void cancelFling() {
-        if (null!=mCurrentFlingRunnable) {
+        if (null != mCurrentFlingRunnable) {
             mCurrentFlingRunnable.cancelFling();
-            mCurrentFlingRunnable=null;
+            mCurrentFlingRunnable = null;
         }
     }
 
@@ -515,7 +514,7 @@ public class DocumentView extends View implements ZoomListener {
         }
 
         public void fling(int startX, int startY, int velocityX, int velocityY, int minX, int maxX, int minY, int maxY) {
-            scroller.fling(startX, startY, velocityX, velocityY, minX, maxX, minY, maxY, 0, 0);
+            scroller.fling(startX, startY, velocityX, velocityY, minX, maxX, minY, maxY);
         }
 
         public void startScroll(int startX, int startY, int dx, int dy) {
@@ -523,7 +522,12 @@ public class DocumentView extends View implements ZoomListener {
         }
 
         public void startScroll(int startX, int startY, int dx, int dy, int duration) {
-            scroller.startScroll(startX, startY, dx, dy, duration);
+            if (duration == 0) {
+                scrollBy(dx, dy);
+                DocumentView.this.invalidate();
+            } else {
+                scroller.startScroll(startX, startY, dx, dy, duration);
+            }
         }
 
         @Override
