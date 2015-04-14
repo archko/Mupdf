@@ -2,8 +2,6 @@ package cn.me.archko.pdf;
 
 import android.os.SystemClock;
 
-import java.util.concurrent.locks.ReentrantLock;
-
 public class Flinger {
 
     private static final float FLING_DURATION_PARAM = 50f;
@@ -13,8 +11,6 @@ public class Flinger {
     private static final int MODE_STOPPED = 0;
     private static final int MODE_SCROLL = 1;
     private static final int MODE_FLING = 2;
-
-    private final ReentrantLock lock = new ReentrantLock();
 
     private int mode = MODE_STOPPED;
 
@@ -40,7 +36,6 @@ public class Flinger {
     }
 
     public void startScroll(final int startX, final int startY, final int dx, final int dy) {
-        lock.lock();
         try {
             mode = MODE_SCROLL;
             this.startX = startX;
@@ -60,7 +55,6 @@ public class Flinger {
             }
             oldProgress = 0;
         } finally {
-            lock.unlock();
         }
     }
 
@@ -70,7 +64,6 @@ public class Flinger {
 
     public void fling(final int startX, final int startY, final int velocityX, final int velocityY, final int minX,
                       final int maxX, final int minY, final int maxY) {
-        lock.lock();
         try {
             mode = MODE_FLING;
             this.startX = startX;
@@ -98,12 +91,10 @@ public class Flinger {
             this.finalX = getX(1.0f);
             this.finalY = getY(1.0f);
         } finally {
-            lock.unlock();
         }
     }
 
     public boolean computeScrollOffset() {
-        lock.lock();
         try {
             if (isFinished()) {
                 if (oldProgress == 0 || oldProgress == 1) {
@@ -142,12 +133,10 @@ public class Flinger {
             oldProgress = progress;
             return true;
         } finally {
-            lock.unlock();
         }
     }
 
     public boolean isFinished() {
-        lock.lock();
         try {
             if (SystemClock.uptimeMillis() - startTime >= duration) {
                 startTime = 0;
@@ -156,12 +145,10 @@ public class Flinger {
             }
             return mode == MODE_STOPPED;
         } finally {
-            lock.unlock();
         }
     }
 
     public void forceFinished() {
-        lock.lock();
         try {
             if (isFinished()) {
                 return;
@@ -181,23 +168,24 @@ public class Flinger {
             }
             mode = MODE_STOPPED;
         } finally {
-            lock.unlock();
         }
     }
 
     public void forceFinished(boolean force) {
-        forceFinished();
+        if (force) {
+            abortAnimation();
+        } else {
+            forceFinished();
+        }
     }
 
     public void abortAnimation() {
-        lock.lock();
         try {
             startTime = 0;
             duration = 0;
             oldProgress = 0;
             mode = MODE_STOPPED;
         } finally {
-            lock.unlock();
         }
     }
 
