@@ -59,6 +59,8 @@ public class ReaderView
 	private int               mScrollerLastX;
 	private int               mScrollerLastY;
 	private boolean           mScrollDisabled;
+	private float		  mLastScaleFocusX;
+	private float		  mLastScaleFocusY;
 
 	static abstract class ViewMapper {
 		abstract void applyToView(View view);
@@ -481,12 +483,22 @@ public class ReaderView
 
 			View v = mChildViews.get(mCurrent);
 			if (v != null) {
+				float currentFocusX = detector.getFocusX();
+				float currentFocusY = detector.getFocusY();
 				// Work out the focus point relative to the view top left
-				int viewFocusX = (int)detector.getFocusX() - (v.getLeft() + mXScroll);
-				int viewFocusY = (int)detector.getFocusY() - (v.getTop() + mYScroll);
+				int viewFocusX = (int)currentFocusX - (v.getLeft() + mXScroll);
+				int viewFocusY = (int)currentFocusY - (v.getTop() + mYScroll);
 				// Scroll to maintain the focus point
 				mXScroll += viewFocusX - viewFocusX * factor;
 				mYScroll += viewFocusY - viewFocusY * factor;
+
+				if (mLastScaleFocusX>=0)
+					mXScroll+=currentFocusX-mLastScaleFocusX;
+				if (mLastScaleFocusY>=0)
+					mYScroll+=currentFocusY-mLastScaleFocusY;
+
+				mLastScaleFocusX=currentFocusX;
+				mLastScaleFocusY=currentFocusY;
 				requestLayout();
 			}
 		}
@@ -499,7 +511,7 @@ public class ReaderView
 		// screen is not showing the effect of them, so they can
 		// only confuse the user
 		mXScroll = mYScroll = 0;
-		// Avoid jump at end of scaling by disabling scrolling
+		mLastScaleFocusX = mLastScaleFocusY = -1;
 		// until the next start of gesture
 		mScrollDisabled = true;
 		return true;
@@ -546,7 +558,6 @@ public class ReaderView
 			}
 		}
 
-		requestLayout();
 		return true;
 	}
 

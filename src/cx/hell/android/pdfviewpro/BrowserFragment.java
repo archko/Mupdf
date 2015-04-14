@@ -254,6 +254,9 @@ public class BrowserFragment extends RefreshableFragment implements OnItemClickL
 	}
 
 	public void update() {
+		if (null==fileList) {
+			this.fileList = new ArrayList<FileListEntry>();
+		}
         fileList.clear();
     	this.pathTextView.setText(this.currentPath);
 		FileListEntry entry;

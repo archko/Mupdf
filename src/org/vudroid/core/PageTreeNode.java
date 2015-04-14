@@ -101,7 +101,9 @@ class PageTreeNode {
     }
 
     private void invalidateChildren() {
-        if (thresholdHit() && children == null && isVisible()) {
+        boolean isThresholdHit=thresholdHit();
+        boolean isVisible=isVisible();
+        if (isThresholdHit && children == null && isVisible) {
             final int newThreshold = treeNodeDepthLevel * 2;
             children = new PageTreeNode[]
                     {
@@ -111,7 +113,7 @@ class PageTreeNode {
                             new PageTreeNode(documentView, new RectF(0.5f, 0.5f, 1.0f, 1.0f), page, newThreshold, this)
                     };
         }
-        if (!thresholdHit() && getBitmap() != null || !isVisible()) {
+        if (!isThresholdHit && getBitmap() != null || !isVisible) {
             recycleChildren();
         }
     }
