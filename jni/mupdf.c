@@ -524,7 +524,7 @@ JNI_FN(MuPDFCore_fileFormatInternal)(JNIEnv * env, jobject thiz)
 	globals *glo = get_globals(env, thiz);
 	fz_context *ctx = glo->ctx;
 
-	fz_meta(ctx, glo->doc, FZ_META_FORMAT_INFO, info, sizeof(info));
+	fz_lookup_metadata(ctx, glo->doc, FZ_META_FORMAT, info, sizeof(info));
 
 	return (*env)->NewStringUTF(env, info);
 }
@@ -544,7 +544,6 @@ JNI_FN(MuPDFCore_isUnencryptedPDFInternal)(JNIEnv * env, jobject thiz)
 	int cryptVer = pdf_crypt_version(ctx, idoc);
 	return (cryptVer == 0) ? JNI_TRUE : JNI_FALSE;
 }
-
 
 JNIEXPORT void JNICALL
 JNI_FN(MuPDFCore_gotoPageInternal)(JNIEnv *env, jobject thiz, int page)
@@ -641,7 +640,9 @@ JNI_FN(MuPDFCore_javascriptSupported)(JNIEnv *env, jobject thiz)
 	globals *glo = get_globals(env, thiz);
 	fz_context *ctx = glo->ctx;
 	pdf_document *idoc = pdf_specifics(ctx, glo->doc);
-	return pdf_js_supported(ctx, idoc);
+	if (idoc)
+		return pdf_js_supported(ctx, idoc);
+	return 0;
 }
 
 static void update_changed_rects(globals *glo, page_cache *pc, pdf_document *idoc)
@@ -848,6 +849,7 @@ static char *widget_type_string(int t)
 	default: return "non-widget";
 	}
 }
+
 JNIEXPORT jboolean JNICALL
 JNI_FN(MuPDFCore_updatePageInternal)(JNIEnv *env, jobject thiz, jobject bitmap, int page,
 		int pageW, int pageH, int patchX, int patchY, int patchW, int patchH, jlong cookiePtr)
@@ -2339,7 +2341,7 @@ JNI_FN(MuPDFCore_getFocusedWidgetSignatureState)(JNIEnv * env, jobject thiz)
 	if (!pdf_signatures_supported())
 		return Signature_NoSupport;
 
-	return pdf_dict_gets(ctx, ((pdf_annot *)focus)->obj, "V") ? Signature_Signed : Signature_Unsigned;
+	return pdf_dict_get(ctx, ((pdf_annot *)focus)->obj, PDF_NAME_V) ? Signature_Signed : Signature_Unsigned;
 }
 
 JNIEXPORT jstring JNICALL
