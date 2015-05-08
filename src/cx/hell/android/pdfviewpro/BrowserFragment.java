@@ -193,6 +193,8 @@ public class BrowserFragment extends RefreshableFragment implements OnItemClickL
 						return true;
 					if (fname.endsWith(".tiff"))
 						return true;
+					if (fname.endsWith(".epub"))
+						return true;
 					return false;
     		}
     	};
