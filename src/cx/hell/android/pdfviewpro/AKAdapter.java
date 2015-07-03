@@ -89,13 +89,13 @@ public class AKAdapter extends BaseAdapter {
         }
 
         if (entry.getType()==FileListEntry.HOME) {
-            viewHolder.mIcon.setImageResource(R.drawable.ic_dir);
+            viewHolder.mIcon.setImageResource(R.drawable.browser_item_folder_open);
         } else if (entry.getType()==FileListEntry.NORMAL&&entry.isDirectory()&&!entry.isUpFolder()) {
-            viewHolder.mIcon.setImageResource(R.drawable.ic_dir);
+            viewHolder.mIcon.setImageResource(R.drawable.browser_item_folder_open);
         } else if (entry.isUpFolder()) {
-            viewHolder.mIcon.setImageResource(R.drawable.ic_arrow_up);
+            viewHolder.mIcon.setImageResource(R.drawable.browser_item_folder_open);
         } else {
-            viewHolder.mIcon.setImageResource(R.drawable.ic_doc);
+            viewHolder.mIcon.setImageResource(R.drawable.browser_item_book);
         }
 
         viewHolder.mName.setText(entry.getLabel());

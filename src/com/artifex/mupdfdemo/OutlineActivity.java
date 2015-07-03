@@ -1,7 +1,9 @@
 package com.artifex.mupdfdemo;
 
 import android.app.ListActivity;
+import android.os.Build;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.ListView;
@@ -13,6 +15,13 @@ public class OutlineActivity extends ListActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+        if (Build.VERSION.SDK_INT>=Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+            getActionBar().setDisplayHomeAsUpEnabled(true);
+            getActionBar().setDisplayShowHomeEnabled(true);
+        } else {
+            setTheme(R.style.AppFullscreen);
+        }
 
 		mItems = OutlineActivityData.get().items;
 		setListAdapter(new OutlineAdapter(getLayoutInflater(),mItems));
@@ -60,5 +69,16 @@ public class OutlineActivity extends ListActivity {
 		OutlineActivityData.get().position = getListView().getFirstVisiblePosition();
 		setResult(mItems[position].page);
 		finish();
+	}
+
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		int itemId=item.getItemId();
+		if (itemId==android.R.id.home) {
+			finish();
+		}
+
+		return super.onOptionsItemSelected(item);
 	}
 }

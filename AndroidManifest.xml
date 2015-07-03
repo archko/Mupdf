@@ -226,7 +226,7 @@
 		<activity
 			android:name="OutlineActivity"
 			android:configChanges="orientation|keyboardHidden|screenSize"
-			android:theme="@style/AppFullscreen"
+			android:theme="@style/AppTheme"
 			android:label="@string/outline_title">
 		</activity>
 		<activity
