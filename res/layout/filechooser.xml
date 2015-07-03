@@ -13,7 +13,8 @@
                                                   android:layout_height="match_parent">
         <ListView android:id="@+id/files"
                   android:cacheColorHint="#00000000"
-                  android:divider="@null" android:dividerHeight="0dp" android:fastScrollAlwaysVisible="true"
+                  android:fastScrollAlwaysVisible="true"
+                  android:paddingBottom="4dp"
                   android:layout_width="fill_parent"
                   android:layout_height="fill_parent"/>
 

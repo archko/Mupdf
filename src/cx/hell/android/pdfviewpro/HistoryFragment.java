@@ -172,6 +172,8 @@ public class HistoryFragment extends BrowserFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view=super.onCreateView(inflater, container, savedInstanceState);
+        filesListView.setDivider(null);
+        filesListView.setDividerHeight(0);
 
         this.pathTextView.setVisibility(View.GONE);
 

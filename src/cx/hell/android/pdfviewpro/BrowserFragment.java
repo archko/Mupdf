@@ -100,7 +100,7 @@ public class BrowserFragment extends RefreshableFragment implements OnItemClickL
 	public void setAsHome() {
 		SharedPreferences.Editor edit = getActivity().getSharedPreferences(ChooseFileFragmentActivity.PREF_TAG, 0).edit();
 		edit.putString(ChooseFileFragmentActivity.PREF_HOME, currentPath);
-		edit.commit();
+		edit.apply();
     }
 
 	public boolean onBackPressed() {
@@ -211,43 +211,6 @@ public class BrowserFragment extends RefreshableFragment implements OnItemClickL
     	final Activity activity = getActivity();
     	if (null==fileListAdapter) {
             fileListAdapter=new AKAdapter(activity);
-			/*this.fileListAdapter = new ArrayAdapter(activity,
-					R.layout.picker_entry, fileList) {
-				public View getView(int position, View convertView,
-						ViewGroup parent) {
-					View v;
-
-					if (convertView == null) {
-						v = View.inflate(activity, R.layout.picker_entry,
-								null);
-					} else {
-						v = convertView;
-					}
-
-					FileListEntry entry = fileList.get(position);
-
-					ImageView icon = (ImageView) v.findViewById(R.id.icon);
-					if (entry.getType() == FileListEntry.HOME) {
-						icon.setImageResource(R.drawable.ic_dir);
-					} else if (entry.getType() == FileListEntry.NORMAL&& entry.isDirectory() && !entry.isUpFolder()) {
-						icon.setImageResource(R.drawable.ic_dir);
-					} else if (entry.isUpFolder()) {
-						icon.setImageResource(R.drawable.ic_arrow_up);
-					} else {
-						icon.setImageResource(R.drawable.ic_doc);
-					}
-
-					TextView tv = (TextView) v.findViewById(R.id.name);
-
-					tv.setText(entry.getLabel());
-					tv.setTypeface(
-							tv.getTypeface(),
-							entry.getType() == FileListEntry.RECENT ? Typeface.ITALIC
-									: Typeface.NORMAL);
-					
-					return v;
-				}
-			};*/
 		}
 		this.filesListView.setAdapter(this.fileListAdapter);
     	this.filesListView.setOnItemClickListener(this);
@@ -394,24 +357,6 @@ public class BrowserFragment extends RefreshableFragment implements OnItemClickL
 	
 	@Override
     public boolean onContextItemSelected(MenuItem item) {
-    	/*if (item == deleteContextMenuItem) {
-    		FileListEntry entry = this.fileList.get(position);
-    		if (entry.getType() == FileListEntry.NORMAL &&
-    				! entry.isDirectory()) {
-    			entry.getFile().delete();
-    			update();
-    		}    		
-    		return true;
-    	}
-    	else if (item == removeContextMenuItem) {
-    		FileListEntry entry = this.fileList.get(position);
-    		if (entry.getType() == FileListEntry.RECENT) {
-    			recent.remove(entry.getRecentNumber());
-    			recent.commit();
-    			update();
-    		}
-    	}
-    	return false;*/
     	return contextItemSeleted(item);
     }
 	
@@ -430,9 +375,6 @@ public class BrowserFragment extends RefreshableFragment implements OnItemClickL
     	else if (item == removeContextMenuItem) {
     		FileListEntry entry = this.fileList.get(position);
     		if (entry.getType() == FileListEntry.RECENT) {//TODO
-    			/*Recent recent=new Recent(getActivity());
-    			recent.remove(entry.getRecentNumber());
-    			recent.commit();*/
                 AKRecent.getInstance(getActivity().getApplicationContext()).removeFromDb(entry.getFile().getAbsolutePath());
     			update();
     		}
