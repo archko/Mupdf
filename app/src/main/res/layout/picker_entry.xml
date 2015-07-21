@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content"
+	android:paddingLeft="4dp" android:paddingRight="8dp">
+
+	<ImageView
+		android:id="@+id/icon"
+        android:src="@drawable/browser_item_book"
+        android:layout_marginBottom="2dp" android:layout_marginTop="2dp"
+		android:layout_width="42dp"
+		android:layout_height="42dp"
+		android:layout_centerVertical="true"
+		android:layout_alignParentLeft="true" />
+
+    <TextView
+        android:id="@+id/size"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:maxLines="1" android:ellipsize="end"
+        android:layout_alignParentRight="true"
+        android:paddingBottom="8dp"
+        android:paddingLeft="4dp"
+        android:paddingRight="0dp"
+        android:paddingTop="6dp" android:text=""
+        android:textSize="12sp" />
+
+	<TextView
+		android:id="@+id/name"
+        android:layout_toLeftOf="@id/size"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+        android:minHeight="34dp"
+        android:maxLines="3" android:ellipsize="end"
+		android:layout_toRightOf="@+id/icon"
+		android:paddingBottom="0dp"
+		android:paddingLeft="6dp"
+		android:paddingRight="0dp"
+		android:paddingTop="6dp" android:text=""
+		android:textSize="16sp" />
+
+    <ProgressBar
+        android:id="@+id/progressbar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:maxHeight="6dp" android:minHeight="6dp"
+        android:layout_toRightOf="@+id/icon"
+        android:layout_below="@id/name"
+        android:paddingBottom="4dp"
+        android:layout_marginLeft="6dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginRight="16dp"
+        android:layout_width="match_parent" android:layout_height="wrap_content"/>
+
+</RelativeLayout>

@@ -19,7 +19,7 @@ APP_CFLAGS := -O3
 
 # Version X+3: mips (Requires android-9, so a change needs to be made in
 # AndroidManifest.xml too)
-APP_PLATFORM=android-9
+#APP_PLATFORM=android-9
 #APP_ABI := mips
 
 ifdef NDK_PROFILER
@@ -27,9 +27,14 @@ ifdef NDK_PROFILER
 # Accordingly, we need to build as debug - but this turns optimisations
 # off, which is less than ideal.
 APP_OPTIM := debug
-APP_CFLAGS := -O3
+APP_CFLAGS := -O2
+else
+ifdef DEBUG
+APP_OPTIM := debug
+APP_CFLAGS := -DDEBUG
 else
 APP_OPTIM := release
+endif
 endif
 ifdef V8_BUILD
 APP_STL := stlport_static

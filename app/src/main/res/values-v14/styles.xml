@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="AppBaseTheme" parent="android:Theme.Holo">
+    </style>
+
+    <style name="AppFullscreen" parent="android:Theme.Holo.NoActionBar.Fullscreen">
+    </style>
+
+    <style name="AppTheme" parent="android:Theme.Holo">
+    </style>
+</resources>

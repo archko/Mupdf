@@ -1,0 +1,38 @@
+现在的历史有两个,一个是apv保存的,包含了缩放,滚动等信息,一个是后来加的,只包含了整体的进度.
+现在要将两个合并起来,但又不想废除某一项,因为可能apv也会更新.当然主要是因为修改太麻烦了.
+
+做法:阅读保存当前的书本设置时,也将设置保存入历史中.统一.
+历史记录照常保存,同时加入阅读进度,需要注意的是书本的设置需要保留,除非有新的.
+恢复时,需要调用数据库,将书本设置更新.
+
+Bookmark这是数据库操作类,提供增删改查.
+
+AKProgress里添加bookmarkEntry,保存书签.
+当两个冲突时,以数据库为准.还是以原来的BookmarkEntry为准.
+
+第一步:
+保存书签设置时,也同步进度.之前已经有保存进度,所以只需要添加书签设置即可.
+恢复进度时,同时恢复书签.如果书签为空,跳过.
+
+研磨商业力:20
+李少波47
+人性弱点407
+大清92
+读心术55
+圣哲54
+
+
+
+
+
+07-06 17:48:37.804: E/AndroidRuntime(5745): Process: com.artifex.mupdfdemo, PID: 5745
+07-06 17:48:37.804: E/AndroidRuntime(5745): java.lang.RuntimeException: An error occured while executing doInBackground()
+07-06 17:48:37.804: E/AndroidRuntime(5745): 	at android.os.AsyncTask$3.done(AsyncTask.java:300)
+07-06 17:48:37.804: E/AndroidRuntime(5745): 	at java.util.concurrent.FutureTask.finishCompletion(FutureTask.java:355)
+07-06 17:48:37.804: E/AndroidRuntime(5745): 	at java.util.concurrent.FutureTask.setException(FutureTask.java:222)
+07-06 17:48:37.804: E/AndroidRuntime(5745): 	at java.util.concurrent.FutureTask.run(FutureTask.java:242)
+07-06 17:48:37.804: E/AndroidRuntime(5745): 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1112)
+07-06 17:48:37.804: E/AndroidRuntime(5745): 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:587)
+07-06 17:48:37.804: E/AndroidRuntime(5745): 	at java.lang.Thread.run(Thread.java:841)
+07-06 17:48:37.804: E/AndroidRuntime(5745): Caused by: java.lang.NullPointerException
+07-06 17:48:37.804: E/AndroidRuntime(5745): 	at cx.hell.android.pdfviewpro.HistoryFragment$2.doInBackground(HistoryFragment.java:124)

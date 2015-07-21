@@ -23,9 +23,6 @@
 #define LOGT(...) __android_log_print(ANDROID_LOG_INFO,"alert",__VA_ARGS__)
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR,LOG_TAG,__VA_ARGS__)
 
-/* Set to 1 to enable debug log traces. */
-#define DEBUG 0
-
 /* Enable to log rendering times (render each frame 100 times and time) */
 #undef TIME_DISPLAY_LIST
 
@@ -36,6 +33,7 @@
 #define LINE_THICKNESS (0.07f)
 #define INK_THICKNESS (4.0f)
 #define SMALL_FLOAT (0.00001)
+#define PROOF_RESOLUTION (300)
 
 enum
 {
@@ -290,6 +288,15 @@ JNI_FN(MuPDFCore_openFile)(JNIEnv * env, jobject thiz, jstring jfilename)
 		return 0;
 	glo->resolution = 160;
 	glo->alerts_initialised = 0;
+
+#ifdef DEBUG
+	/* Try and send stdout/stderr to file in debug builds. This
+	 * path may not work on all platforms, but it works on the
+	 * LG G3, and it's no worse than not redirecting it anywhere
+	 * on anything else. */
+	freopen("/storage/emulated/0/Download/stdout.txt", "a", stdout);
+	freopen("/storage/emulated/0/Download/stderr.txt", "a", stderr);
+#endif
 
 	filename = (*env)->GetStringUTFChars(env, jfilename, NULL);
 	if (filename == NULL)
@@ -2674,4 +2681,111 @@ JNI_FN(MuPDFCore_abortCookie)(JNIEnv * env, jobject thiz, jlong cookiePtr)
 	fz_cookie *cookie = (fz_cookie *) (intptr_t) cookiePtr;
 	if (cookie != NULL)
 		cookie->abort = 1;
+}
+
+static char *tmp_gproof_path(char *path)
+{
+	FILE *f;
+	int i;
+	char *buf = malloc(strlen(path) + 20 + 1);
+	if (!buf)
+		return NULL;
+
+	for (i = 0; i < 10000; i++)
+	{
+		sprintf(buf, "%s.%d.gproof", path, i);
+
+		LOGE("Trying for %s\n", buf);
+		f = fopen(buf, "r");
+		if (f != NULL)
+		{
+			fclose(f);
+			continue;
+		}
+
+		f = fopen(buf, "w");
+		if (f != NULL)
+		{
+			fclose(f);
+			break;
+		}
+	}
+	if (i == 10000)
+	{
+		LOGE("Failed to find temp gproof name");
+		free(buf);
+		return NULL;
+	}
+
+	LOGE("Rewritten to %s\n", buf);
+	return buf;
+}
+
+JNIEXPORT jstring JNICALL
+JNI_FN(MuPDFCore_startProofInternal)(JNIEnv * env, jobject thiz)
+{
+#ifdef SUPPORT_GPROOF
+	globals *glo = get_globals(env, thiz);
+	fz_context *ctx = glo->ctx;
+	char *tmp;
+	jstring ret;
+
+	if (!glo->doc || !glo->current_path)
+		return NULL;
+
+	tmp = tmp_gproof_path(glo->current_path);
+	if (!tmp)
+		return NULL;
+
+	fz_try(ctx)
+	{
+		fz_write_gproof_file(ctx, glo->current_path, glo->doc, tmp, PROOF_RESOLUTION);
+
+		LOGE("Creating %s\n", tmp);
+		ret = (*env)->NewStringUTF(env, tmp);
+	}
+	fz_always(ctx)
+	{
+		free(tmp);
+	}
+	fz_catch(ctx)
+	{
+		ret = NULL;
+	}
+	return ret;
+#else
+	return NULL;
+#endif
+}
+
+JNIEXPORT void JNICALL
+JNI_FN(MuPDFCore_endProofInternal)(JNIEnv * env, jobject thiz, jstring jfilename)
+{
+#ifdef SUPPORT_GPROOF
+	globals *glo = get_globals(env, thiz);
+	fz_context *ctx = glo->ctx;
+	const char *tmp;
+
+	if (!glo->doc || !glo->current_path || jfilename == NULL)
+		return;
+
+	tmp = (*env)->GetStringUTFChars(env, jfilename, NULL);
+	if (tmp)
+	{
+		LOGE("Deleting %s\n", tmp);
+
+		unlink(tmp);
+		(*env)->ReleaseStringUTFChars(env, jfilename, tmp);
+	}
+#endif
+}
+
+JNIEXPORT jboolean JNICALL
+JNI_FN(MuPDFCore_gprfSupportedInternal)(JNIEnv * env)
+{
+#ifdef SUPPORT_GPROOF
+	return JNI_TRUE;
+#else
+	return JNI_FALSE;
+#endif
 }
