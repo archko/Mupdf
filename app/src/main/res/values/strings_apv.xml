@@ -46,7 +46,7 @@
 		<item>almost disappear</item>
 		<item>fade</item>
 	</string-array>
-	<string name="default_zoom_animation">2</string> 
+	<string name="default_zoom_animation">1</string>
 	<string name="page_animation">Page number/count</string>
 	<string-array name="page_animations">
 		<item>100</item>
@@ -62,7 +62,7 @@
 		<item>fade</item>
 		<item>show always</item>
 	</string-array>
-	<string name="default_page_animation">2</string> 
+	<string name="default_page_animation">4</string>
 	<string name="fade_speed">Zoom and page fade wait</string>
 	<string-array name="fade_speeds">
 		<item>1</item>
@@ -87,7 +87,7 @@
 	<string name="dirs_first">List directories first</string>
 	<string name="show_extension">Show .pdf extension</string>
 	<string name="orientation">Orientation</string>
-	<string name="default_orientation">2</string>
+	<string name="default_orientation">7</string>
 	<string-array name="orientation_labels">
 	<item>automatic</item>
 	<item>harder to change</item>

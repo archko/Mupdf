@@ -6,6 +6,6 @@
     <style name="AppFullscreen" parent="android:Theme.Holo.NoActionBar.Fullscreen">
     </style>
 
-    <style name="AppTheme" parent="android:Theme.Material">
+    <style name="AppTheme" parent="android:Theme.Material.NoActionBar">
     </style>
 </resources>
