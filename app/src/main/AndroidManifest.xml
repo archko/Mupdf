@@ -85,7 +85,8 @@
 			</intent-filter>-->
 		</activity>
 		<activity
-			android:name="cx.hell.android.pdfviewpro.OpenFileActivity" 
+			android:name="cx.hell.android.pdfviewpro.OpenFileActivity"
+			android:theme="@style/AppTheme"
 			android:configChanges="orientation|keyboardHidden|screenSize"
 			android:label="APV">
 			<intent-filter>
@@ -158,6 +159,7 @@
 		</activity>
         <activity android:name="cx.hell.android.pdfviewpro.Options" android:label="@string/options" />
         <activity android:name="org.vudroid.pdfdroid.PdfViewerActivity" android:screenOrientation="landscape"
+			android:theme="@style/AppTheme"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="Vudroid">
             <intent-filter>

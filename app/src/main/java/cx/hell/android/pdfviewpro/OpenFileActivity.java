@@ -463,7 +463,7 @@ public class OpenFileActivity extends Activity implements SensorEventListener {
 			getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		this.pageNumberTextView.setVisibility(pageNumberAnim == null ? View.GONE : View.VISIBLE);
 // #ifdef pro
-		this.zoomLayout.setVisibility((zoomAnim == null || this.textReflowMode) ? View.GONE : View.VISIBLE);
+		this.zoomLayout.setVisibility((zoomAnim==null||this.textReflowMode) ? View.GONE : View.VISIBLE);
 // #endif
 		
 // #ifdef lite
@@ -1551,4 +1551,17 @@ public class OpenFileActivity extends Activity implements SensorEventListener {
 	}
 // #endif
 
+	@Override
+	public void onWindowFocusChanged(boolean hasFocus) {
+		super.onWindowFocusChanged(hasFocus);
+		if (hasFocus) {
+			getWindow().getDecorView().setSystemUiVisibility(
+				View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+					|View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+					|View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+					|View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+					|View.SYSTEM_UI_FLAG_FULLSCREEN
+					|View.SYSTEM_UI_FLAG_IMMERSIVE);
+		}
+	}
 }

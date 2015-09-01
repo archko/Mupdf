@@ -736,7 +736,7 @@ public class MuPDFActivity extends Activity implements FilePicker.FilePickerSupp
 
 	private void setButtonEnabled(ImageButton button, boolean enabled) {
 		button.setEnabled(enabled);
-		button.setColorFilter(enabled ? Color.argb(255, 255, 255, 255):Color.argb(255, 128, 128, 128));
+		button.setColorFilter(enabled ? Color.argb(255, 255, 255, 255) : Color.argb(255, 128, 128, 128));
 	}
 
 	private void setLinkHighlight(boolean highlight) {
@@ -1167,5 +1167,19 @@ public class MuPDFActivity extends Activity implements FilePicker.FilePickerSupp
 		Intent intent = new Intent(this, ChoosePDFActivity.class);
 		intent.setAction(ChoosePDFActivity.PICK_KEY_FILE);
 		startActivityForResult(intent, FILEPICK_REQUEST);
+	}
+
+	@Override
+	public void onWindowFocusChanged(boolean hasFocus) {
+		super.onWindowFocusChanged(hasFocus);
+		if (hasFocus) {
+			getWindow().getDecorView().setSystemUiVisibility(
+				View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+					|View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+					|View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+					|View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+					|View.SYSTEM_UI_FLAG_FULLSCREEN
+					|View.SYSTEM_UI_FLAG_IMMERSIVE);
+		}
 	}
 }

@@ -361,6 +361,9 @@ public class BrowserFragment extends RefreshableFragment implements OnItemClickL
     }
 	
 	protected boolean contextItemSeleted(MenuItem item) {
+		if (null==fileList) {
+			return true;
+		}
     	int position =  
         		((AdapterView.AdapterContextMenuInfo)item.getMenuInfo()).position;
 		if (item == deleteContextMenuItem) {

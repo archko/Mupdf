@@ -15,13 +15,19 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.view.*;
+import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewConfiguration;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 import cn.me.archko.pdf.AKProgress;
 import cn.me.archko.pdf.AKRecent;
 import cn.me.archko.pdf.DataListener;
-import org.vudroid.core.views.PageSeekBarControls;
 import com.artifex.mupdfdemo.OutlineActivity;
 import com.artifex.mupdfdemo.OutlineActivityData;
 import com.artifex.mupdfdemo.R;
@@ -33,6 +39,7 @@ import org.vudroid.core.events.DecodingProgressListener;
 import org.vudroid.core.models.CurrentPageModel;
 import org.vudroid.core.models.DecodingProgressModel;
 import org.vudroid.core.models.ZoomModel;
+import org.vudroid.core.views.PageSeekBarControls;
 import org.vudroid.core.views.PageViewZoomControls;
 
 public abstract class BaseViewerActivity extends Activity implements DecodingProgressListener, CurrentPageListener, SensorEventListener
@@ -433,6 +440,20 @@ public abstract class BaseViewerActivity extends Activity implements DecodingPro
         }
         documentView.setScrollMargin(height);
         documentView.setDecodePage(options.getBoolean(Options.PREF_RENDER_AHEAD, true) ? 1 : 0);
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus) {
+            getWindow().getDecorView().setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                    |View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                    |View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                    |View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                    |View.SYSTEM_UI_FLAG_FULLSCREEN
+                    |View.SYSTEM_UI_FLAG_IMMERSIVE);
+        }
     }
 
     @Override

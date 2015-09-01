@@ -110,6 +110,9 @@ public class MuPDFCore
 	private native void abortCookie(long cookie);
 	private native String startProofInternal();
 	private native void endProofInternal(String filename);
+	private native int getNumSepsOnPageInternal();
+	private native int controlSepOnPageInternal(int sep, boolean disable);
+	private native Separation getSepInternal(int sep);
 
 	public native boolean javascriptSupported();
 
@@ -448,6 +451,18 @@ public class MuPDFCore
 		if (gs_so_available == false)
 			return false;
 		return gprfSupportedInternal();
+	}
+
+	public synchronized int getNumSepsOnPage() {
+		return getNumSepsOnPageInternal();
+	}
+
+	public synchronized int controlSepOnPage(int sep, boolean disable) {
+		return controlSepOnPageInternal(sep, disable);
+	}
+
+	public synchronized Separation getSep(int sep) {
+		return getSepInternal(sep);
 	}
 	
 	public static class Size implements Cloneable {
