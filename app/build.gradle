@@ -2,12 +2,14 @@ apply plugin: 'com.android.application'
 android {
     signingConfigs {
         config {
-            keyAlias 'android'
+            keyAlias 'androiddebugkey '
             storeFile file('D:/Projects/PDF/Mupdf/mupdf_debug.keystore')
+            keyPassword 'android '
+            storePassword 'android '
         }
     }
     compileSdkVersion 22
-    buildToolsVersion "23.0.0 rc3"
+    buildToolsVersion '23.0.0'
     defaultConfig {
         applicationId 'com.artifex.mupdfdemo'
         minSdkVersion 14

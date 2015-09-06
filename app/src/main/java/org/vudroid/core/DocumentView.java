@@ -93,7 +93,7 @@ public class DocumentView extends View implements ZoomListener {
 
     private void goToPageImpl(final int toPage) {
         int scrollX = getScrollX();
-        Page page = pages.get(toPage);
+        Page page = pages.get(toPage);  //TODO ,page is not really page on the first time.
         int scrollY = page.getTop();
         Log.d(VIEW_LOG_TAG, "goToPageImpl:" + xToScroll + " scroll:" + scrollX + " yToScroll:" + yToScroll + " scrollY:" + scrollY + " page:" + page);
         if (xToScroll != 0) {
