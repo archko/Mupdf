@@ -62,7 +62,7 @@
 		<item>fade</item>
 		<item>show always</item>
 	</string-array>
-	<string name="default_page_animation">4</string>
+	<string name="default_page_animation">1</string>
 	<string name="fade_speed">Zoom and page fade wait</string>
 	<string-array name="fade_speeds">
 		<item>1</item>
