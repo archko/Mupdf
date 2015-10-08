@@ -108,11 +108,12 @@ public class MuPDFCore
 	private native long createCookie();
 	private native void destroyCookie(long cookie);
 	private native void abortCookie(long cookie);
-	private native String startProofInternal();
+
+	private native String startProofInternal(int resolution);
 	private native void endProofInternal(String filename);
-	private native int getNumSepsOnPageInternal();
-	private native int controlSepOnPageInternal(int sep, boolean disable);
-	private native Separation getSepInternal(int sep);
+	private native int getNumSepsOnPageInternal(int page);
+	private native int controlSepOnPageInternal(int page, int sep, boolean disable);
+	private native Separation getSepInternal(int page, int sep);
 
 	public native boolean javascriptSupported();
 
@@ -439,8 +440,8 @@ public class MuPDFCore
 		saveInternal();
 	}
 
-	public synchronized String startProof() {
-		return startProofInternal();
+	public synchronized String startProof(int resolution) {
+		return startProofInternal(resolution);
 	}
 
 	public synchronized void endProof(String filename) {
@@ -453,16 +454,24 @@ public class MuPDFCore
 		return gprfSupportedInternal();
 	}
 
-	public synchronized int getNumSepsOnPage() {
-		return getNumSepsOnPageInternal();
+	public boolean canProof()
+	{
+		String format = fileFormat();
+		if (format.contains("PDF"))
+			return true;
+		return false;
 	}
 
-	public synchronized int controlSepOnPage(int sep, boolean disable) {
-		return controlSepOnPageInternal(sep, disable);
+	public synchronized int getNumSepsOnPage(int page) {
+		return getNumSepsOnPageInternal(page);
 	}
 
-	public synchronized Separation getSep(int sep) {
-		return getSepInternal(sep);
+	public synchronized int controlSepOnPage(int page, int sep, boolean disable) {
+		return controlSepOnPageInternal(page, sep, disable);
+	}
+
+	public synchronized Separation getSep(int page, int sep) {
+		return getSepInternal(page, sep);
 	}
 	
 	public static class Size implements Cloneable {

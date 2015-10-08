@@ -412,6 +412,34 @@ public class AKRecent implements Serializable {
         return progress;
     }
 
+    public ArrayList<AKProgress> readRecentFromDb(int start, int count) {
+        ArrayList<AKProgress> list=null;
+        RecentManager recentManager=new RecentManager(APVApplication.getInstance());
+        try {
+            recentManager.open();
+            list=recentManager.getProgresses(start, count);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            recentManager.close();
+        }
+        return list;
+    }
+
+    public int getProgressCount() {
+        RecentManager recentManager=new RecentManager(APVApplication.getInstance());
+        try {
+            recentManager.open();
+            return recentManager.getProgressCount();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            recentManager.close();
+        }
+
+        return 0;
+    }
+
     public String backupFromDb() {
         String name="mupdf_"+DateUtil.formatTime(System.currentTimeMillis(), "yyyy-MM-dd-HH-mm-ss");
         return backupFromDb(name);

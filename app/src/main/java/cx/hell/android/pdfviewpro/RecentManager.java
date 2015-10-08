@@ -119,15 +119,23 @@ public class RecentManager {
     public AKProgress getProgress(String path) {
         AKProgress entry=null;
 
-        Cursor cur=db.query(true, ProgressTbl.TABLE_NAME, null,
-            ProgressTbl.KEY_PATH+"='"+path+"'", null,
-            null, null, null, "1");
+        Cursor cur=null;
 
-        if (cur!=null) {
-            if (cur.moveToFirst()) {
-                entry=fillProgress(cur);
+        try {
+            cur=db.query(true, ProgressTbl.TABLE_NAME, null,
+                ProgressTbl.KEY_PATH+"='"+path+"'", null,
+                null, null, null, "1");
+            if (cur!=null) {
+                if (cur.moveToFirst()) {
+                    entry=fillProgress(cur);
+                }
             }
-            cur.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (null!=cur) {
+                cur.close();
+            }
         }
         return entry;
     }
@@ -151,21 +159,76 @@ public class RecentManager {
     public ArrayList<AKProgress> getProgresses() {
         ArrayList<AKProgress> list=null;
 
-        Cursor cur=db.query(ProgressTbl.TABLE_NAME, null,
-            null, null, null, null, ProgressTbl.KEY_TIMESTAMP+" desc");
-        if (cur!=null) {
-            list=new ArrayList<AKProgress>();
-            if (cur.moveToFirst()) {
-                do {
-                    list.add(fillProgress(cur));
-                } while (cur.moveToNext());
+        Cursor cur=null;
+        try {
+            cur=db.query(ProgressTbl.TABLE_NAME, null,
+                null, null, null, null, ProgressTbl.KEY_TIMESTAMP+" desc");
+            if (cur!=null) {
+                list=new ArrayList<AKProgress>();
+                if (cur.moveToFirst()) {
+                    do {
+                        list.add(fillProgress(cur));
+                    } while (cur.moveToNext());
+                }
             }
-            cur.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (null!=cur) {
+                cur.close();
+            }
         }
 
         //Collections.sort(list);
 
         return list;
+    }
+
+    public ArrayList<AKProgress> getProgresses(int start, int count) {
+        ArrayList<AKProgress> list=null;
+
+        Cursor cur=null;
+        try {
+            cur=db.query(ProgressTbl.TABLE_NAME, null,
+                null, null, null, null, ProgressTbl.KEY_TIMESTAMP+" desc",  start+" , "+count);
+            if (cur!=null) {
+                list=new ArrayList<AKProgress>();
+                if (cur.moveToFirst()) {
+                    do {
+                        list.add(fillProgress(cur));
+                    } while (cur.moveToNext());
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (null!=cur) {
+                cur.close();
+            }
+        }
+
+        //Collections.sort(list);
+
+        return list;
+    }
+
+    public int getProgressCount() {
+        Cursor cur=null;
+        try {
+            cur=db.query(ProgressTbl.TABLE_NAME, new String[]{"_id"},
+                null, null, null, null, null);
+            if (cur!=null&&cur.getCount()>0) {
+                return cur.getCount();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (null!=cur) {
+                cur.close();
+            }
+        }
+
+        return 0;
     }
 
     public void deleteProgress(String path) {

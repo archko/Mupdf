@@ -12,6 +12,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.Toast;
 import cn.me.archko.pdf.AKProgress;
 import cn.me.archko.pdf.AKRecent;
@@ -27,10 +28,16 @@ import java.util.ArrayList;
  * @description:
  * @author: archko 11-11-17
  */
-public class HistoryFragment extends BrowserFragment {
+public class HistoryFragment extends BrowserFragment implements AbsListView.OnScrollListener {
 
     public static final String TAG="HistoryFragment";
     private Boolean showExtension=false;
+
+    private int mSavedLastVisibleIndex = -1;
+    int totalCount=0;
+    int curPage=-1;
+    int totalPage=0;
+    static final int PAGE_SIZE=15;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -176,8 +183,21 @@ public class HistoryFragment extends BrowserFragment {
         filesListView.setDividerHeight(0);
 
         this.pathTextView.setVisibility(View.GONE);
+        filesListView.setOnScrollListener(this);
 
         return view;
+    }
+
+    @Override
+    public void onRefresh() {
+        curPage=-1;
+        totalCount=0;
+        totalPage=0;
+        mSavedLastVisibleIndex = -1;
+        if (fileList!=null) {
+            fileList.clear();
+        }
+        update();
     }
 
     public void update() {
@@ -190,7 +210,8 @@ public class HistoryFragment extends BrowserFragment {
             @Override
             protected ArrayList<FileListEntry> doInBackground(Void... params) {
                 AKRecent recent=AKRecent.getInstance(HistoryFragment.this.getActivity());
-                ArrayList<AKProgress> progresses=recent.readRecentFromDb();
+                int count=recent.getProgressCount();
+                ArrayList<AKProgress> progresses=recent.readRecentFromDb(PAGE_SIZE*(curPage+1), PAGE_SIZE);
                 //Log.d(TAG, "progresses:"+progresses);
                 ArrayList<FileListEntry> entryList=new ArrayList<FileListEntry>();
                 if (null!=progresses&&progresses.size()>0) {
@@ -223,19 +244,59 @@ public class HistoryFragment extends BrowserFragment {
                     }*/
                 }
 
+                if (entryList.size()>0) {
+                    totalCount=count;
+                    curPage++;
+                    totalPage=count/PAGE_SIZE;
+                    if (count%PAGE_SIZE>0) {
+                        totalPage++;
+                    }
+                }
+                Log.d(TAG, String.format("totalCount:%d, curPage:%d, totalPage:%d,count:%d", totalCount, curPage, totalPage, count));
+
                 return entryList;
             }
 
             @Override
             protected void onPostExecute(ArrayList<FileListEntry> entries) {
                 if (null!=entries&&entries.size()>0) {
-                    fileList=entries;
+                    if (fileList==null) {
+                        fileList=new ArrayList<FileListEntry>();
+                    }
+                    fileList.addAll(entries);
                     fileListAdapter.setData(fileList);
                     fileListAdapter.notifyDataSetChanged();
                     //filesListView.setSelection(0);
-                    mSwipeRefreshWidget.setRefreshing(false);
                 }
+                mSwipeRefreshWidget.setRefreshing(false);
             }
         }, (Void[]) null);
+    }
+
+    @Override
+    public void onScrollStateChanged(AbsListView view, int scrollState) {
+
+    }
+
+    public final void onScroll(final AbsListView view, final int firstVisibleItem, final int visibleItemCount, final int totalItemCount) {
+        // Detect whether the last visible item has changed
+        final int lastVisibleItemIndex=firstVisibleItem+visibleItemCount;
+
+        /**
+         * Check that the last item has changed, we have any items, and that
+         * the last item is visible. lastVisibleItemIndex is a zero-based
+         * index, so we onEvent one to it to check against totalItemCount.
+         */
+        if (visibleItemCount>0&&(lastVisibleItemIndex+1)==totalItemCount) {
+            if (lastVisibleItemIndex!=mSavedLastVisibleIndex) {
+                mSavedLastVisibleIndex=lastVisibleItemIndex;
+                //mOnLastItemVisibleListener.onLastItemVisible();
+                if (curPage<totalPage) {
+                    update();
+                } else {
+                    Log.d(TAG, "curPage>=totalPage:"+curPage+" totalPage:"+totalPage);
+                }
+            }
+        }
     }
 }

@@ -2722,7 +2722,7 @@ static char *tmp_gproof_path(char *path)
 }
 
 JNIEXPORT jstring JNICALL
-JNI_FN(MuPDFCore_startProofInternal)(JNIEnv * env, jobject thiz)
+JNI_FN(MuPDFCore_startProofInternal)(JNIEnv * env, jobject thiz, int inResolution)
 {
 #ifdef SUPPORT_GPROOF
 	globals *glo = get_globals(env, thiz);
@@ -2737,9 +2737,13 @@ JNI_FN(MuPDFCore_startProofInternal)(JNIEnv * env, jobject thiz)
 	if (!tmp)
 		return NULL;
 
+	int theResolution = PROOF_RESOLUTION;
+	if (inResolution != 0)
+		theResolution = inResolution;
+
 	fz_try(ctx)
 	{
-		fz_write_gproof_file(ctx, glo->current_path, glo->doc, tmp, PROOF_RESOLUTION);
+		fz_write_gproof_file(ctx, glo->current_path, glo->doc, tmp, theResolution, "", "");
 
 		LOGE("Creating %s\n", tmp);
 		ret = (*env)->NewStringUTF(env, tmp);
@@ -2800,7 +2804,7 @@ JNI_FN(MuPDFCore_getNumSepsOnPageInternal)(JNIEnv *env, jobject thiz, int page)
 	for (i = 0; i < NUM_CACHE; i++)
 	{
 		if (glo->pages[i].page != NULL && glo->pages[i].number == page)
-		  break;
+			break;
 	}
 	if (i == NUM_CACHE)
 		return 0;
@@ -2820,7 +2824,7 @@ JNI_FN(MuPDFCore_controlSepOnPageInternal)(JNIEnv *env, jobject thiz, int page, 
 	for (i = 0; i < NUM_CACHE; i++)
 	{
 		if (glo->pages[i].page != NULL && glo->pages[i].number == page)
-		  break;
+			break;
 	}
 	if (i == NUM_CACHE)
 		return;
@@ -2845,13 +2849,13 @@ JNI_FN(MuPDFCore_getSepInternal)(JNIEnv *env, jobject thiz, int page, int sep)
 	for (i = 0; i < NUM_CACHE; i++)
 	{
 		if (glo->pages[i].page != NULL && glo->pages[i].number == page)
-		  break;
+			break;
 	}
 	if (i == NUM_CACHE)
 		return NULL;
 
 	/* MuPDF returns RGBA as bytes. Android wants a packed BGRA int. */
-	name = fz_get_separation_on_page(ctx, glo->pages[i].page, sep, &rgba[0], &cmyk);
+	name = fz_get_separation_on_page(ctx, glo->pages[i].page, sep, (unsigned int *)(&rgba[0]), &cmyk);
 	bgra = (rgba[0] << 16) | (rgba[1]<<8) | rgba[2] | (rgba[3]<<24);
 	jname = name ? (*env)->NewStringUTF(env, name) : NULL;
 
