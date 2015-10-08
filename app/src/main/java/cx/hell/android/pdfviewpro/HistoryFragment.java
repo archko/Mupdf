@@ -292,6 +292,7 @@ public class HistoryFragment extends BrowserFragment implements AbsListView.OnSc
                 mSavedLastVisibleIndex=lastVisibleItemIndex;
                 //mOnLastItemVisibleListener.onLastItemVisible();
                 if (curPage<totalPage) {
+                    mSwipeRefreshWidget.setRefreshing(true);
                     update();
                 } else {
                     Log.d(TAG, "curPage>=totalPage:"+curPage+" totalPage:"+totalPage);
