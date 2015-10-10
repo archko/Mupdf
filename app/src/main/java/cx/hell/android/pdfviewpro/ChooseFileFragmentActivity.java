@@ -242,7 +242,7 @@ public class ChooseFileFragmentActivity extends FragmentActivity {
                 APVApplication apvApplication = APVApplication.getInstance();
                 if (apvApplication.hasChanged) {
                     delayUpdate(position);
-                    apvApplication.hasChanged = true;
+                    apvApplication.hasChanged = false;
                 }
             } else if (position == 2) {
                 delayUpdate(position);

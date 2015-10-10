@@ -1,11 +1,5 @@
 package cx.hell.android.pdfviewpro;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -16,21 +10,29 @@ import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.AdapterView.OnItemClickListener;
 import cn.me.archko.pdf.AKRecent;
 import com.artifex.mupdfdemo.MuPDFActivity;
 import com.artifex.mupdfdemo.R;
 import org.vudroid.pdfdroid.PdfViewerActivity;
+
+import java.io.File;
+import java.io.FileFilter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @version 1.00.00
@@ -66,6 +68,7 @@ public class BrowserFragment extends RefreshableFragment implements OnItemClickL
 
     protected MenuItem backMenuItem = null;
     protected MenuItem restoreMenuItem = null;
+	Map<String, Integer> mPathMap=new HashMap<>();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -267,7 +270,14 @@ public class BrowserFragment extends RefreshableFragment implements OnItemClickL
     	}
 
         fileListAdapter.setData(fileList);
-        fileListAdapter.notifyDataSetChanged();
+		//System.out.println("mPathMap.get(currentPath):"+mPathMap.get(currentPath)+ " size:"+fileList.size());
+		if (null!=mPathMap.get(currentPath)) {
+			int pos=mPathMap.get(currentPath);
+			if (pos<fileList.size()) {
+				filesListView.setSelection(pos);
+			}
+		}
+		fileListAdapter.notifyDataSetChanged();
     	//this.filesListView.setSelection(0);
 		mSwipeRefreshWidget.setRefreshing(false);
 	}
@@ -314,6 +324,7 @@ public class BrowserFragment extends RefreshableFragment implements OnItemClickL
     		return;
     	
     	if (clickedFile.isDirectory()) {
+			mPathMap.put(currentPath, position);
     		this.currentPath = clickedFile.getAbsolutePath();
     		updateAdapter();
     	} else {

@@ -33,7 +33,7 @@ public class HistoryFragment extends BrowserFragment implements AbsListView.OnSc
     public static final String TAG="HistoryFragment";
     private Boolean showExtension=false;
 
-    private int mSavedLastVisibleIndex = -1;
+    private int mSavedLastVisibleIndex=-1;
     int totalCount=0;
     int curPage=-1;
     int totalPage=0;
@@ -188,16 +188,14 @@ public class HistoryFragment extends BrowserFragment implements AbsListView.OnSc
         return view;
     }
 
-    @Override
-    public void onRefresh() {
+    private void reset() {
         curPage=-1;
         totalCount=0;
         totalPage=0;
-        mSavedLastVisibleIndex = -1;
+        mSavedLastVisibleIndex=-1;
         if (fileList!=null) {
             fileList.clear();
         }
-        update();
     }
 
     public void update() {
@@ -206,9 +204,15 @@ public class HistoryFragment extends BrowserFragment implements AbsListView.OnSc
         }
         this.fileListAdapter.setMode(AKAdapter.TYPE_RENCENT);
 
+        reset();
+        getHistory();
+    }
+
+    private void getHistory() {
         Util.execute(true, new AsyncTask<Void, Void, ArrayList<FileListEntry>>() {
             @Override
             protected ArrayList<FileListEntry> doInBackground(Void... params) {
+                final long now=System.currentTimeMillis();
                 AKRecent recent=AKRecent.getInstance(HistoryFragment.this.getActivity());
                 int count=recent.getProgressCount();
                 ArrayList<AKProgress> progresses=recent.readRecentFromDb(PAGE_SIZE*(curPage+1), PAGE_SIZE);
@@ -244,6 +248,21 @@ public class HistoryFragment extends BrowserFragment implements AbsListView.OnSc
                     }*/
                 }
 
+                long newTime=System.currentTimeMillis()-now;
+                if (newTime<600l) {
+                    newTime=600l-newTime;
+                } else {
+                    newTime=0;
+                }
+
+                if (newTime>0) {
+                    try {
+                        Thread.sleep(newTime);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+
                 if (entryList.size()>0) {
                     totalCount=count;
                     curPage++;
@@ -252,7 +271,7 @@ public class HistoryFragment extends BrowserFragment implements AbsListView.OnSc
                         totalPage++;
                     }
                 }
-                Log.d(TAG, String.format("totalCount:%d, curPage:%d, totalPage:%d,count:%d", totalCount, curPage, totalPage, count));
+                //Log.d(TAG, String.format("totalCount:%d, curPage:%d, totalPage:%d,count:%d", totalCount, curPage, totalPage, count));
 
                 return entryList;
             }
@@ -293,11 +312,15 @@ public class HistoryFragment extends BrowserFragment implements AbsListView.OnSc
                 //mOnLastItemVisibleListener.onLastItemVisible();
                 if (curPage<totalPage) {
                     mSwipeRefreshWidget.setRefreshing(true);
-                    update();
+                    loadMore();
                 } else {
                     Log.d(TAG, "curPage>=totalPage:"+curPage+" totalPage:"+totalPage);
                 }
             }
         }
+    }
+
+    private void loadMore() {
+        getHistory();
     }
 }
