@@ -193,9 +193,6 @@ public class HistoryFragment extends BrowserFragment implements AbsListView.OnSc
         totalCount=0;
         totalPage=0;
         mSavedLastVisibleIndex=-1;
-        if (fileList!=null) {
-            fileList.clear();
-        }
     }
 
     public void update() {
@@ -281,6 +278,9 @@ public class HistoryFragment extends BrowserFragment implements AbsListView.OnSc
                 if (null!=entries&&entries.size()>0) {
                     if (fileList==null) {
                         fileList=new ArrayList<FileListEntry>();
+                    }
+                    if (curPage==0) {
+                        fileList.clear();
                     }
                     fileList.addAll(entries);
                     fileListAdapter.setData(fileList);
