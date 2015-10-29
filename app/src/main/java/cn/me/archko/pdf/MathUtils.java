@@ -73,7 +73,7 @@ public class MathUtils {
         return max;
     }
 
-    public static float round(final float value, final float share) {
+    /*public static float round(final float value, final float share) {
         return FloatMath.floor(value * share) / share;
     }
 
@@ -107,7 +107,7 @@ public class MathUtils {
         rect.right = FloatMath.ceil(rect.right);
         rect.bottom = FloatMath.ceil(rect.bottom);
         return rect;
-    }
+    }*/
 
     public static int nextPowerOf2(int n) {
         if (n <= 0 || n > (1 << 30)) {
