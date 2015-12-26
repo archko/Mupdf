@@ -59,6 +59,7 @@ public class AKRecent implements Serializable {
      * @param numberOfPage  总页数
      * @param bookmarkEntry 书签字符串,是一个合并形式的.
      */
+    @Deprecated
     public void addAsync(final String path, final int page, final int numberOfPage, final String bookmarkEntry, final DataListener dataListener) {
         Util.execute(true, new AsyncTask<Void, Void, Void>() {
             @Override
@@ -72,6 +73,7 @@ public class AKRecent implements Serializable {
         }, (Void[]) null);
     }
 
+    @Deprecated
     public ArrayList<AKProgress> add(final String path, final int page, final int numberOfPage, String bookmarkEntry) {
         if (TextUtils.isEmpty(path)||TextUtils.isEmpty(bookmarkEntry)) {
             Log.d("", "path is null.");
@@ -114,6 +116,7 @@ public class AKRecent implements Serializable {
 
     }
 
+    @Deprecated
     private void addNewRecent(String path, int page, int numberOfPage, String bookmarkEntry) {
         Log.d(TAG, "addNewRecent:"+page+" nop:"+numberOfPage+" path:"+path);
         AKProgress tmp=new AKProgress(path);
@@ -323,20 +326,25 @@ public class AKRecent implements Serializable {
         RecentManager recentManager=new RecentManager(APVApplication.getInstance());
         try {
             recentManager.open();
-            AKProgress progress=recentManager.getProgress(path);
+            String sdcard=Environment.getExternalStorageDirectory().getPath();
+            String filepath=path;
+            if (path.contains(sdcard)) {
+                filepath=path.substring(sdcard.length());
+            }
+            AKProgress progress=recentManager.getProgress(filepath);
             if (progress==null) {
                 progress=new AKProgress();
                 progress.timestampe=System.currentTimeMillis();
-                progress.path=path;
+                progress.path=filepath;
                 progress.page=page;
                 progress.numberOfPages=numberOfPage;
                 progress.bookmarkEntry=bookmarkEntry;
                 if (progress.size==0) {
-                    File file=new File(progress.path);
+                    File file=new File(path);
                     if (file.exists()) {
                         progress.size=file.length();
                     } else {
-                        Log.d(TAG, "file not exists."+path);
+                        Log.d(TAG, "file not exists."+filepath);
                         return;
                     }
                 }
@@ -348,11 +356,11 @@ public class AKRecent implements Serializable {
                 progress.numberOfPages=numberOfPage;
                 progress.bookmarkEntry=bookmarkEntry;
                 if (progress.size==0) {
-                    File file=new File(progress.path);
+                    File file=new File(path);
                     if (file.exists()) {
                         progress.size=file.length();
                     } else {
-                        Log.d(TAG, "file not exists."+path);
+                        Log.d(TAG, "file not exists."+filepath);
                         return;
                     }
                 }

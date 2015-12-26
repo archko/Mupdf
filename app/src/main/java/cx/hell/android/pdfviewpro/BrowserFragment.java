@@ -233,6 +233,9 @@ public class BrowserFragment extends RefreshableFragment implements OnItemClickL
 	}
 
 	public void update() {
+		if (!isResumed()) {
+			return;
+		}
 		if (null==fileList) {
 			this.fileList = new ArrayList<FileListEntry>();
 		}

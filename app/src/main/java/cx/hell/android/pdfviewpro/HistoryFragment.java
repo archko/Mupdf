@@ -217,9 +217,12 @@ public class HistoryFragment extends BrowserFragment implements AbsListView.OnSc
                 ArrayList<FileListEntry> entryList=new ArrayList<FileListEntry>();
                 if (null!=progresses&&progresses.size()>0) {
                     FileListEntry entry;
+                    File file;
+                    String path=Environment.getExternalStorageDirectory().getPath();
                     for (AKProgress progress : progresses) {
                         try {
-                            entry=new FileListEntry(FileListEntry.RECENT, 0, new File(progress.path), showExtension);
+                            file=new File(path+"/"+progress.path);
+                            entry=new FileListEntry(FileListEntry.RECENT, 0, file, showExtension);
                             entry.setAkProgress(progress);
                             entryList.add(entry);
                         } catch (Exception e) {
