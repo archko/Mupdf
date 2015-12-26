@@ -351,7 +351,7 @@ public class AKRecent implements Serializable {
                 recentManager.setProgress(progress);
             } else {
                 progress.timestampe=System.currentTimeMillis();
-                progress.path=path;
+                progress.path=filepath;
                 progress.page=page;
                 progress.numberOfPages=numberOfPage;
                 progress.bookmarkEntry=bookmarkEntry;
@@ -382,8 +382,13 @@ public class AKRecent implements Serializable {
 
         RecentManager recentManager=new RecentManager(APVApplication.getInstance());
         try {
+            String sdcard=Environment.getExternalStorageDirectory().getPath();
+            String filepath=path;
+            if (path.contains(sdcard)) {
+                filepath=path.substring(sdcard.length());
+            }
             recentManager.open();
-            recentManager.deleteProgress(path);
+            recentManager.deleteProgress(filepath);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -410,8 +415,13 @@ public class AKRecent implements Serializable {
         AKProgress progress=null;
         RecentManager recentManager=new RecentManager(APVApplication.getInstance());
         try {
+            String sdcard=Environment.getExternalStorageDirectory().getPath();
+            String filepath=path;
+            if (path.contains(sdcard)) {
+                filepath=path.substring(sdcard.length());
+            }
             recentManager.open();
-            progress=recentManager.getProgress(path);
+            progress=recentManager.getProgress(filepath);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
