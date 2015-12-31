@@ -10,6 +10,7 @@
     <string name="menu_vudroid">用Vudroid方式打开</string>
     <string name="menu_apv">用Apv方式打开</string>
     <string name="menu_mupdf">用Mupdf方式打开</string>
+	<string name="menu_other">用其它应用打开</string>
 
 	<string name="about">关于</string>
 	<string name="goto_page">跳转到页…</string>

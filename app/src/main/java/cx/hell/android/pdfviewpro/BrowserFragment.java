@@ -74,6 +74,7 @@ public class BrowserFragment extends RefreshableFragment implements OnItemClickL
 	protected static final int mupdfContextMenuItem=Menu.FIRST+110;
 	protected static final int apvContextMenuItem=Menu.FIRST+111;
 	protected static final int vudroidContextMenuItem=Menu.FIRST+112;
+	protected static final int otherContextMenuItem=Menu.FIRST+113;
 
     protected MenuItem backMenuItem = null;
     protected MenuItem restoreMenuItem = null;
@@ -365,6 +366,7 @@ public class BrowserFragment extends RefreshableFragment implements OnItemClickL
                 menu.add(0, apvContextMenuItem, 0, getString(R.string.menu_apv));
                 menu.add(0, mupdfContextMenuItem, 0, getString(R.string.menu_mupdf));
                 menu.add(0, vudroidContextMenuItem, 0, getString(R.string.menu_vudroid));
+				menu.add(0, otherContextMenuItem, 0, getString(R.string.menu_other));
 
         		//openContextMenuItem = menu.add(R.string.open);
         		menu.add(0, removeContextMenuItem, 0, getString(R.string.remove_from_recent));
@@ -373,6 +375,7 @@ public class BrowserFragment extends RefreshableFragment implements OnItemClickL
 				menu.add(0, apvContextMenuItem, 0, getString(R.string.menu_apv));
 				menu.add(0, mupdfContextMenuItem, 0, getString(R.string.menu_mupdf));
 				menu.add(0, vudroidContextMenuItem, 0, getString(R.string.menu_vudroid));
+				menu.add(0, otherContextMenuItem, 0, getString(R.string.menu_other));
 
         		//openContextMenuItem = menu.add(R.string.open);
         		menu.add(0, deleteContextMenuItem, 0, getString(R.string.delete));
@@ -445,7 +448,11 @@ public class BrowserFragment extends RefreshableFragment implements OnItemClickL
                     intent.setDataAndType(Uri.fromFile(clickedFile), "application/pdf");
                     startActivity(intent);
                     return true;
-                }
+                } else if (item.getItemId()==otherContextMenuItem) {
+					intent.setAction(Intent.ACTION_VIEW);
+					intent.setDataAndType(Uri.fromFile(clickedFile), "application/pdf");
+					startActivity(intent);
+				}
             }
         }
     	return false;
