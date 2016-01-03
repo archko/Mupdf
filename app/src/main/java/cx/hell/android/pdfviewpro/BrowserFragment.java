@@ -10,8 +10,6 @@ import android.preference.PreferenceManager;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
-import android.view.ContextMenu;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -21,6 +19,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 import cn.me.archko.pdf.AKRecent;
 import com.artifex.mupdfdemo.MuPDFActivity;
@@ -40,7 +39,8 @@ import java.util.Map;
  * @description:
  * @author: archko 11-11-17
  */
-public class BrowserFragment extends RefreshableFragment implements OnItemClickListener, SwipeRefreshLayout.OnRefreshListener {
+public class BrowserFragment extends RefreshableFragment implements OnItemClickListener,
+		SwipeRefreshLayout.OnRefreshListener, PopupMenu.OnMenuItemClickListener, AdapterView.OnItemLongClickListener {
 
     public static final String TAG="BrowserFragment";
 
@@ -60,13 +60,6 @@ public class BrowserFragment extends RefreshableFragment implements OnItemClickL
 	private MenuItem setAsHomeMenuItem = null;
 	protected MenuItem optionsMenuItem = null;
 
-	/*protected MenuItem deleteContextMenuItem = null;
-	protected MenuItem removeContextMenuItem = null;
-	protected MenuItem openContextMenuItem = null;
-
-    private MenuItem mupdfContextMenuItem= null;
-    private MenuItem apvContextMenuItem= null;
-    private MenuItem vudroidContextMenuItem= null;*/
 	protected static final int deleteContextMenuItem=Menu.FIRST+100;
 	protected static final int removeContextMenuItem=Menu.FIRST+101;
 	protected static final int openContextMenuItem=Menu.FIRST+102;
@@ -79,6 +72,7 @@ public class BrowserFragment extends RefreshableFragment implements OnItemClickL
     protected MenuItem backMenuItem = null;
     protected MenuItem restoreMenuItem = null;
 	Map<String, Integer> mPathMap=new HashMap<>();
+	protected int mSelectedPos=-1;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -178,7 +172,6 @@ public class BrowserFragment extends RefreshableFragment implements OnItemClickL
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        registerForContextMenu(this.filesListView);
     	this.fileFilter = new FileFilter() {
     		public boolean accept(File file) {
     			//return (file.isDirectory() || file.getName().toLowerCase().endsWith(".pdf"));
@@ -220,6 +213,8 @@ public class BrowserFragment extends RefreshableFragment implements OnItemClickL
 		updateAdapter();
 
     	//registerForContextMenu(this.filesListView);
+		filesListView.setOnItemClickListener(this);
+		filesListView.setOnItemLongClickListener(this);
     }
     
     public void updateAdapter() {
@@ -346,8 +341,20 @@ public class BrowserFragment extends RefreshableFragment implements OnItemClickL
     		pdfView(clickedFile);
     	}
 	}
+
+	@Override
+	public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+		FileListEntry entry = (FileListEntry) this.fileListAdapter.getItem(position);
+		if (!entry.isDirectory() && entry.getType() != FileListEntry.HOME) {
+			mSelectedPos=position;
+			prepareMenu(view, entry);
+			return true;
+		}
+		mSelectedPos=-1;
+		return false;
+	}
     
-    @Override
+    /*@Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
     	super.onCreateContextMenu(menu, v, menuInfo);
     	
@@ -359,10 +366,10 @@ public class BrowserFragment extends RefreshableFragment implements OnItemClickL
     		
         	FileListEntry entry = this.fileList.get(info.position);
         	
-        	/*if (entry.getType() == FileListEntry.HOME) {
+        	*//*if (entry.getType() == FileListEntry.HOME) {
         		setAsHomeContextMenuItem = menu.add(R.string.set_as_home);
         	}
-        	else*/ if (entry.getType() == FileListEntry.RECENT) {
+        	else*//* if (entry.getType() == FileListEntry.RECENT) {
                 menu.add(0, apvContextMenuItem, 0, getString(R.string.menu_apv));
                 menu.add(0, mupdfContextMenuItem, 0, getString(R.string.menu_mupdf));
                 menu.add(0, vudroidContextMenuItem, 0, getString(R.string.menu_vudroid));
@@ -456,5 +463,127 @@ public class BrowserFragment extends RefreshableFragment implements OnItemClickL
             }
         }
     	return false;
+	}*/
+
+	//--------------------- popupMenu ---------------------
+
+	/**
+	 * 初始化自定义菜单
+	 *
+	 * @param anchorView 菜单显示的锚点View。
+	 */
+	public void prepareMenu(View anchorView, FileListEntry entry) {
+		PopupMenu popupMenu=new PopupMenu(getActivity(), anchorView);
+
+		onCreateCustomMenu(popupMenu);
+		onPrepareCustomMenu(popupMenu, entry);
+		//return showCustomMenu(anchorView);
+		popupMenu.setOnMenuItemClickListener(this);
+		popupMenu.show();
+	}
+
+	/**
+	 * 创建菜单项，供子类覆盖，以便动态地添加菜单项。
+	 *
+	 * @param menuBuilder
+	 */
+	public void onCreateCustomMenu(PopupMenu menuBuilder) {
+        /*menuBuilder.add(0, 1, 0, "title1");*/
+		menuBuilder.getMenu().clear();
+	}
+
+	/**
+	 * 创建菜单项，供子类覆盖，以便动态地添加菜单项。
+	 *
+	 * @param menuBuilder
+	 */
+	public void onPrepareCustomMenu(PopupMenu menuBuilder, FileListEntry entry) {
+        /*menuBuilder.add(0, 1, 0, "title1");*/
+		if (entry.getType() == FileListEntry.HOME) {
+			//menuBuilder.getMenu().add(R.string.set_as_home);
+		} else if (entry.getType() == FileListEntry.RECENT) {
+			menuBuilder.getMenu().add(0, apvContextMenuItem, 0, getString(R.string.menu_apv));
+			menuBuilder.getMenu().add(0, mupdfContextMenuItem, 0, getString(R.string.menu_mupdf));
+			menuBuilder.getMenu().add(0, vudroidContextMenuItem, 0, getString(R.string.menu_vudroid));
+			menuBuilder.getMenu().add(0, otherContextMenuItem, 0, getString(R.string.menu_other));
+
+			menuBuilder.getMenu().add(0, removeContextMenuItem, 0, getString(R.string.remove_from_recent));
+		} else if (! entry.isDirectory()&&entry.getType() != FileListEntry.HOME) {
+			menuBuilder.getMenu().add(0, apvContextMenuItem, 0, getString(R.string.menu_apv));
+			menuBuilder.getMenu().add(0, mupdfContextMenuItem, 0, getString(R.string.menu_mupdf));
+			menuBuilder.getMenu().add(0, vudroidContextMenuItem, 0, getString(R.string.menu_vudroid));
+			menuBuilder.getMenu().add(0, otherContextMenuItem, 0, getString(R.string.menu_other));
+
+			menuBuilder.getMenu().add(0, deleteContextMenuItem, 0, getString(R.string.delete));
+		}
+	}
+
+	@Override
+	public boolean onMenuItemClick(MenuItem item) {
+		if (null==fileList || mSelectedPos==-1) {
+			return true;
+		}
+		int position = mSelectedPos;
+		Log.d(TAG, "delete:"+position+ "++"+ (item.getItemId() == deleteContextMenuItem));
+		if (item.getItemId() == deleteContextMenuItem) {
+			FileListEntry entry = this.fileList.get(position);
+			Log.d(TAG, "delete:"+entry);
+			if (entry.getType() == FileListEntry.NORMAL && ! entry.isDirectory()) {
+				entry.getFile().delete();
+				update();
+			}
+			return true;
+		}
+		else if (item.getItemId() == removeContextMenuItem) {
+			FileListEntry entry = this.fileList.get(position);
+			if (entry.getType() == FileListEntry.RECENT) {
+				AKRecent.getInstance(getActivity().getApplicationContext()).removeFromDb(entry.getFile().getAbsolutePath());
+				update();
+			}
+		} else if (item.getItemId() == openContextMenuItem) {
+			FileListEntry entry = this.fileList.get(position);
+			File clickedFile;
+
+			clickedFile = entry.getFile();
+
+			if (clickedFile.exists()) {
+				pdfView(clickedFile);
+				return true;
+			}
+		} else {
+			FileListEntry entry = this.fileList.get(position);
+			File clickedFile;
+
+			clickedFile = entry.getFile();
+
+			if (null!=clickedFile&&clickedFile.exists()) {
+				Uri uri = Uri.parse(clickedFile.getAbsolutePath());
+				Intent intent ;
+				intent=new Intent();
+				intent.setAction(Intent.ACTION_VIEW);
+				intent.setData(uri);
+
+				if (item.getItemId()==vudroidContextMenuItem) {
+					intent.setClass(getActivity(), PdfViewerActivity.class);
+					intent.setData(Uri.fromFile(clickedFile));
+					startActivity(intent);
+					return true;
+				} else if (item.getItemId()==mupdfContextMenuItem) {
+					intent.setClass(getActivity(), MuPDFActivity.class);
+					startActivity(intent);
+					return true;
+				} else if (item.getItemId()==apvContextMenuItem) {
+					intent.setClass(getActivity(), OpenFileActivity.class);
+					intent.setDataAndType(Uri.fromFile(clickedFile), "application/pdf");
+					startActivity(intent);
+					return true;
+				} else if (item.getItemId()==otherContextMenuItem) {
+					intent.setAction(Intent.ACTION_VIEW);
+					intent.setDataAndType(Uri.fromFile(clickedFile), "application/pdf");
+					startActivity(intent);
+				}
+			}
+		}
+		return false;
 	}
 }
