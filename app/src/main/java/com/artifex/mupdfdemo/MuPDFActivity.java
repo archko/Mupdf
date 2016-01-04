@@ -41,12 +41,11 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.ViewAnimator;
 
-import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.concurrent.Executor;
 
-import cx.hell.android.pdfviewpro.Recent;
+import cn.archko.pdf.R;
+import cn.archko.pdf.Recent;
 
 class ThreadPerTaskExecutor implements Executor {
 	public void execute(Runnable r) {

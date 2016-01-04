@@ -1,4 +1,4 @@
-package cx.hell.android.pdfviewpro;
+package cn.archko.pdf;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -10,8 +10,8 @@ import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.ViewGroup;
-import cn.me.archko.pdf.SlidingTabLayout;
-import com.artifex.mupdfdemo.R;
+
+import cx.hell.android.pdfviewpro.APVApplication;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -48,7 +48,7 @@ public class ChooseFileFragmentActivity extends FragmentActivity {
 
     /**
      * This class represents a tab to be displayed by {@link android.support.v4.view.ViewPager} and it's associated
-     * {@link cn.me.archko.pdf.SlidingTabLayout}.
+     * {@link cn.archko.pdf.SlidingTabLayout}.
      */
     static class SamplePagerItem {
 
@@ -83,14 +83,14 @@ public class ChooseFileFragmentActivity extends FragmentActivity {
         }
 
         /**
-         * @return the color to be used for indicator on the {@link cn.me.archko.pdf.SlidingTabLayout}
+         * @return the color to be used for indicator on the {@link cn.archko.pdf.SlidingTabLayout}
          */
         int getIndicatorColor() {
             return mIndicatorColor;
         }
 
         /**
-         * @return the color to be used for right divider on the {@link cn.me.archko.pdf.SlidingTabLayout}
+         * @return the color to be used for right divider on the {@link cn.archko.pdf.SlidingTabLayout}
          */
         int getDividerColor() {
             return mDividerColor;

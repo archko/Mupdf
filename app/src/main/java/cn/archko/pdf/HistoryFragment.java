@@ -1,4 +1,4 @@
-package cx.hell.android.pdfviewpro;
+package cn.archko.pdf;
 
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
@@ -14,11 +14,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.Toast;
-import cn.me.archko.pdf.AKProgress;
-import cn.me.archko.pdf.AKRecent;
-import cn.me.archko.pdf.LengthUtils;
-import cn.me.archko.pdf.Util;
-import com.artifex.mupdfdemo.R;
+
+import cn.archko.pdf.utils.LengthUtils;
+import cn.archko.pdf.utils.Util;
+import cx.hell.android.pdfviewpro.APVApplication;
+import cx.hell.android.pdfviewpro.FileListEntry;
 
 import java.io.File;
 import java.util.ArrayList;

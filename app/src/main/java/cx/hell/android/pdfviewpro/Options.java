@@ -11,7 +11,7 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import com.artifex.mupdfdemo.R;
+import cn.archko.pdf.R;
 
 public class Options extends PreferenceActivity implements OnSharedPreferenceChangeListener {
 	private final static String TAG = "cx.hell.android.pdfviewpro";

@@ -9,7 +9,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import com.artifex.mupdfdemo.R;
+import cn.archko.pdf.R;
 import org.vudroid.core.events.BringUpZoomControlsListener;
 import org.vudroid.core.models.CurrentPageModel;
 

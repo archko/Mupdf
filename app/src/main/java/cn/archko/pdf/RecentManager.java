@@ -1,4 +1,4 @@
-package cx.hell.android.pdfviewpro;
+package cn.archko.pdf;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -7,7 +7,6 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.BaseColumns;
-import cn.me.archko.pdf.AKProgress;
 
 import java.util.ArrayList;
 

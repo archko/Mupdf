@@ -3,19 +3,19 @@ android {
     signingConfigs {
         debug {
             keyAlias 'mupdf_release_key'
-            storeFile file('/Users/archko/Projects/PDF/Mupdf/mupdf_release_key.jks')
+            storeFile file('D:/Projects/PDF/Mupdf/mupdf_release_key.jks')
 
         }
         release {
             keyAlias 'mupdf_release_key'
-            storeFile file('/Users/archko/Projects/PDF/Mupdf/mupdf_release_key.jks')
+            storeFile file('D:/Projects/PDF/Mupdf/mupdf_release_key.jks')
 
         }
     }
     compileSdkVersion 23
     buildToolsVersion '23.0.2'
     defaultConfig {
-        applicationId 'com.artifex.mupdfdemo'
+        applicationId 'cn.archko.mupdf'
         minSdkVersion 14
         targetSdkVersion 23
         versionCode 50

@@ -1,4 +1,4 @@
-package cx.hell.android.pdfviewpro;
+package cn.archko.pdf;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -15,6 +15,8 @@ import cx.hell.android.lib.pagesview.PagesProvider;
 import cx.hell.android.lib.pagesview.PagesView;
 import cx.hell.android.lib.pagesview.RenderingException;
 import cx.hell.android.lib.pagesview.Tile;
+import cx.hell.android.pdfviewpro.APVApplication;
+import cx.hell.android.pdfviewpro.BitmapCache;
 
 import java.lang.ref.SoftReference;
 import java.util.ArrayList;

@@ -16,6 +16,8 @@ import android.widget.Scroller;
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
 
+import cn.archko.pdf.R;
+
 public class AKReaderView
 		extends AdapterView<Adapter>
 		implements GestureDetector.OnGestureListener, ScaleGestureDetector.OnScaleGestureListener, Runnable {

@@ -65,6 +65,7 @@ public class MuPDFReflowView extends WebView implements MuPDFView {
 			@Override
 			protected void onPostExecute(byte[] result) {
 				String b64 = Base64.encodeToString(result, Base64.DEFAULT);
+				String s=new String(result);
 				loadData(b64, "text/html; charset=utf-8", "base64");
 			}
 		};

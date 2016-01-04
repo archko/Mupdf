@@ -10,6 +10,8 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toolbar;
 
+import cn.archko.pdf.R;
+
 public class OutlineActivity extends Activity {
 	OutlineItem mItems[];
 

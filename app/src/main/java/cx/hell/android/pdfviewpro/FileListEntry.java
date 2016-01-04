@@ -1,7 +1,7 @@
 package cx.hell.android.pdfviewpro;
 
-import cn.me.archko.pdf.AKProgress;
-import cn.me.archko.pdf.AKRecent;
+import cn.archko.pdf.AKProgress;
+import cn.archko.pdf.AKRecent;
 
 import java.io.File;
 
@@ -11,9 +11,9 @@ public class FileListEntry {
 	private boolean isDirectory = false;
 	private int type = NORMAL;
 	private int recentNumber = -1;
-	static final int NORMAL = 0; 
-	static final int HOME   = 1;
-	static final int RECENT = 2;
+	public static final int NORMAL = 0;
+	public static final int HOME   = 1;
+	public static final int RECENT = 2;
     AKProgress mAkProgress;
 
     public AKProgress getAkProgress() {

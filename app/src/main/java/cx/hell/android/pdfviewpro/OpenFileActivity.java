@@ -45,13 +45,13 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 //import cx.hell.android.lib.pagesview.FindResult;
-import cn.me.archko.pdf.AKProgress;
-import cn.me.archko.pdf.AKRecent;
-import cn.me.archko.pdf.DataListener;
+import cn.archko.pdf.AKPDFPagesProvider;
+import cn.archko.pdf.AKProgress;
+import cn.archko.pdf.AKRecent;
+import cn.archko.pdf.DataListener;
 import com.artifex.mupdfdemo.ChoosePDFActivity;
 import com.artifex.mupdfdemo.OutlineActivity;
 import com.artifex.mupdfdemo.OutlineActivityData;
@@ -60,7 +60,7 @@ import cx.hell.android.lib.pagesview.PagesProvider;
 import cx.hell.android.lib.pagesview.PagesView;
 
 import com.artifex.mupdfdemo.MuPDFCore;
-import com.artifex.mupdfdemo.R;
+import cn.archko.pdf.R;
 
 // #ifdef pro
 import android.view.ViewGroup.LayoutParams;

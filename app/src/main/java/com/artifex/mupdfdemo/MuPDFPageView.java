@@ -21,6 +21,8 @@ import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 
+import cn.archko.pdf.R;
+
 /* This enum should be kept in line with the cooresponding C enum in mupdf.c */
 enum SignatureState {
 	NoSupport,

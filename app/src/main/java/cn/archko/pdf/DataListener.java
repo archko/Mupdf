@@ -1,4 +1,4 @@
-package cn.me.archko.pdf;
+package cn.archko.pdf;
 
 /**
  * 数据查询接口.所有的数据查询都可以用这个,因为返回的是多个元素.

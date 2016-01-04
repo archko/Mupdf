@@ -7,7 +7,7 @@ import android.view.VelocityTracker;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Scroller;
-import com.artifex.mupdfdemo.R;
+import cn.archko.pdf.R;
 import org.vudroid.core.models.ZoomModel;
 
 public class ZoomRoll extends View

@@ -1,15 +1,17 @@
-package cn.me.archko.pdf;
+package cn.archko.pdf;
 
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.text.TextUtils;
 import android.util.Log;
+
+import cn.archko.pdf.utils.DateUtil;
+import cn.archko.pdf.utils.Util;
 import cx.hell.android.pdfviewpro.APVApplication;
 import cx.hell.android.pdfviewpro.Bookmark;
 import cx.hell.android.pdfviewpro.BookmarkEntry;
-import cx.hell.android.pdfviewpro.RecentManager;
-import cx.hell.android.pdfviewpro.StreamUtils;
+import cn.archko.pdf.utils.StreamUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -173,7 +175,7 @@ public class AKRecent implements Serializable {
     }
 
     public String backup() {
-        String name="mupdf_"+DateUtil.formatTime(System.currentTimeMillis(), "yyyy-MM-dd-HH-mm-ss");
+        String name="mupdf_"+ DateUtil.formatTime(System.currentTimeMillis(), "yyyy-MM-dd-HH-mm-ss");
         return backup(name);
     }
 

@@ -1,4 +1,4 @@
-package cx.hell.android.pdfviewpro;
+package cn.archko.pdf;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -21,9 +21,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
-import cn.me.archko.pdf.AKRecent;
 import com.artifex.mupdfdemo.MuPDFActivity;
-import com.artifex.mupdfdemo.R;
 import org.vudroid.pdfdroid.PdfViewerActivity;
 
 import java.io.File;
@@ -33,6 +31,11 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
+
+import cx.hell.android.pdfviewpro.APVApplication;
+import cx.hell.android.pdfviewpro.FileListEntry;
+import cx.hell.android.pdfviewpro.OpenFileActivity;
+import cx.hell.android.pdfviewpro.Options;
 
 /**
  * @version 1.00.00

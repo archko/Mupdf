@@ -2,7 +2,7 @@ package cx.hell.android.pdfviewpro;
 
 import android.app.Application;
 import android.util.Log;
-import cn.me.archko.pdf.CrashHandler;
+import cn.archko.pdf.CrashHandler;
 //import cx.hell.android.lib.pdf.PDF;
 
 public class APVApplication extends Application {

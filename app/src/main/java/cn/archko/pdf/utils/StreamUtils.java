@@ -1,4 +1,4 @@
-package cx.hell.android.pdfviewpro;
+package cn.archko.pdf.utils;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -18,7 +18,6 @@ import java.util.ArrayList;
 
 import android.util.Log;
 import android.widget.ProgressBar;
-import cn.me.archko.pdf.FileUtils;
 
 public class StreamUtils {
 

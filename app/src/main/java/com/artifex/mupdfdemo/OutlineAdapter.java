@@ -6,6 +6,8 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import cn.archko.pdf.R;
+
 public class OutlineAdapter extends BaseAdapter {
 	private final OutlineItem    mItems[];
 	private final LayoutInflater mInflater;

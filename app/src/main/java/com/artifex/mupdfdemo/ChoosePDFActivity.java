@@ -13,6 +13,8 @@ import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.AdapterView;
+
+import cn.archko.pdf.R;
 import cx.hell.android.pdfviewpro.OpenFileActivity;
 import android.app.AlertDialog;
 import android.app.ListActivity;

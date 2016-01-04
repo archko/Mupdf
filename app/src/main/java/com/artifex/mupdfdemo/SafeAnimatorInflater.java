@@ -6,6 +6,8 @@ import android.animation.AnimatorSet;
 import android.app.Activity;
 import android.view.View;
 
+import cn.archko.pdf.R;
+
 public class SafeAnimatorInflater
 {
 	private View mView;

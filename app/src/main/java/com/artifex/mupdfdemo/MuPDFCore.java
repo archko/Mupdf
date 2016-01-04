@@ -9,6 +9,8 @@ import android.graphics.PointF;
 import android.graphics.RectF;
 import android.content.Intent;
 
+import cn.archko.pdf.R;
+
 public class MuPDFCore
 {
 	/* load our native library */

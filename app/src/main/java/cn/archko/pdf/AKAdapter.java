@@ -1,4 +1,4 @@
-package cx.hell.android.pdfviewpro;
+package cn.archko.pdf;
 
 import android.content.Context;
 import android.graphics.Typeface;
@@ -8,10 +8,9 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import cn.me.archko.pdf.AKProgress;
-import cn.me.archko.pdf.AKRecent;
-import cn.me.archko.pdf.Util;
-import com.artifex.mupdfdemo.R;
+
+import cn.archko.pdf.utils.Util;
+import cx.hell.android.pdfviewpro.FileListEntry;
 
 import java.util.ArrayList;
 
