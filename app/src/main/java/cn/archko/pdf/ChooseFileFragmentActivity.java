@@ -1,8 +1,11 @@
 package cn.archko.pdf;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -10,6 +13,7 @@ import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import cx.hell.android.pdfviewpro.APVApplication;
 
@@ -35,6 +39,7 @@ public class ChooseFileFragmentActivity extends FragmentActivity {
     ViewPager mViewPager;
     TabsAdapter mPagerAdapter;
     final String[] titles = new String[2];
+    private static final int REQUEST_PERMISSION_CODE = 0x001;
 
     /**
      * List of {@link SamplePagerItem} which represent this sample's tabs.
@@ -103,6 +108,10 @@ public class ChooseFileFragmentActivity extends FragmentActivity {
 
         setContentView(R.layout.fragment_tabs_pager);
 
+        checkSdcardPermission();
+    }
+
+    private void loadView() {
         mViewPager = (ViewPager) findViewById(R.id.pager);
 
         mSlidingTabLayout = (SlidingTabLayout) findViewById(R.id.sliding_tabs);
@@ -121,6 +130,57 @@ public class ChooseFileFragmentActivity extends FragmentActivity {
                 ((RefreshableFragment) mPagerAdapter.getItem(position)).update();
             }
         });
+    }
+
+
+    public void checkSdcardPermission() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            // WRITE_EXTERNAL_STORAGE permission has not been granted.
+
+            requestSdcardPermission();
+        } else {
+            loadView();
+        }
+    }
+
+    /**
+     * Requests the sdcard permission.
+     * If the permission has been denied previously, a SnackBar will prompt the user to grant the
+     * permission, otherwise it is requested directly.
+     */
+    private void requestSdcardPermission() {
+        Log.i(TAG, "sdcard permission has NOT been granted. Requesting permission.");
+
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            // Provide an additional rationale to the user if the permission was not granted
+            // and the user would benefit from additional context for the use of the permission.
+            // For example if the user has previously denied the permission.
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    REQUEST_PERMISSION_CODE);
+        } else {
+
+            // sdcard permission has not been granted yet. Request it directly.
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    REQUEST_PERMISSION_CODE);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if (requestCode == REQUEST_PERMISSION_CODE) {
+            if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                //  权限通过
+                //((RefreshableFragment) (mPagerAdapter.getItem(mViewPager.getCurrentItem()))).update();
+                loadView();
+            } else {
+                // 权限拒绝
+                Toast.makeText(this, "没有获取sdcard的读取权限", Toast.LENGTH_LONG).show();
+            }
+        }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
     }
 
     protected void postSlidingTabLayout() {
@@ -160,9 +220,11 @@ public class ChooseFileFragmentActivity extends FragmentActivity {
 
     @Override
     public void onBackPressed() {
-        BrowserFragment fragment = (BrowserFragment) mPagerAdapter.getItem(mViewPager.getCurrentItem());
-        if (fragment.onBackPressed()) {
-            return;
+        if (null != mPagerAdapter) {
+            BrowserFragment fragment = (BrowserFragment) mPagerAdapter.getItem(mViewPager.getCurrentItem());
+            if (fragment.onBackPressed()) {
+                return;
+            }
         }
         super.onBackPressed();
     }
