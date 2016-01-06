@@ -229,7 +229,7 @@ public class Options extends PreferenceActivity implements OnSharedPreferenceCha
 	/* returns true when the calling app is responsible for monitoring */
 	public static boolean setOrientation(Activity activity) {
 		SharedPreferences options = PreferenceManager.getDefaultSharedPreferences(activity);
-		int orientation = Integer.parseInt(options.getString(PREF_ORIENTATION, "0"));
+		int orientation = Integer.parseInt(options.getString(PREF_ORIENTATION, "7"));
 		switch(orientation) {
 		case 0: 
 			activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
