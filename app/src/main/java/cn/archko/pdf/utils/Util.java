@@ -1,8 +1,11 @@
 package cn.archko.pdf.utils;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.util.DisplayMetrics;
+import android.view.WindowManager;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -105,5 +108,25 @@ public class Util {
             }
         }
         return null;
+    }
+
+    /**
+     * @param context
+     * @return
+     */
+    public static int getScreenWidthPixelWithOrientation(Context context) {
+        DisplayMetrics dm = new DisplayMetrics();
+        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        wm.getDefaultDisplay().getMetrics(dm);
+        int width = (int) dm.widthPixels;
+        return width;
+    }
+
+    public static int getScreenHeightPixelWithOrientation(Context context) {
+        DisplayMetrics dm = new DisplayMetrics();
+        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        wm.getDefaultDisplay().getMetrics(dm);
+        int width = (int) dm.heightPixels;
+        return width;
     }
 }

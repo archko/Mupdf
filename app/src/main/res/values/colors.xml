@@ -17,4 +17,7 @@
 	<color name="tab_indicator_selected_color">#168de2</color>
 	<color name="tab_indicator_normal_color">#d9d9d9</color>
 	<color name="tab_divider_color">#dddddd</color>
+
+	<color name="text_reflow_color">#000000</color>
+	<color name="text_reflow_bg_color">#ffffdc</color>
 </resources>

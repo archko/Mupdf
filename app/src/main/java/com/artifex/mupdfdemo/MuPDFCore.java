@@ -4,10 +4,8 @@ import java.util.ArrayList;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Bitmap.Config;
 import android.graphics.PointF;
 import android.graphics.RectF;
-import android.content.Intent;
 
 import cn.archko.pdf.R;
 
@@ -55,22 +53,11 @@ public class MuPDFCore
 			int patchX, int patchY,
 			int patchW, int patchH,
             long cookiePtr);
-    public native void drawPage3(Bitmap bitmap,
-        int pageW, int pageH,
-        int patchX, int patchY,
-        int patchW, int patchH,
-        long cookiePtr);
-    public native void drawPageWithNumber(
-        int page, Bitmap bitmap,
-        int pageW, int pageH,
-        int patchX, int patchY,
-        int patchW, int patchH,
-        long cookiePtr);
-    public native void renderPageDirect(ByteBuffer buffer,
-        int pageW, int pageH,
-        int patchX, int patchY,
-        int patchW, int patchH,
-        long cookiePtr);
+    public native void drawPage4Apv(Bitmap bitmap,
+									int pageW, int pageH,
+									int patchX, int patchY,
+									int patchW, int patchH,
+									long cookiePtr);
     private native void updatePageInternal(Bitmap bitmap,
         int page,
         int pageW, int pageH,
@@ -80,6 +67,7 @@ public class MuPDFCore
 	private native RectF[] searchPage(String text);
 	private native TextChar[][][][] text();
 	private native byte[] textAsHtml();
+	private native byte[] textAsText();
 	private native void addMarkupAnnotationInternal(PointF[] quadPoints, int type);
 	private native void addInkAnnotationInternal(PointF[][] arcs);
 	private native void deleteAnnotationInternal(int annot_index);
@@ -284,17 +272,7 @@ public class MuPDFCore
         gotoPage(page);
         /*System.out.println(String.format("renderPage pageW-:%d, pageH-:%d, patchX:%d, patchY:%d, patchW:%d, patchH:%d",
             pageW, pageH, patchX, patchY, patchW, patchH));*/
-        drawPage3(bm, pageW, pageH, patchX, patchY, patchW, patchH, cookie.cookiePtr);
-        //drawPageWithNumber(page, bm, pageW, pageH, patchX, patchY, patchW, patchH, cookie.cookiePtr);
-    }
-
-    public synchronized void renderPageDirect(ByteBuffer buffer, int page,
-        int pageW, int pageH,
-        int patchX, int patchY,
-        int patchW, int patchH,
-        MuPDFCore.Cookie cookie) {
-        gotoPage(page);
-        renderPageDirect(buffer, pageW, pageH, patchX, patchY, patchW, patchH, cookie.cookiePtr);
+        drawPage4Apv(bm, pageW, pageH, patchX, patchY, patchW, patchH, cookie.cookiePtr);
     }
 
 	public synchronized void updatePage(Bitmap bm, int page,
@@ -363,6 +341,11 @@ public class MuPDFCore
 	public synchronized byte[] html(int page) {
 		gotoPage(page);
 		return textAsHtml();
+	}
+
+	public synchronized byte[] text(int page) {
+		gotoPage(page);
+		return textAsText();
 	}
 
 	public synchronized TextWord [][] textLines(int page) {
@@ -474,25 +457,6 @@ public class MuPDFCore
 
 	public synchronized Separation getSep(int page, int sep) {
 		return getSepInternal(page, sep);
-	}
-	
-	public static class Size implements Cloneable {
-		public int width;
-		public int height;
-		
-		public Size() {
-			this.width = 0;
-			this.height = 0;
-		}
-		
-		public Size(int width, int height) {
-			this.width = width;
-			this.height = height;
-		}
-		
-		public Size clone() {
-			return new Size(this.width, this.height);
-		}
 	}
 
     //==========================================================================

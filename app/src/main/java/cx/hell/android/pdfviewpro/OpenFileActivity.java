@@ -13,6 +13,7 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -22,6 +23,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.text.Html;
 import android.text.InputType;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -243,6 +245,13 @@ public class OpenFileActivity extends Activity implements SensorEventListener {
         this.textReflowScrollView.setFillViewport(true);
         
         this.textReflowTextView = new TextView(this);
+		Paint mPaint = textReflowTextView.getPaint();
+		float mTextSize = mPaint.getTextSize();
+		mPaint.setTextSize(mTextSize*1.2f);
+		//textReflowTextView.setTextSize(textReflowTextView.getTextSize()*1.2f);
+		textReflowTextView.setPadding(20, 20, 20, 20);
+		textReflowTextView.setTextColor(getResources().getColor(R.color.text_reflow_color));
+		textReflowTextView.setBackgroundColor(getResources().getColor(R.color.text_reflow_bg_color));
         
         LinearLayout textReflowButtonsLayout = new LinearLayout(this);
         textReflowButtonsLayout.setGravity(Gravity.CENTER);
@@ -1541,15 +1550,29 @@ public class OpenFileActivity extends Activity implements SensorEventListener {
 		}
 		if (this.textReflowMode) {
 			int page = this.pagesView.getCurrentPage();
-			String text =null;//= this.pdf.getText(page);
+			byte[] result=pdf.text(page);
+
+			String text =new String(result); //= this.pdf.getText(page);
+			//String s=ConvertDecimalNCRToString(text);
 			if (text == null) text = "";
-			text = text.trim();
-			this.textReflowTextView.setText(text);
+			//text = text.trim();
+			this.textReflowTextView.setText(Html.fromHtml(text));
 			this.textReflowScrollView.scrollTo(0,0);
 		}
 //
 	}
 // #endif
+
+	public static String ConvertDecimalNCRToString(String hex) {
+		String myString = hex.replace("&#", "");
+		String[] split = myString.split(";");
+		StringBuilder sb = new StringBuilder();
+
+		for (int i = 0; i < split.length; i++) {
+			sb.append((char) Integer.parseInt(split[i]));
+		}
+		return sb.toString();
+	}
 
 	@Override
 	public void onWindowFocusChanged(boolean hasFocus) {

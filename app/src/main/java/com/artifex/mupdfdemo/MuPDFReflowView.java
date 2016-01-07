@@ -8,6 +8,7 @@ import android.os.Handler;
 import android.util.Base64;
 import android.view.MotionEvent;
 import android.view.View;
+import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -28,22 +29,26 @@ public class MuPDFReflowView extends WebView implements MuPDFView {
 		mScale = 1.0f;
 		mContentHeight = parentSize.y;
 		getSettings().setJavaScriptEnabled(true);
-		addJavascriptInterface(new Object(){
-			public void reportContentHeight(String value) {
-				mContentHeight = (int)Float.parseFloat(value);
-				mHandler.post(new Runnable() {
-					public void run() {
-						requestLayout();
-					}
-				});
-			}
+		addJavascriptInterface(new JsObject(){
 		}, "HTMLOUT");
 		setWebViewClient(new WebViewClient() {
 			@Override
 			public void onPageFinished(WebView view, String url) {
-				setScale(mScale);
+				//setScale(mScale);
 			}
 		});
+	}
+
+	class JsObject {
+		@JavascriptInterface
+		public void reportContentHeight(String value) {
+			mContentHeight = (int)Float.parseFloat(value);
+			mHandler.post(new Runnable() {
+				public void run() {
+					requestLayout();
+				}
+			});
+		}
 	}
 
 	private void requestHeight() {
@@ -64,9 +69,10 @@ public class MuPDFReflowView extends WebView implements MuPDFView {
 			}
 			@Override
 			protected void onPostExecute(byte[] result) {
-				String b64 = Base64.encodeToString(result, Base64.DEFAULT);
+				//String b64 = Base64.encodeToString(result, Base64.DEFAULT);
+				//loadData(b64, "text/html; charset=utf-8", "base64");
 				String s=new String(result);
-				loadData(b64, "text/html; charset=utf-8", "base64");
+				loadData(s, "text/html; charset=utf-8", null);
 			}
 		};
 		mLoadHTML.execute();

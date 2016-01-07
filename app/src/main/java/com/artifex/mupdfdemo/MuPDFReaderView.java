@@ -51,6 +51,7 @@ public class MuPDFReaderView extends AKReaderView {
         if (tapPageMargin > dm.widthPixels/5)
             tapPageMargin = dm.widthPixels/5;
         width=dm.widthPixels/5;		//TODO 修改垂直滚动锁定.
+		//Log.d(VIEW_LOG_TAG, "height:"+height+" y:"+e.getY()+" mMargin:"+mMargin);
     }
 
     public MuPDFReaderView(Context context) {
@@ -64,6 +65,10 @@ public class MuPDFReaderView extends AKReaderView {
 		super(context, attrs);
 		mContext = context;
 		setup();
+	}
+
+	public void setTapPageMargin(int tapPageMargin) {
+		this.tapPageMargin = tapPageMargin;
 	}
 
 	public boolean onSingleTapUp(MotionEvent e) {
@@ -95,11 +100,11 @@ public class MuPDFReaderView extends AKReaderView {
 							// Clicked on a remote (GoToR) link
 						}
 					});
-				} else if (e.getX() < tapPageMargin) {
+				} /*else if (e.getX() < tapPageMargin) {
 					super.smartMoveBackwards();
 				} else if (e.getX() > super.getWidth() - tapPageMargin) {
 					super.smartMoveForwards();
-				} else if (e.getY() < tapPageMargin) {
+				}*/ else if (e.getY() < tapPageMargin) {
 					super.smartMoveBackwards();
 				} else if (e.getY() > super.getHeight() - tapPageMargin) {
 					super.smartMoveForwards();

@@ -8,9 +8,8 @@
 
 # Version X+1: armeabi-v7a (Much faster due to the availability of hardware
 # FP, but cannot be run in the emulator).
-APP_PLATFORM=android-14
+APP_PLATFORM=android-8
 APP_ABI := armeabi-v7a
-APP_CFLAGS := -O3
 
 # Version X+2: x86 (Requires android-9, so a change needs to be made in
 # AndroidManifest.xml too)
@@ -48,4 +47,3 @@ endif
 
 # If the ndk is newer than r8c, try using clang.
 #NDK_TOOLCHAIN_VERSION=clang3.1
-#NDK_TOOLCHAIN_VERSION=arm-linux-androideabi-4.8

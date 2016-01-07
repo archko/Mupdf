@@ -442,7 +442,7 @@ public class PDFPagesProvider extends PagesProvider {
                 (int)size.x, (int)size.y,
                 tile.getX(), tile.getY(),
                 tile.getPrefXSize(), tile.getPrefYSize()));*/
-            pdf.drawPage3(b, tile.getPage(),
+            pdf.drawPage4Apv(b, tile.getPage(),
                 (int)size.x*tile.getZoom()/1000, (int)size.y*tile.getZoom()/1000,
                 tile.getX(), tile.getY(),
                 tile.getPrefXSize(), tile.getPrefYSize());
