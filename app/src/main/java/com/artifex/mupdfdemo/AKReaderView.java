@@ -228,7 +228,7 @@ public class AKReaderView
 			yOffset = smartAdvanceAmount(screenHeight, docHeight - bottom);
 		}
 		mScrollerLastX = mScrollerLastY = 0;
-		mScroller.startScroll(0, 0, remainingX - xOffset, remainingY - yOffset, 400);
+		mScroller.startScroll(0, 0, remainingX - xOffset, remainingY - yOffset, 500);
 		mStepper.prod();
 	}
 
@@ -303,7 +303,7 @@ public class AKReaderView
 			yOffset = -smartAdvanceAmount(screenHeight, top);
 		}
 		mScrollerLastX = mScrollerLastY = 0;
-		mScroller.startScroll(0, 0, remainingX - xOffset, remainingY - yOffset, 400);
+		mScroller.startScroll(0, 0, remainingX - xOffset, remainingY - yOffset, 500);
 		mStepper.prod();
 	}
 
@@ -862,7 +862,7 @@ public class AKReaderView
 		Point corr = getCorrection(getScrollBounds(v));
 		if (corr.x != 0 || corr.y != 0) {
 			mScrollerLastX = mScrollerLastY = 0;
-			mScroller.startScroll(0, 0, corr.x, corr.y, 400);
+			mScroller.startScroll(0, 0, corr.x, corr.y, 500);
 			mStepper.prod();
 		}
 	}

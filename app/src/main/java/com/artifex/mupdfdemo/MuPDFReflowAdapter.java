@@ -5,7 +5,7 @@ import android.graphics.Paint;
 import android.graphics.PointF;
 import android.graphics.RectF;
 import android.text.Html;
-import android.util.Log;
+import android.text.Spanned;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -55,7 +55,8 @@ public class MuPDFReflowAdapter extends BaseAdapter {
 		byte[] result=mCore.text(position);
 
 		String text =new String(result);
-		reflowView.setText(Html.fromHtml(text));
+        Spanned spanned=Html.fromHtml(text);
+		reflowView.setText(spanned);
 
 		return reflowView;
 	}
@@ -64,6 +65,7 @@ public class MuPDFReflowAdapter extends BaseAdapter {
 
 		Paint mPaint;
 		float mTextSize=16;
+		float mScale=1.0f;
 		MuPDFReflowAdapter mAdapter;
 
 		public PDFTextView(Context context, MuPDFReflowAdapter adapter) {
@@ -78,6 +80,7 @@ public class MuPDFReflowAdapter extends BaseAdapter {
 			setTextColor(context.getResources().getColor(R.color.text_reflow_color));
 			setBackgroundColor(context.getResources().getColor(R.color.text_reflow_bg_color));
 			setWidth(Util.getScreenWidthPixelWithOrientation(context));
+			setTextIsSelectable(true);
 		}
 
 		@Override
@@ -87,14 +90,18 @@ public class MuPDFReflowAdapter extends BaseAdapter {
 
 		@Override
 		public void setScale(float scale) {
-			if (scale>1){
-				if (scale>1.8) {
-					scale=1.8f;
+			if (scale != mScale) {
+				if (scale > 2f) {
+					scale = 2f;
 				}
+				if (scale < 0.5f) {
+					scale = 0.5f;
+				}
+				mScale = scale;
 				float textSize = mTextSize * scale;
 				mPaint.setTextSize(textSize);
 				setText(getText());
-				invalidate();
+				//invalidate();
 			}
 		}
 
