@@ -11,6 +11,13 @@
     <string name="menu_apv">用Apv方式打开</string>
     <string name="menu_mupdf">用Mupdf方式打开</string>
 	<string name="menu_other">用其它应用打开</string>
+	<string name="menu_info">查看文件信息</string>
+
+	<string name="label_filename">文件名:</string>
+	<string name="label_filesize">大小:</string>
+	<string name="label_read">上次阅读:</string>
+	<string name="label_lastmodified">上次更新:</string>
+	<string name="label_location">位置:</string>
 
 	<string name="about">关于</string>
 	<string name="goto_page">跳转到页…</string>

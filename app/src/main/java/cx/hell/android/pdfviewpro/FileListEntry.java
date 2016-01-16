@@ -4,8 +4,9 @@ import cn.archko.pdf.AKProgress;
 import cn.archko.pdf.AKRecent;
 
 import java.io.File;
+import java.io.Serializable;
 
-public class FileListEntry {
+public class FileListEntry implements Serializable{
 	private String label = null;
 	private  File file = null;
 	private boolean isDirectory = false;

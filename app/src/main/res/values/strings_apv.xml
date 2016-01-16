@@ -11,6 +11,13 @@
     <string name="menu_apv">Open with Apv</string>
     <string name="menu_mupdf">Open with Mupdf</string>
 	<string name="menu_other">Open with Other App</string>
+	<string name="menu_info">View File Info</string>
+
+	<string name="label_filename">FileName:</string>
+	<string name="label_filesize">FileSize:</string>
+	<string name="label_read">LastRead:</string>
+	<string name="label_lastmodified">LastModified:</string>
+	<string name="label_location">Location:</string>
 
 	<string name="about">About</string>
 	<string name="goto_page">Go to page…</string>
