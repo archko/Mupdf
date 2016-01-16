@@ -7,6 +7,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import cn.archko.pdf.utils.DateUtil;
+import cn.archko.pdf.utils.FileUtils;
 import cn.archko.pdf.utils.Util;
 import cx.hell.android.pdfviewpro.APVApplication;
 import cx.hell.android.pdfviewpro.Bookmark;
@@ -328,11 +329,8 @@ public class AKRecent implements Serializable {
         RecentManager recentManager=new RecentManager(APVApplication.getInstance());
         try {
             recentManager.open();
-            String sdcard=Environment.getExternalStorageDirectory().getPath();
-            String filepath=path;
-            if (path.contains(sdcard)) {
-                filepath=path.substring(sdcard.length());
-            }
+            String filepath= FileUtils.getRealPath(path);
+
             AKProgress progress=recentManager.getProgress(filepath);
             if (progress==null) {
                 progress=new AKProgress();
@@ -384,11 +382,8 @@ public class AKRecent implements Serializable {
 
         RecentManager recentManager=new RecentManager(APVApplication.getInstance());
         try {
-            String sdcard=Environment.getExternalStorageDirectory().getPath();
-            String filepath=path;
-            if (path.contains(sdcard)) {
-                filepath=path.substring(sdcard.length());
-            }
+            String filepath= FileUtils.getRealPath(path);
+
             recentManager.open();
             recentManager.deleteProgress(filepath);
         } catch (Exception e) {
@@ -417,11 +412,8 @@ public class AKRecent implements Serializable {
         AKProgress progress=null;
         RecentManager recentManager=new RecentManager(APVApplication.getInstance());
         try {
-            String sdcard=Environment.getExternalStorageDirectory().getPath();
-            String filepath=path;
-            if (path.contains(sdcard)) {
-                filepath=path.substring(sdcard.length());
-            }
+            String filepath= FileUtils.getRealPath(path);
+
             recentManager.open();
             progress=recentManager.getProgress(filepath);
         } catch (Exception e) {

@@ -1,5 +1,7 @@
 package cn.archko.pdf.utils;
 
+import android.os.Environment;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -41,6 +43,15 @@ public final class FileUtils {
     }
 
     private FileUtils() {
+    }
+
+    public static final String getRealPath(String path){
+        String sdcard= Environment.getExternalStorageDirectory().getPath();
+        String filepath=path;
+        if (path.contains(sdcard)) {
+            filepath=path.substring(sdcard.length());
+        }
+        return filepath;
     }
 
     public static final String getFileSize(final long size) {

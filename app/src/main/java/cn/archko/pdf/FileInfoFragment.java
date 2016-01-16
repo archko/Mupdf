@@ -17,7 +17,9 @@ import java.io.File;
 import java.math.BigDecimal;
 
 import cn.archko.pdf.utils.DateUtil;
+import cn.archko.pdf.utils.FileUtils;
 import cn.archko.pdf.utils.Util;
+import cx.hell.android.pdfviewpro.APVApplication;
 import cx.hell.android.pdfviewpro.FileListEntry;
 
 /**
@@ -93,17 +95,34 @@ public class FileInfoFragment extends DialogFragment {
 
         AKProgress progress = mEntry.getAkProgress();
         if (null == progress) {
-            mLastReadLayout.setVisibility(View.GONE);
+            RecentManager recentManager = new RecentManager(APVApplication.getInstance());
+            try {
+                recentManager.open();
+                progress = recentManager.getProgress(FileUtils.getRealPath(file.getAbsolutePath()));
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                recentManager.close();
+            }
+            if (null != progress) {
+                showProgress(progress);
+            } else {
+                mLastReadLayout.setVisibility(View.GONE);
+            }
         } else {
             mLastReadLayout.setVisibility(View.VISIBLE);
-            String text = DateUtil.formatTime(progress.timestampe, DateUtil.TIME_FORMAT_TWO);
-            float percent = progress.page * 100f / progress.numberOfPages;
-            BigDecimal b = new BigDecimal(percent);
-            text += "       " + b.setScale(2, BigDecimal.ROUND_HALF_UP).floatValue() + "%";
-            mLastRead.setText(text);
-            mProgressBar.setMax(progress.numberOfPages);
-            mProgressBar.setProgress(progress.page);
+            showProgress(progress);
         }
         mLastModified.setText(DateUtil.formatTime(file.lastModified(), DateUtil.TIME_FORMAT_TWO));
+    }
+
+    private void showProgress(AKProgress progress) {
+        String text = DateUtil.formatTime(progress.timestampe, DateUtil.TIME_FORMAT_TWO);
+        float percent = progress.page * 100f / progress.numberOfPages;
+        BigDecimal b = new BigDecimal(percent);
+        text += "       " + b.setScale(2, BigDecimal.ROUND_HALF_UP).floatValue() + "%";
+        mLastRead.setText(text);
+        mProgressBar.setMax(progress.numberOfPages);
+        mProgressBar.setProgress(progress.page);
     }
 }
