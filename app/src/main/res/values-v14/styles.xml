@@ -8,4 +8,8 @@
 
     <style name="AppTheme" parent="android:Theme.Holo">
     </style>
+
+    <style name="AppDialogTheme" parent="@android:style/Theme.Holo">
+        <item name="android:windowBackground">@drawable/tiled_background</item>
+    </style>
 </resources>

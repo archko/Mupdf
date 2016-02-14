@@ -50,8 +50,6 @@ public class HistoryFragment extends BrowserFragment implements AbsListView.OnSc
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        menu.clear();
         this.optionsMenuItem=menu.add(R.string.options);
         MenuItemCompat.setShowAsAction(this.optionsMenuItem, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
         backMenuItem=menu.add(R.string.options_back);

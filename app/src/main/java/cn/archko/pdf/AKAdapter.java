@@ -21,6 +21,7 @@ public class AKAdapter extends BaseAdapter {
 
     public static final int TYPE_FILE=0;
     public static final int TYPE_RENCENT=1;
+    public static final int TYPE_SEARCH=2;
 
     ArrayList<FileListEntry> mData;
     Context mContext;
@@ -56,27 +57,43 @@ public class AKAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        ViewHolder viewHolder;
+    public int getItemViewType(int position) {
+        return mMode;
+    }
 
-        if (convertView==null) {
-            convertView=View.inflate(mContext, R.layout.picker_entry, null);
-            viewHolder=new ViewHolder();
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+        ViewHolder viewHolder = null;
+
+        int type = getItemViewType(position);
+        if (convertView == null) {
+            viewHolder = new ViewHolder();
+            switch (type) {
+                case TYPE_FILE:
+                    convertView = View.inflate(mContext, R.layout.picker_entry, null);
+                    break;
+                case TYPE_RENCENT:
+                    convertView = View.inflate(mContext, R.layout.picker_entry_history, null);
+                    viewHolder.mProgressBar = (ProgressBar) convertView.findViewById(R.id.progressbar);
+                    break;
+                case TYPE_SEARCH:
+                    convertView = View.inflate(mContext, R.layout.picker_entry_search, null);
+                    viewHolder.mPath= (TextView) convertView.findViewById(R.id.fullpath);
+                    break;
+            }
+
+            viewHolder.mIcon = (ImageView) convertView.findViewById(R.id.icon);
+            viewHolder.mName = (TextView) convertView.findViewById(R.id.name);
+            viewHolder.mSize = (TextView) convertView.findViewById(R.id.size);
             convertView.setTag(viewHolder);
         } else {
-            viewHolder=(ViewHolder) convertView.getTag();
+            viewHolder = (ViewHolder) convertView.getTag();
         }
 
         FileListEntry entry=mData.get(position);
 
-        viewHolder.mIcon=(ImageView) convertView.findViewById(R.id.icon);
-        viewHolder.mName=(TextView) convertView.findViewById(R.id.name);
-        viewHolder.mProgressBar=(ProgressBar) convertView.findViewById(R.id.progressbar);
-        viewHolder.mSize=(TextView) convertView.findViewById(R.id.size);
 
-        if (mMode==TYPE_FILE) {
-            viewHolder.mProgressBar.setVisibility(View.GONE);
-        } else {
+        if (type==TYPE_RENCENT) {
             AKProgress progress=entry.getAkProgress();
             if (null!=progress) {
                 viewHolder.mProgressBar.setVisibility(View.VISIBLE);
@@ -85,6 +102,8 @@ public class AKAdapter extends BaseAdapter {
             } else {
                 viewHolder.mProgressBar.setVisibility(View.GONE);
             }
+        } else if (type == TYPE_SEARCH) {
+            viewHolder.mPath.setText(entry.getFile().getAbsolutePath());
         }
 
         if (entry.getType()==FileListEntry.HOME) {
@@ -116,5 +135,6 @@ public class AKAdapter extends BaseAdapter {
         ImageView mIcon;
         ProgressBar mProgressBar;
         TextView mSize;
+        TextView mPath;
     }
 }

@@ -35,6 +35,7 @@
 	<string name="toggle_fine_zoom">Toggle fine zoom</string>
 	<string name="set_as_home">Set as home</string>
 	<string name="go_home">Home</string>
+	<string name="menu_search">Search</string>
 	<!--<string name="cancel">Cancel</string>-->
 	<string name="searching_for">Searching for "%1$s"</string>
 	<string name="page_of">Page %1$d of %2$d</string>

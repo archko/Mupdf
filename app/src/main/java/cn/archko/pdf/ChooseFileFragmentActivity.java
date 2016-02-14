@@ -9,9 +9,13 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.util.SparseArray;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
@@ -50,6 +54,7 @@ public class ChooseFileFragmentActivity extends FragmentActivity {
      * above, but is designed to give continuous feedback to the user when scrolling.
      */
     protected SlidingTabLayout mSlidingTabLayout;
+    private MenuItem searchMenuItem;
 
     /**
      * This class represents a tab to be displayed by {@link android.support.v4.view.ViewPager} and it's associated
@@ -232,6 +237,38 @@ public class ChooseFileFragmentActivity extends FragmentActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        boolean flag= super.onCreateOptionsMenu(menu);
+        this.searchMenuItem = menu.add(R.string.menu_search);
+        MenuItemCompat.setShowAsAction(this.searchMenuItem, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
+        return flag;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem menuItem) {
+        if (menuItem == this.searchMenuItem) {
+            showSearchDialog();
+        }
+        return super.onOptionsItemSelected(menuItem);
+    }
+
+
+    protected void showSearchDialog() {
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        Fragment prev = getSupportFragmentManager().findFragmentByTag("dialog");
+        if (prev != null) {
+            ft.remove(prev);
+        }
+        ft.addToBackStack(null);
+
+        // Create and show the dialog.
+        SearchFragment fileInfoFragment = new SearchFragment();
+        Bundle bundle = new Bundle();
+        fileInfoFragment.setArguments(bundle);
+        fileInfoFragment.show(ft, "dialog");
     }
 
     /**
