@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -30,7 +32,8 @@ import cx.hell.android.pdfviewpro.FileListEntry;
 /**
  * @author: archko 2016/2/14 :15:58
  */
-public class SearchFragment extends DialogFragment implements AdapterView.OnItemClickListener {
+public class SearchFragment extends DialogFragment implements AdapterView.OnItemClickListener,
+        AdapterView.OnItemLongClickListener {
 
     EditText editView;
     ListView filesListView;
@@ -123,8 +126,9 @@ public class SearchFragment extends DialogFragment implements AdapterView.OnItem
             fileListAdapter = new AKAdapter(activity);
             this.fileListAdapter.setMode(AKAdapter.TYPE_SEARCH);
         }
-        this.filesListView.setAdapter(this.fileListAdapter);
-        this.filesListView.setOnItemClickListener(this);
+        filesListView.setAdapter(this.fileListAdapter);
+        filesListView.setOnItemClickListener(this);
+        filesListView.setOnItemLongClickListener(this);
     }
 
     public void updateAdapter() {
@@ -187,23 +191,20 @@ public class SearchFragment extends DialogFragment implements AdapterView.OnItem
 
     @Override
     public void onItemClick(AdapterView parent, View v, int position, long id) {
-        FileListEntry clickedEntry = this.fileList.get(position);
-        File clickedFile;
-
-        if (clickedEntry.getType() == FileListEntry.HOME) {
-            clickedFile = new File(getHome());
-        } else {
-            clickedFile = clickedEntry.getFile();
-        }
+        FileListEntry clickedEntry = (FileListEntry) this.fileListAdapter.getItem(position);
+        File clickedFile = clickedEntry.getFile();
 
         if (null == clickedFile || !clickedFile.exists())
             return;
 
-        if (clickedFile.isDirectory()) {
+        pdfView(clickedFile);
+    }
 
-        } else {
-            pdfView(clickedFile);
-        }
+    @Override
+    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+        FileListEntry entry = (FileListEntry) this.fileListAdapter.getItem(position);
+        showFileInfoDialog(entry);
+        return false;
     }
 
     public void pdfView(File f) {
@@ -215,5 +216,21 @@ public class SearchFragment extends DialogFragment implements AdapterView.OnItem
         intent.setClass(getActivity(), PdfViewerActivity.class);
         intent.setAction("android.intent.action.VIEW");
         getActivity().startActivity(intent);
+    }
+
+    protected void showFileInfoDialog(FileListEntry entry) {
+        FragmentTransaction ft=getActivity().getSupportFragmentManager().beginTransaction();
+        Fragment prev=getActivity().getSupportFragmentManager().findFragmentByTag("dialog");
+        if (prev!=null) {
+            ft.remove(prev);
+        }
+        ft.addToBackStack(null);
+
+        // Create and show the dialog.
+        FileInfoFragment fileInfoFragment=new FileInfoFragment();
+        Bundle bundle=new Bundle();
+        bundle.putSerializable(FileInfoFragment.FILE_LIST_ENTRY, entry);
+        fileInfoFragment.setArguments(bundle);
+        fileInfoFragment.show(ft, "dialog");
     }
 }
