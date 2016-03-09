@@ -24,6 +24,8 @@ import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.LinearLayout;
 import android.widget.OverScroller;
+
+import cn.archko.pdf.Flinger;
 import cx.hell.android.pdfviewpro.Actions;
 import cx.hell.android.pdfviewpro.AndroidReflections;
 import cx.hell.android.pdfviewpro.Bookmark;
@@ -200,7 +202,7 @@ public class PagesView extends View implements
     boolean onlyDrawPagenumber=false;
     float dpi=160;
     private final Paint bitmapPaint=new Paint();
-    private final OverScroller mScroller;
+    private final Flinger mScroller;
     private RectF viewRect;
 
     public PagesView(Activity activity) {
@@ -234,7 +236,7 @@ public class PagesView extends View implements
         this.mtZoomActive=false;
         this.mtDebounce=0;
 
-        mScroller=new OverScroller(activity, new AccelerateDecelerateInterpolator());
+        mScroller=new Flinger();
         this.gestureDetector=new GestureDetector(activity,
             new GestureDetector.OnGestureListener() {
                 public boolean onDown(MotionEvent e) {
@@ -1808,7 +1810,7 @@ public class PagesView extends View implements
         }
 
         public void fling(int startX, int startY, int velocityX, int velocityY, int minX, int maxX, int minY, int maxY) {
-            mScroller.fling(startX, startY, velocityX, velocityY, minX, maxX, minY, maxY, 0, 0);
+            mScroller.fling(startX, startY, velocityX, velocityY, minX, maxX, minY, maxY);
         }
 
         @Override
