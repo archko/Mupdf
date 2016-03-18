@@ -14,7 +14,9 @@ public class MuPDFCore
 	/* load our native library */
 	private static boolean gs_so_available = false;
 	static {
-		System.loadLibrary("mupdf");
+		System.out.println("Loading dll");
+		System.loadLibrary("mupdf_java");
+		System.out.println("Loaded dll");
 		if (gprfSupportedInternal())
 		{
 			try {

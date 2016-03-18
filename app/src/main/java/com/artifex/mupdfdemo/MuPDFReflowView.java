@@ -8,7 +8,6 @@ import android.os.Handler;
 import android.util.Base64;
 import android.view.MotionEvent;
 import android.view.View;
-import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -29,26 +28,22 @@ public class MuPDFReflowView extends WebView implements MuPDFView {
 		mScale = 1.0f;
 		mContentHeight = parentSize.y;
 		getSettings().setJavaScriptEnabled(true);
-		addJavascriptInterface(new JsObject(){
+		addJavascriptInterface(new Object(){
+			public void reportContentHeight(String value) {
+				mContentHeight = (int)Float.parseFloat(value);
+				mHandler.post(new Runnable() {
+					public void run() {
+						requestLayout();
+					}
+				});
+			}
 		}, "HTMLOUT");
 		setWebViewClient(new WebViewClient() {
 			@Override
 			public void onPageFinished(WebView view, String url) {
-				//setScale(mScale);
+				setScale(mScale);
 			}
 		});
-	}
-
-	class JsObject {
-		@JavascriptInterface
-		public void reportContentHeight(String value) {
-			mContentHeight = (int)Float.parseFloat(value);
-			mHandler.post(new Runnable() {
-				public void run() {
-					requestLayout();
-				}
-			});
-		}
 	}
 
 	private void requestHeight() {

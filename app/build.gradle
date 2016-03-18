@@ -4,12 +4,14 @@ android {
         debug {
             keyAlias 'mupdf_release_key'
             storeFile file('D:/Projects/PDF/Mupdf/mupdf_release_key.jks')
-
+            keyPassword 'Abc123456'
+            storePassword 'Abc123456'
         }
         release {
             keyAlias 'mupdf_release_key'
             storeFile file('D:/Projects/PDF/Mupdf/mupdf_release_key.jks')
-
+            keyPassword 'Abc123456'
+            storePassword 'Abc123456'
         }
     }
     compileSdkVersion 23
@@ -18,8 +20,8 @@ android {
         applicationId 'cn.archko.mupdf'
         minSdkVersion 14
         targetSdkVersion 23
-        versionCode 50
-        versionName '1.8'
+        versionCode 70
+        versionName '1.9'
         signingConfig signingConfigs.debug
     }
 
@@ -27,14 +29,12 @@ android {
         debug {
             signingConfig signingConfigs.release
             buildConfigField "Boolean", "tv", "false"
-            buildConfigField "String", "FLAVOR_target", "\"chrome\""
-            jniDebuggable false
+            jniDebuggable true
         }
         release {
             signingConfig signingConfigs.release
             minifyEnabled false
             buildConfigField "Boolean", "tv", "false"
-            buildConfigField "String", "FLAVOR_target", "\"chrome\""
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
