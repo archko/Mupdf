@@ -1801,6 +1801,89 @@ JNI_FN(MuPDFCore_textAsHtml)(JNIEnv * env, jobject thiz)
 	return bArray;
 }
 
+JNIEXPORT jbyteArray JNICALL
+JNI_FN(MuPDFCore_textAsText)(JNIEnv * env, jobject thiz)
+{
+	fz_stext_sheet *sheet = NULL;
+	fz_stext_page *text = NULL;
+	fz_device *dev = NULL;
+	fz_matrix ctm;
+	globals *glo = get_globals(env, thiz);
+	fz_context *ctx = glo->ctx;
+	fz_document *doc = glo->doc;
+	page_cache *pc = &glo->pages[glo->current];
+	jbyteArray bArray = NULL;
+	fz_buffer *buf = NULL;
+	fz_output *out = NULL;
+
+	fz_var(sheet);
+	fz_var(text);
+	fz_var(dev);
+	fz_var(buf);
+	fz_var(out);
+
+	fz_try(ctx)
+	{
+		int b, l, s, c;
+
+		ctm = fz_identity;
+		sheet = fz_new_stext_sheet(ctx);
+		text = fz_new_stext_page(ctx);
+		dev = fz_new_stext_device(ctx, sheet, text);
+		fz_run_page(ctx, pc->page, dev, &ctm, NULL);
+		fz_drop_device(ctx, dev);
+		dev = NULL;
+
+		fz_analyze_text(ctx, sheet, text);
+
+		buf = fz_new_buffer(ctx, 256);
+		out = fz_new_output_with_buffer(ctx, buf);
+		//fz_printf(ctx, out, "<html>\n");
+		//fz_printf(ctx, out, "<style>\n");
+		//fz_printf(ctx, out, "body{margin:0;}\n");
+		//fz_printf(ctx, out, "div.page{background-color:white;}\n");
+		//fz_printf(ctx, out, "div.block{margin:0pt;padding:0pt;}\n");
+		//fz_printf(ctx, out, "div.metaline{display:table;width:100%%}\n");
+		//fz_printf(ctx, out, "div.line{display:table-row;}\n");
+		//fz_printf(ctx, out, "div.cell{display:table-cell;padding-left:0.25em;padding-right:0.25em}\n");
+		////fz_printf(ctx, out, "p{margin:0;padding:0;}\n");
+		//fz_printf(ctx, out, "</style>\n");
+		//fz_printf(ctx, out, "<body style=\"margin:0\"><div style=\"padding:10px\" id=\"content\">");
+		fz_print_stext_page_html(ctx, out, text);
+		//fz_printf(ctx, out, "</div></body>\n");
+		//fz_printf(ctx, out, "<style>\n");
+		//fz_print_stext_sheet(ctx, out, sheet);
+		//fz_printf(ctx, out, "</style>\n</html>\n");
+		fz_drop_output(ctx, out);
+		out = NULL;
+
+		bArray = (*env)->NewByteArray(env, buf->len);
+		if (bArray == NULL)
+			fz_throw(ctx, FZ_ERROR_GENERIC, "Failed to make byteArray");
+		(*env)->SetByteArrayRegion(env, bArray, 0, buf->len, buf->data);
+
+	}
+	fz_always(ctx)
+	{
+		fz_drop_stext_page(ctx, text);
+		fz_drop_stext_sheet(ctx, sheet);
+		fz_drop_device(ctx, dev);
+		fz_drop_output(ctx, out);
+		fz_drop_buffer(ctx, buf);
+	}
+	fz_catch(ctx)
+	{
+		jclass cls = (*env)->FindClass(env, "java/lang/OutOfMemoryError");
+		if (cls != NULL)
+			(*env)->ThrowNew(env, cls, "Out of memory in MuPDFCore_textAsHtml");
+		(*env)->DeleteLocalRef(env, cls);
+
+		return NULL;
+	}
+
+	return bArray;
+}
+
 JNIEXPORT void JNICALL
 JNI_FN(MuPDFCore_addMarkupAnnotationInternal)(JNIEnv * env, jobject thiz, jobjectArray points, fz_annot_type type)
 {
