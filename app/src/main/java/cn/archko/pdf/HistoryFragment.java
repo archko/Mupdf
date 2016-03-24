@@ -70,6 +70,7 @@ public class HistoryFragment extends BrowserFragment implements AbsListView.OnSc
 
     private void backup() {
         final ProgressDialog progressDialog=new ProgressDialog(getActivity());
+        progressDialog.setTitle("Waiting...");
         final long now=System.currentTimeMillis();
         Util.execute(true, new AsyncTask<Void, Void, String>() {
             @Override
@@ -115,6 +116,7 @@ public class HistoryFragment extends BrowserFragment implements AbsListView.OnSc
 
     private void restore() {
         final ProgressDialog progressDialog=new ProgressDialog(getActivity());
+        progressDialog.setTitle("Waiting...");
         final long now=System.currentTimeMillis();
         Util.execute(true, new AsyncTask<Void, Void, Boolean>() {
             @Override

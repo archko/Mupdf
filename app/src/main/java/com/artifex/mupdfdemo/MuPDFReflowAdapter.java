@@ -73,10 +73,10 @@ public class MuPDFReflowAdapter extends BaseAdapter {
 			mAdapter=adapter;
 			mPaint = getPaint();
 			mTextSize = mPaint.getTextSize();
-			mPaint.setTextSize(mTextSize * 1.3f);
+			mPaint.setTextSize(mTextSize * 1.4f);
 			//setTextSize(getTextSize()*1.1f);
-			setPadding(20, 20, 20, 20);
-			setLineSpacing(0, 1.3f);
+			setPadding(40, 50, 40, 30);
+			setLineSpacing(0, 1.4f);
 			setTextColor(context.getResources().getColor(R.color.text_reflow_color));
 			setBackgroundColor(context.getResources().getColor(R.color.text_reflow_bg_color));
 			setWidth(Util.getScreenWidthPixelWithOrientation(context));
@@ -91,8 +91,8 @@ public class MuPDFReflowAdapter extends BaseAdapter {
 		@Override
 		public void setScale(float scale) {
 			if (scale != mScale) {
-				if (scale > 2f) {
-					scale = 2f;
+				if (scale > 2.5f) {
+					scale = 2.5f;
 				}
 				if (scale < 0.5f) {
 					scale = 0.5f;

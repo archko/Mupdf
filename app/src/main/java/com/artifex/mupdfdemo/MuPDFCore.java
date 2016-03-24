@@ -436,7 +436,7 @@ public class MuPDFCore
 	}
 
 	public static boolean gprfSupported() {
-		if (gs_so_available == false)
+		if (!gs_so_available)
 			return false;
 		return gprfSupportedInternal();
 	}
