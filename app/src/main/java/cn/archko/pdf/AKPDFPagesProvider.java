@@ -9,7 +9,9 @@ import android.os.Message;
 import android.support.v4.util.LruCache;
 import android.util.Log;
 import android.view.WindowManager;
+
 import com.artifex.mupdfdemo.MuPDFCore;
+
 import cx.hell.android.lib.pagesview.OnImageRenderedListener;
 import cx.hell.android.lib.pagesview.PagesProvider;
 import cx.hell.android.lib.pagesview.PagesView;
@@ -18,13 +20,11 @@ import cx.hell.android.lib.pagesview.Tile;
 import cx.hell.android.pdfviewpro.APVApplication;
 import cx.hell.android.pdfviewpro.BitmapCache;
 
-import java.lang.ref.SoftReference;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
