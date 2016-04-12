@@ -54,14 +54,14 @@ import cn.archko.pdf.AKPDFPagesProvider;
 import cn.archko.pdf.AKProgress;
 import cn.archko.pdf.AKRecent;
 import cn.archko.pdf.DataListener;
-import com.artifex.mupdfdemo.AKChoosePDFActivity;
-import com.artifex.mupdfdemo.MuPDFCore;
-import com.artifex.mupdfdemo.AKOutlineActivity;
+import com.artifex.mupdfdemo.ChoosePDFActivity;
+import com.artifex.mupdfdemo.OutlineActivity;
 import com.artifex.mupdfdemo.OutlineActivityData;
 import com.artifex.mupdfdemo.OutlineItem;
 import cx.hell.android.lib.pagesview.PagesProvider;
 import cx.hell.android.lib.pagesview.PagesView;
 
+import com.artifex.mupdfdemo.MuPDFCore;
 import cn.archko.pdf.R;
 
 // #ifdef pro
@@ -757,7 +757,7 @@ public class OpenFileActivity extends Activity implements SensorEventListener {
     	} else if (menuItem == this.clearFindTextMenuItem) {
     		this.clearFind();
     	} else if (menuItem == this.chooseFileMenuItem) {
-    		startActivity(new Intent(this, AKChoosePDFActivity.class));
+    		startActivity(new Intent(this, ChoosePDFActivity.class));
     		//startActivity(new Intent(this, ChooseFileFragmentActivity.class));
     	} else if (menuItem == this.optionsMenuItem) {
     		startActivity(new Intent(this, Options.class));
@@ -772,7 +772,7 @@ public class OpenFileActivity extends Activity implements SensorEventListener {
             OutlineItem outline[] = pdf.getOutline();
             if (outline != null) {
                 OutlineActivityData.get().items = outline;
-                Intent intent = new Intent(OpenFileActivity.this, AKOutlineActivity.class);
+                Intent intent = new Intent(OpenFileActivity.this, OutlineActivity.class);
 				intent.putExtra("cp", pagesView.getCurrentPage());
                 startActivityForResult(intent, OUTLINE_REQUEST);
             }
@@ -1184,7 +1184,7 @@ public class OpenFileActivity extends Activity implements SensorEventListener {
         } else if (menuItem == this.clearFindTextMenuItem) {
             this.clearFind();
         } else if (menuItem == this.chooseFileMenuItem) {
-            startActivity(new Intent(this, AKChoosePDFActivity.class));
+            startActivity(new Intent(this, ChoosePDFActivity.class));
         	//startActivity(new Intent(this, ChooseFileFragmentActivity.class));        	
         } else if (menuItem == this.optionsMenuItem) {
             startActivity(new Intent(this, Options.class));

@@ -23,7 +23,7 @@
         android:theme="@style/AppBaseTheme"
 		android:hardwareAccelerated="true">
 		<activity
-			android:name="com.artifex.mupdfdemo.AKChoosePDFActivity"
+			android:name="com.artifex.mupdfdemo.ChoosePDFActivity"
 			android:configChanges="orientation|keyboardHidden|screenSize"
 			android:label="@string/app_name">
 			<intent-filter>
@@ -41,7 +41,7 @@
             </intent-filter>
         </activity>
 		<activity
-			android:name="com.artifex.mupdfdemo.AKMuPDFActivity" android:theme="@style/AppFullscreen"
+			android:name="com.artifex.mupdfdemo.MuPDFActivity" android:theme="@style/AppFullscreen"
 			android:configChanges="orientation|keyboardHidden|screenSize"
 			android:label="@string/app_name">
 			<!--<intent-filter>
@@ -226,7 +226,7 @@
 			</intent-filter>
         </activity>
 		<activity
-			android:name="com.artifex.mupdfdemo.AKOutlineActivity"
+			android:name="com.artifex.mupdfdemo.OutlineActivity"
 			android:configChanges="orientation|keyboardHidden|screenSize"
 			android:theme="@style/AppTheme"
 			android:label="@string/outline_title">
@@ -237,26 +237,5 @@
 			android:theme="@style/AppFullscreen"
 			android:label="@string/print">
 		</activity>
-
-		<!--<activity android:name="com.artifex.mupdf.example.MainActivity" android:icon="@drawable/action_close_normal">
-			<intent-filter>
-				<action android:name="android.intent.action.MAIN" />
-				<category android:name="android.intent.category.LAUNCHER" />
-			</intent-filter>
-		</activity>
-
-		<activity
-			android:name="com.artifex.mupdf.example.ChooseDocActivity"
-			android:configChanges="orientation|keyboardHidden|screenSize"
-			android:label="@string/app_name"
-			android:theme="@android:style/Theme.Light">
-			<intent-filter>
-				<action android:name="android.intent.action.VIEW" />
-				<category android:name="android.intent.category.DEFAULT" />
-			</intent-filter>
-		</activity>
-
-		<activity android:name="com.artifex.mupdf.example.DocViewActivity">
-		</activity>-->
 	</application>
 </manifest> 

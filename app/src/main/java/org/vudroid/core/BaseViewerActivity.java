@@ -28,7 +28,7 @@ import android.widget.Toast;
 import cn.archko.pdf.AKProgress;
 import cn.archko.pdf.AKRecent;
 import cn.archko.pdf.DataListener;
-import com.artifex.mupdfdemo.AKOutlineActivity;
+import com.artifex.mupdfdemo.OutlineActivity;
 import com.artifex.mupdfdemo.OutlineActivityData;
 import cn.archko.pdf.R;
 import cx.hell.android.pdfviewpro.Bookmark;
@@ -270,7 +270,7 @@ public abstract class BaseViewerActivity extends Activity implements DecodingPro
             }
             case MENU_OUTLINE:{
                 if (OutlineActivityData.get().items!=null) {
-                    Intent intent=new Intent(this, AKOutlineActivity.class);
+                    Intent intent=new Intent(this, OutlineActivity.class);
                     intent.putExtra("cp", documentView.getCurrentPage());
                     startActivityForResult(intent, OUTLINE_REQUEST);
                 }

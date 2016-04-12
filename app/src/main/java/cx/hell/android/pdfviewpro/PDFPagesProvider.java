@@ -8,13 +8,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import com.artifex.mupdfdemo.MuPDFCore;
+
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.PointF;
 import android.util.Log;
-
-import com.artifex.mupdfdemo.MuPDFCore;
-
 import cx.hell.android.lib.pagesview.OnImageRenderedListener;
 import cx.hell.android.lib.pagesview.PagesProvider;
 import cx.hell.android.lib.pagesview.RenderingException;
