@@ -10,7 +10,6 @@ public class APVApplication extends Application {
     private final static String TAG = "cx.hell.android.pdfviewpro";
 
     private static final int CPU_COUNT = Runtime.getRuntime().availableProcessors();
-    public boolean hasChanged=false;
     private static APVApplication mInstance=null;
 
     int threadCount=2;

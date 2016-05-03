@@ -337,7 +337,7 @@ public class ChooseFileFragmentActivity extends FragmentActivity {
         @Override
         public void onPageSelected(int position) {
             mViewPager.setCurrentItem(position);
-            if (position == 0) {
+            /*if (position == 0) {
                 APVApplication apvApplication = APVApplication.getInstance();
                 if (apvApplication.hasChanged) {
                     delayUpdate(position);
@@ -345,7 +345,7 @@ public class ChooseFileFragmentActivity extends FragmentActivity {
                 }
             } else if (position == 2) {
                 delayUpdate(position);
-            }
+            }*/
         }
 
         @Override

@@ -23,6 +23,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.support.v4.content.LocalBroadcastManager;
 import android.text.Html;
 import android.text.InputType;
 import android.util.DisplayMetrics;
@@ -58,6 +59,8 @@ import com.artifex.mupdfdemo.ChoosePDFActivity;
 import com.artifex.mupdfdemo.OutlineActivity;
 import com.artifex.mupdfdemo.OutlineActivityData;
 import com.artifex.mupdfdemo.OutlineItem;
+
+import cn.archko.pdf.HistoryFragment;
 import cx.hell.android.lib.pagesview.PagesProvider;
 import cx.hell.android.lib.pagesview.PagesView;
 
@@ -497,6 +500,7 @@ public class OpenFileActivity extends Activity implements SensorEventListener {
             this.pdf.onDestroy();//freeMemory(); /* gc is too slow, code must make sure double free is not possible */
         }
         System.gc();
+		LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(HistoryFragment.ACTION_STOPPED));
 	}
 
     /**
@@ -620,8 +624,6 @@ public class OpenFileActivity extends Activity implements SensorEventListener {
 				/*Recent recent = new Recent(this);
 				recent.add(0, filePath);
 				recent.commit();*/
-				APVApplication apvApplication=APVApplication.getInstance();
-				apvApplication.hasChanged=true;
 			}
 			return new MuPDFCore(OpenFileActivity.this, filePath);//new MuPDFCore(new File(filePath), this.box);
     	} else if (uri.getScheme().equals("content")) {

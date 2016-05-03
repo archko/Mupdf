@@ -1,9 +1,14 @@
 package cn.archko.pdf;
 
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.MenuItemCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -38,10 +43,41 @@ public class HistoryFragment extends BrowserFragment implements AbsListView.OnSc
     int curPage=-1;
     int totalPage=0;
     static final int PAGE_SIZE=15;
+    public static final String ACTION_STARTED = "com.example.android.supportv4.STARTED";
+    public static final String ACTION_UPDATE = "com.example.android.supportv4.UPDATE";
+    public static final String ACTION_STOPPED = "com.example.android.supportv4.STOPPED";
+    LocalBroadcastManager mLocalBroadcastManager;
+    BroadcastReceiver mReceiver;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mLocalBroadcastManager = LocalBroadcastManager.getInstance(getActivity());
+
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(ACTION_STARTED);
+        filter.addAction(ACTION_UPDATE);
+        filter.addAction(ACTION_STOPPED);
+        mReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (intent.getAction().equals(ACTION_STARTED)) {
+                    Log.d(TAG, "STARTED");
+                } else if (intent.getAction().equals(ACTION_UPDATE)) {
+                    Log.d(TAG, "Got update: " + intent.getIntExtra("value", 0));
+                } else if (intent.getAction().equals(ACTION_STOPPED)) {
+                    Log.d(TAG, "STOPPED");
+                    update();
+                }
+            }
+        };
+        mLocalBroadcastManager.registerReceiver(mReceiver, filter);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mLocalBroadcastManager.unregisterReceiver(mReceiver);
     }
 
     public boolean onBackPressed() {
@@ -71,6 +107,7 @@ public class HistoryFragment extends BrowserFragment implements AbsListView.OnSc
     private void backup() {
         final ProgressDialog progressDialog=new ProgressDialog(getActivity());
         progressDialog.setTitle("Waiting...");
+        progressDialog.setMessage("Waiting...");
         final long now=System.currentTimeMillis();
         Util.execute(true, new AsyncTask<Void, Void, String>() {
             @Override
@@ -117,6 +154,7 @@ public class HistoryFragment extends BrowserFragment implements AbsListView.OnSc
     private void restore() {
         final ProgressDialog progressDialog=new ProgressDialog(getActivity());
         progressDialog.setTitle("Waiting...");
+        progressDialog.setMessage("Waiting...");
         final long now=System.currentTimeMillis();
         Util.execute(true, new AsyncTask<Void, Void, Boolean>() {
             @Override

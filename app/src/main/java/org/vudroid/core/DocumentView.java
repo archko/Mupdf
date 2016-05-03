@@ -60,7 +60,7 @@ public class DocumentView extends View implements ZoomListener {
         setFocusable(true);
         setFocusableInTouchMode(true);
         initMultiTouchZoomIfAvailable(zoomModel);
-        mGestureDetector = new GestureDetector(new MySimpleOnGestureListener());
+        mGestureDetector = new GestureDetector(context, new MySimpleOnGestureListener());
     }
 
     private void initMultiTouchZoomIfAvailable(ZoomModel zoomModel) {
