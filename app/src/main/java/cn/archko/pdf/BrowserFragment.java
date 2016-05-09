@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
@@ -73,6 +74,7 @@ public class BrowserFragment extends RefreshableFragment implements OnItemClickL
 	protected static final int vudroidContextMenuItem=Menu.FIRST+112;
 	protected static final int otherContextMenuItem=Menu.FIRST+113;
 	protected static final int infoContextMenuItem=Menu.FIRST+114;
+	protected static final int LPDFContextMenuItem=Menu.FIRST+115;
 
     protected MenuItem backMenuItem = null;
     protected MenuItem restoreMenuItem = null;
@@ -401,6 +403,9 @@ public class BrowserFragment extends RefreshableFragment implements OnItemClickL
 			menuBuilder.getMenu().add(0, mupdfContextMenuItem, 0, getString(R.string.menu_mupdf));
 			menuBuilder.getMenu().add(0, otherContextMenuItem, 0, getString(R.string.menu_other));
 			menuBuilder.getMenu().add(0, infoContextMenuItem, 0, getString(R.string.menu_info));
+			if (Build.VERSION_CODES.LOLLIPOP <= Build.VERSION.SDK_INT) {
+				menuBuilder.getMenu().add(0, LPDFContextMenuItem, 0, "LOLLIPOP_PDF_Viewer");
+			}
 
 			menuBuilder.getMenu().add(0, removeContextMenuItem, 0, getString(R.string.remove_from_recent));
 		} else if (! entry.isDirectory()&&entry.getType() != FileListEntry.HOME) {
@@ -409,6 +414,9 @@ public class BrowserFragment extends RefreshableFragment implements OnItemClickL
 			menuBuilder.getMenu().add(0, mupdfContextMenuItem, 0, getString(R.string.menu_mupdf));
 			menuBuilder.getMenu().add(0, otherContextMenuItem, 0, getString(R.string.menu_other));
 			menuBuilder.getMenu().add(0, infoContextMenuItem, 0, getString(R.string.menu_info));
+			if (Build.VERSION_CODES.LOLLIPOP <= Build.VERSION.SDK_INT) {
+				menuBuilder.getMenu().add(0, LPDFContextMenuItem, 0, "LOLLIPOP_PDF_Viewer");
+			}
 
 			menuBuilder.getMenu().add(0, deleteContextMenuItem, 0, getString(R.string.delete));
 		}
@@ -465,6 +473,11 @@ public class BrowserFragment extends RefreshableFragment implements OnItemClickL
 					startActivity(intent);
 				} else if (infoContextMenuItem == item.getItemId()) {
 					showFileInfoDialog(entry);
+				} else if (LPDFContextMenuItem==item.getItemId()) {
+					intent.setClass(getActivity(), LOLLIPOPPDFActivity.class);
+					intent.setDataAndType(Uri.fromFile(clickedFile), "application/pdf");
+					startActivity(intent);
+					return true;
 				}
 			}
 		}

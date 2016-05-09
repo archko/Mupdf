@@ -247,7 +247,7 @@ public class HistoryFragment extends BrowserFragment implements AbsListView.OnSc
         Util.execute(true, new AsyncTask<Void, Void, ArrayList<FileListEntry>>() {
             @Override
             protected ArrayList<FileListEntry> doInBackground(Void... params) {
-                final long now=System.currentTimeMillis();
+                //final long now=System.currentTimeMillis();
                 AKRecent recent=AKRecent.getInstance(HistoryFragment.this.getActivity());
                 int count=recent.getProgressCount();
                 ArrayList<AKProgress> progresses=recent.readRecentFromDb(PAGE_SIZE*(curPage+1), PAGE_SIZE);
@@ -286,7 +286,7 @@ public class HistoryFragment extends BrowserFragment implements AbsListView.OnSc
                     }*/
                 }
 
-                long newTime=System.currentTimeMillis()-now;
+                /*long newTime=System.currentTimeMillis()-now;
                 if (newTime<600l) {
                     newTime=600l-newTime;
                 } else {
@@ -299,7 +299,7 @@ public class HistoryFragment extends BrowserFragment implements AbsListView.OnSc
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                }
+                }*/
 
                 if (entryList.size()>0) {
                     totalCount=count;
