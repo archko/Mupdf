@@ -24,7 +24,6 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
-import com.artifex.mupdfdemo.MuPDFActivity;
 import org.vudroid.pdfdroid.PdfViewerActivity;
 
 import java.io.File;
@@ -459,7 +458,7 @@ public class BrowserFragment extends RefreshableFragment implements OnItemClickL
 					startActivity(intent);
 					return true;
 				} else if (item.getItemId()==mupdfContextMenuItem) {
-					intent.setClass(getActivity(), MuPDFActivity.class);
+					intent.setClass(getActivity(), MuPDFRecyclerActivity.class);
 					startActivity(intent);
 					return true;
 				} else if (item.getItemId()==apvContextMenuItem) {

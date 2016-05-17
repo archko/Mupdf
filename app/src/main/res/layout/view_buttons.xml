@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ViewAnimator android:id="@+id/switcher"
+              xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:layout_alignParentTop="true"
+              android:layout_centerHorizontal="true">
+
+    <LinearLayout
+        android:id="@+id/topBar0Main"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@color/toolbar">
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text=""
+            android:ellipsize="marquee"
+            android:paddingLeft="4dp"
+            android:paddingRight="4dp"
+            android:textSize="16sp"
+            android:textColor="@android:color/white"/>
+
+        <ImageButton
+            android:id="@+id/reflowButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/toggle_reflow_mode"
+            android:background="@drawable/button"
+            android:src="@drawable/ic_reflow"/>
+
+        <ImageButton
+            android:id="@+id/outlineButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/outline_title"
+            android:background="@drawable/button"
+            android:src="@drawable/ic_list"/>
+
+    </LinearLayout>
+
+</ViewAnimator>

@@ -2,8 +2,8 @@ package com.artifex.mupdfdemo;
 
 public class Separation
 {
-	String name;
-	int rgba;
+	public String name;
+	public int rgba;
 	int cmyk;
 
 	public Separation(String name, int rgba, int cmyk)

@@ -17,5 +17,5 @@ public abstract class FilePicker {
 		support.performPickFor(this);
 	}
 
-	abstract void onPick(Uri uri);
+	public abstract void onPick(Uri uri);
 }
