@@ -190,7 +190,20 @@ public class MuPDFRecyclerActivity extends FragmentActivity implements SensorEve
         mRecyclerView.setAdapter(new BaseRecyclerAdapter());
         mRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST));
 
-        mRecyclerView.setBackgroundColor(Color.WHITE);
+        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                    mRecyclerView.getAdapter().notifyDataSetChanged();
+                }
+            }
+
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+            }
+        });
 
         RelativeLayout layout = new RelativeLayout(this);
         layout.addView(mRecyclerView);
@@ -554,41 +567,80 @@ public class MuPDFRecyclerActivity extends FragmentActivity implements SensorEve
 
         @Override
         public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, final int viewType) {
-            Holder holder = null;
+            PdfHolder holder = null;
             ImageView view = new ImageView(getBaseContext());
             ViewGroup.LayoutParams lp = view.getLayoutParams();
             if (null == lp) {
                 lp = new RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                 view.setLayoutParams(lp);
             }
-            holder = new Holder(view);
+            holder = new PdfHolder(view);
             return holder;
         }
 
         @Override
         public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
-            PointF result = core.getPageSize(position);
-            int width = (int) result.x;
-            int height = (int) result.y;
-            Bitmap bm = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-            core.drawPage(bm, position, width, height, 0, 0, width, height, core.new Cookie());
-
-
-            ((Holder) viewHolder).imageView.setImageBitmap(bm);
-            ((Holder) viewHolder).imageView.setAdjustViewBounds(true);
             pos = viewHolder.getAdapterPosition();
+            PdfHolder pdfHolder = (PdfHolder) viewHolder;
+
+            if (pdfHolder.mBitmap != null && !pdfHolder.mBitmap.isRecycled()) {
+                updateBitmap(pdfHolder, pdfHolder.mBitmap);
+                return;
+            } else {
+                if (pdfHolder.mThumbnail != null && !pdfHolder.mThumbnail.isRecycled()) {
+                    updateBitmap(pdfHolder, pdfHolder.mThumbnail);
+                }
+            }
+
+            if (mRecyclerView.getScrollState() == RecyclerView.SCROLL_STATE_IDLE) {
+                Bitmap bm = renderBitmap(position, 1);
+                pdfHolder.mBitmap = bm;
+                updateBitmap(pdfHolder, pdfHolder.mBitmap);
+            } else {
+                Bitmap bm = renderBitmap(position, 8);
+                pdfHolder.mThumbnail = bm;
+                updateBitmap(pdfHolder, pdfHolder.mThumbnail);
+            }
         }
 
+        private Bitmap renderBitmap(int position, int scale) {
+            PointF result = core.getPageSize(position);
+            int width = (int) result.x / scale;
+            int height = (int) result.y / scale;
+            Bitmap bm = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+            core.drawPage(bm, position, width, height, 0, 0, width, height, core.new Cookie());
+            return bm;
+        }
+
+        private void updateBitmap(PdfHolder pdfHolder, Bitmap bitmap) {
+            pdfHolder.imageView.setImageBitmap(bitmap);
+            pdfHolder.imageView.setAdjustViewBounds(true);
+        }
+
+        @Override
+        public void onViewRecycled(RecyclerView.ViewHolder holder) {
+            super.onViewRecycled(holder);
+            PdfHolder pdfHolder = (PdfHolder) holder;
+            pdfHolder.imageView.setImageBitmap(null);
+            if (null != pdfHolder && null != pdfHolder.mThumbnail && !pdfHolder.mThumbnail.isRecycled()) {
+                pdfHolder.mThumbnail.recycle();
+            }
+            if (null != pdfHolder && null != pdfHolder.mBitmap && !pdfHolder.mBitmap.isRecycled()) {
+                pdfHolder.mBitmap.recycle();
+            }
+        }
 
         @Override
         public int getItemCount() {
             return core.countPages();
         }
 
-        public class Holder extends RecyclerView.ViewHolder {
+        public class PdfHolder extends RecyclerView.ViewHolder {
+            Bitmap mThumbnail;
+            Bitmap mBitmap;
             ImageView imageView;
 
-            public Holder(ImageView itemView) {
+            public PdfHolder(ImageView itemView) {
                 super(itemView);
                 imageView = itemView;
             }
