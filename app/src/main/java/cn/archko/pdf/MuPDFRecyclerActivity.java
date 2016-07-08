@@ -179,6 +179,10 @@ public class MuPDFRecyclerActivity extends FragmentActivity implements SensorEve
     protected void onDestroy() {
         super.onDestroy();
         //LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(HistoryFragment.ACTION_STOPPED));
+        mRecyclerView.setAdapter(null);
+        if (null != core) {
+            core.onDestroy();
+        }
     }
 
     private void initView() {
@@ -601,6 +605,7 @@ public class MuPDFRecyclerActivity extends FragmentActivity implements SensorEve
                 pdfHolder.mThumbnail = bm;
                 updateBitmap(pdfHolder, pdfHolder.mThumbnail);
             }
+            Log.d(TAG, "onBindViewHolder:" + pos);
         }
 
         private Bitmap renderBitmap(int position, int scale) {
@@ -643,6 +648,48 @@ public class MuPDFRecyclerActivity extends FragmentActivity implements SensorEve
             public PdfHolder(ImageView itemView) {
                 super(itemView);
                 imageView = itemView;
+            }
+        }
+
+    }
+
+    class PDFRecyclerAdapter<T> extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+
+        @Override
+        public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, final int viewType) {
+            PdfHolder holder = null;
+            PDFView view = new PDFView(getBaseContext(), core);
+            holder = new PdfHolder(view);
+            return holder;
+        }
+
+        @Override
+        public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
+            pos = viewHolder.getAdapterPosition();
+            PdfHolder pdfHolder = (PdfHolder) viewHolder;
+
+            PointF result = core.getPageSize(position);
+            pdfHolder.mPdfView.setPage(position, result);
+        }
+
+        /*@Override
+        public void onViewRecycled(RecyclerView.ViewHolder holder) {
+            super.onViewRecycled(holder);
+            PdfHolder pdfHolder = (PdfHolder) holder;
+            pdfHolder.mPdfView.releaseBitmaps();
+        }*/
+
+        @Override
+        public int getItemCount() {
+            return core.countPages();
+        }
+
+        public class PdfHolder extends RecyclerView.ViewHolder {
+            PDFView mPdfView;
+
+            public PdfHolder(PDFView pdfView) {
+                super(pdfView);
+                this.mPdfView = pdfView;
             }
         }
 
