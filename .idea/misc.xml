@@ -3,7 +3,6 @@
   <component name="AndroidDexCompilerConfiguration">
     <option name="FORCE_JUMBO" value="true" />
   </component>
-  <component name="CopyrightManager" default="" />
   <component name="EclipseCompilerSettings">
     <option name="DEBUGGING_INFO" value="false" />
     <option name="GENERATE_NO_WARNINGS" value="true" />
@@ -43,6 +42,10 @@
       </value>
     </option>
   </component>
+  <component name="ProjectDictionaryState">
+    <dictionary name="58" />
+    <dictionary name="archko" />
+  </component>
   <component name="ProjectInspectionProfilesVisibleTreeState">
     <entry key="Project Default">
       <profile-state>
@@ -77,9 +80,6 @@
   </component>
   <component name="ProjectType">
     <option name="id" value="Android" />
-  </component>
-  <component name="SvnConfiguration">
-    <configuration useDefault="false">C:\Users\archko\AppData\Roaming\Subversion</configuration>
   </component>
   <component name="masterDetails">
     <states>

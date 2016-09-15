@@ -249,5 +249,15 @@
 			android:configChanges="orientation|keyboardHidden|screenSize"
 			android:label="@string/app_name">
 		</activity>
+
+		<activity
+			android:name="com.artifex.mupdf.example.PDFDocViewActivity" android:theme="@style/AppFullscreen"
+			android:configChanges="orientation|keyboardHidden|screenSize" android:screenOrientation="sensor"
+			android:label="@string/app_name">
+		</activity>
+
+		<activity android:name="com.artifex.mupdf.android.ProofActivity"
+				  android:configChanges="orientation|screenSize">
+		</activity>
 	</application>
 </manifest> 

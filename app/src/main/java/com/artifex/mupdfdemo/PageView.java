@@ -96,7 +96,7 @@ public abstract class PageView extends ViewGroup {
 	private static final float INK_THICKNESS = 10.0f;
 	private static final int BACKGROUND_COLOR = 0xFFFFFFFF;
 	private static final int PROGRESS_DIALOG_DELAY = 200;
-	protected final Context   mContext;
+	protected final Context mContext;
 	protected     int       mPageNumber;
 	private       Point     mParentSize;
 	protected     Point     mSize;   // Size of page at minimum zoom
@@ -129,10 +129,12 @@ public abstract class PageView extends ViewGroup {
 
 	public PageView(Context c, Point parentSize, Bitmap sharedHqBm) {
 		super(c);
-		mContext    = c;
+		mContext = c;
 		mParentSize = parentSize;
 		setBackgroundColor(BACKGROUND_COLOR);
-		mEntireBm = Bitmap.createBitmap(parentSize.x, parentSize.y, Config.ARGB_8888);
+		if (null!=parentSize) {
+			mEntireBm = Bitmap.createBitmap(parentSize.x, parentSize.y, Config.ARGB_8888);
+		}
 		mPatchBm = sharedHqBm;
 		mEntireMat = new Matrix();
 	}
@@ -142,6 +144,21 @@ public abstract class PageView extends ViewGroup {
 	protected abstract LinkInfo[] getLinkInfo();
 	protected abstract TextWord[][] getText();
 	protected abstract void addMarkup(PointF[] quadPoints, Annotation.Type type);
+
+	public void setParentSize(Point parentSize) {
+		this.mParentSize = parentSize;
+		if (null!=mEntire) {
+			mEntire.setImageBitmap(null);
+			if (null != mEntireBm && !mEntireBm.isRecycled()) {
+				mEntireBm.recycle();
+			}
+		}
+		mEntireBm = Bitmap.createBitmap(parentSize.x, parentSize.y, Config.ARGB_8888);
+	}
+
+	public Point getParentSize() {
+		return mParentSize;
+	}
 
 	private void reinit() {
 		// Cancel pending render task
@@ -203,7 +220,7 @@ public abstract class PageView extends ViewGroup {
 	public void releaseBitmaps() {
 		reinit();
 
-		//  recycle bitmaps before releasing them.
+		// recycle bitmaps before releasing them.
 
 		if (mEntireBm!=null)
 			mEntireBm.recycle();
@@ -229,6 +246,9 @@ public abstract class PageView extends ViewGroup {
 	}
 
 	public void setPage(int page, PointF size) {
+		if (null == mParentSize) {
+			mParentSize = new Point((int) size.x, (int) size.y);
+		}
 		// Cancel pending render task
 		if (mDrawEntire != null) {
 			mDrawEntire.cancelAndWait();
@@ -271,6 +291,10 @@ public abstract class PageView extends ViewGroup {
 
 		mGetLinkInfo.execute();
 
+		if (null==mEntireBm) {
+			mEntireBm = Bitmap.createBitmap(mSize.x, mSize.y, Config.ARGB_8888);
+		}
+
 		// Render the page in the background
 		mDrawEntire = new CancellableAsyncTask<Void, Void>(getDrawPageTask(mEntireBm, mSize.x, mSize.y, 0, 0, mSize.x, mSize.y)) {
 
@@ -301,7 +325,13 @@ public abstract class PageView extends ViewGroup {
 				mBusyIndicator = null;
 				mEntire.setImageBitmap(mEntireBm);
 				mEntire.invalidate();
-				setBackgroundColor(Color.TRANSPARENT);
+				//setBackgroundColor(Color.TRANSPARENT);
+
+			}
+
+			@Override
+			public void cancelAndWait() {
+				super.cancelAndWait();
 
 			}
 		};
@@ -322,16 +352,16 @@ public abstract class PageView extends ViewGroup {
 						paint.setColor(HIGHLIGHT_COLOR);
 						for (RectF rect : mSearchBoxes)
 							canvas.drawRect(rect.left*scale, rect.top*scale,
-									        rect.right*scale, rect.bottom*scale,
-									        paint);
+									rect.right*scale, rect.bottom*scale,
+									paint);
 					}
 
 					if (!mIsBlank && mLinks != null && mHighlightLinks) {
 						paint.setColor(LINK_COLOR);
 						for (LinkInfo link : mLinks)
 							canvas.drawRect(link.rect.left*scale, link.rect.top*scale,
-									        link.rect.right*scale, link.rect.bottom*scale,
-									        paint);
+									link.rect.right*scale, link.rect.bottom*scale,
+									paint);
 					}
 
 					if (mSelectBox != null && mText != null) {
@@ -520,13 +550,14 @@ public abstract class PageView extends ViewGroup {
 		default:
 			x = View.MeasureSpec.getSize(widthMeasureSpec);
 		}
-		switch(View.MeasureSpec.getMode(heightMeasureSpec)) {
+		/*switch(View.MeasureSpec.getMode(heightMeasureSpec)) {
 		case View.MeasureSpec.UNSPECIFIED:
 			y = mSize.y;
 			break;
 		default:
 			y = View.MeasureSpec.getSize(heightMeasureSpec);
-		}
+		}*/
+		y=x/mSize.x*mSize.y;
 
 		setMeasuredDimension(x, y);
 
@@ -538,7 +569,7 @@ public abstract class PageView extends ViewGroup {
 
 	@Override
 	protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-		int w  = right-left;
+		int w = right-left;
 		int h = bottom-top;
 
 		if (mEntire != null) {
@@ -558,7 +589,7 @@ public abstract class PageView extends ViewGroup {
 			if (mPatchViewSize.x != w || mPatchViewSize.y != h) {
 				// Zoomed since patch was created
 				mPatchViewSize = null;
-				mPatchArea     = null;
+				mPatchArea = null;
 				if (mPatch != null) {
 					mPatch.setImageBitmap(null);
 					mPatch.invalidate();
@@ -632,7 +663,7 @@ public abstract class PageView extends ViewGroup {
 
 				public void onPostExecute(Void result) {
 					mPatchViewSize = patchViewSize;
-					mPatchArea     = patchArea;
+					mPatchArea = patchArea;
 					mPatch.setImageBitmap(mPatchBm);
 					mPatch.invalidate();
 					//requestLayout();
@@ -657,7 +688,6 @@ public abstract class PageView extends ViewGroup {
 			mDrawPatch.cancelAndWait();
 			mDrawPatch = null;
 		}
-
 
 		// Render the page in the background
 		mDrawEntire = new CancellableAsyncTask<Void, Void>(getUpdatePageTask(mEntireBm, mSize.x, mSize.y, 0, 0, mSize.x, mSize.y)) {

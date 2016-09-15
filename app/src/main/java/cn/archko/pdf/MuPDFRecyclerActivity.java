@@ -28,6 +28,7 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.BaseAdapter;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -672,12 +673,12 @@ public class MuPDFRecyclerActivity extends FragmentActivity implements SensorEve
             pdfHolder.mPdfView.setPage(position, result);
         }
 
-        /*@Override
+        @Override
         public void onViewRecycled(RecyclerView.ViewHolder holder) {
             super.onViewRecycled(holder);
             PdfHolder pdfHolder = (PdfHolder) holder;
             pdfHolder.mPdfView.releaseBitmaps();
-        }*/
+        }
 
         @Override
         public int getItemCount() {

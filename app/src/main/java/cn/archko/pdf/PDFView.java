@@ -12,22 +12,29 @@ import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 
-import com.artifex.mupdfdemo.Annotation;
 import com.artifex.mupdfdemo.CancellableAsyncTask;
 import com.artifex.mupdfdemo.CancellableTaskDefinition;
-import com.artifex.mupdfdemo.LinkInfo;
 import com.artifex.mupdfdemo.MuPDFCancellableTaskDefinition;
 import com.artifex.mupdfdemo.MuPDFCore;
 import com.artifex.mupdfdemo.MuPDFReaderView;
-import com.artifex.mupdfdemo.PageView;
-import com.artifex.mupdfdemo.TextWord;
 
 /**
  * @author: archko 2016/5/13 :13:05
  */
 public class PDFView extends ViewGroup implements ScaleGestureDetector.OnScaleGestureListener {
+
+    class OpaqueImageView extends ImageView {
+
+        public OpaqueImageView(Context context) {
+            super(context);
+        }
+
+        @Override
+        public boolean isOpaque() {
+            return true;
+        }
+    }
 
     private static final float MIN_SCALE = 1.0f;
     private static final float MAX_SCALE = 5.0f;
@@ -41,7 +48,6 @@ public class PDFView extends ViewGroup implements ScaleGestureDetector.OnScaleGe
     private float mScale = 1.0f;
     protected final Context mContext;
 
-    //private ProgressBar mBusyIndicator;
     protected int mPageNumber;
     private Point mParentSize;
     protected Point mSize;   // Size of page at minimum zoom
@@ -60,9 +66,7 @@ public class PDFView extends ViewGroup implements ScaleGestureDetector.OnScaleGe
         mEntireMat = new Matrix();
     }
 
-
     public void setMode(MuPDFReaderView.Mode mode) {
-
     }
 
     @Override
@@ -73,10 +77,6 @@ public class PDFView extends ViewGroup implements ScaleGestureDetector.OnScaleGe
         float max_scale = MAX_SCALE * scale_factor;
         mScale = Math.min(Math.max(mScale * detector.getScaleFactor(), min_scale), max_scale);
 
-        /*View v = mChildViews.get(mCurrent);
-        if (v != null) {
-            onScaleChild(v, mScale);
-        }*/
         return true;
     }
 
@@ -95,7 +95,6 @@ public class PDFView extends ViewGroup implements ScaleGestureDetector.OnScaleGe
         mScaleGestureDetector.onTouchEvent(event);
         return false;
     }*/
-
 
     protected CancellableTaskDefinition<Void, Void> getDrawPageTask(final Bitmap bm, final int sizeX, final int sizeY,
                                                                     final int patchX, final int patchY, final int patchWidth, final int patchHeight) {
@@ -135,11 +134,6 @@ public class PDFView extends ViewGroup implements ScaleGestureDetector.OnScaleGe
         Log.d(VIEW_LOG_TAG, "measure:" + x + " y:" + y);
 
         setMeasuredDimension(x, y);
-
-        /*if (mBusyIndicator != null) {
-            int limit = Math.min(mParentSize.x, mParentSize.y) / 2;
-            mBusyIndicator.measure(View.MeasureSpec.AT_MOST | limit, View.MeasureSpec.AT_MOST | limit);
-        }*/
     }
 
     @Override
@@ -155,13 +149,6 @@ public class PDFView extends ViewGroup implements ScaleGestureDetector.OnScaleGe
             }
             mEntire.layout(0, 0, w, h);
         }
-
-        /*if (mBusyIndicator != null) {
-            int bw = mBusyIndicator.getMeasuredWidth();
-            int bh = mBusyIndicator.getMeasuredHeight();
-
-            mBusyIndicator.layout((w - bw) / 2, (h - bh) / 2, (w + bw) / 2, (h + bh) / 2);
-        }*/
     }
 
     private void reinit() {
@@ -184,19 +171,14 @@ public class PDFView extends ViewGroup implements ScaleGestureDetector.OnScaleGe
 
     public void releaseResources() {
         reinit();
-
-        /*if (mBusyIndicator != null) {
-            removeView(mBusyIndicator);
-            mBusyIndicator = null;
-        }*/
     }
 
     public void releaseBitmaps() {
         //reinit();
 
         //  recycle bitmaps before releasing them.
-        if (mEntireBm != null)
-            mEntireBm.recycle();
+        /*if (mEntireBm != null)
+            mEntireBm.recycle();*/
         mEntireBm = null;
         if (mEntire != null) {
             mEntire.setImageBitmap(null);
@@ -221,7 +203,6 @@ public class PDFView extends ViewGroup implements ScaleGestureDetector.OnScaleGe
         }
 
         if (mPageNumber == page && null != mEntireBm) {
-            //removeView(mBusyIndicator);
             mEntire.setImageBitmap(mEntireBm);
             mEntire.invalidate();
             return;
@@ -245,7 +226,7 @@ public class PDFView extends ViewGroup implements ScaleGestureDetector.OnScaleGe
         if (null == mEntireBm) {
             mEntireBm = Bitmap.createBitmap(mSize.x, mSize.y, Bitmap.Config.ARGB_8888);
         }
-        mEntireBm.eraseColor(0);
+        //mEntireBm.eraseColor(0);
         mEntire.invalidate();
 
         // Render the page in the background
@@ -253,29 +234,11 @@ public class PDFView extends ViewGroup implements ScaleGestureDetector.OnScaleGe
 
             @Override
             public void onPreExecute() {
-                setBackgroundColor(BACKGROUND_COLOR);
-                /*mEntire.setImageBitmap(null);
-                mEntire.invalidate();*/
-
-                /*if (mBusyIndicator == null) {
-                    mBusyIndicator = new ProgressBar(mContext);
-                    mBusyIndicator.setIndeterminate(true);
-                    mBusyIndicator.setBackgroundResource(R.drawable.busy);
-                    addView(mBusyIndicator);
-                    mBusyIndicator.setVisibility(INVISIBLE);
-                    mHandler.postDelayed(new Runnable() {
-                        public void run() {
-                            if (mBusyIndicator != null)
-                                mBusyIndicator.setVisibility(VISIBLE);
-                        }
-                    }, PROGRESS_DIALOG_DELAY);
-                }*/
+                //setBackgroundColor(BACKGROUND_COLOR);
             }
 
             @Override
             public void onPostExecute(Void result) {
-                /*removeView(mBusyIndicator);
-                mBusyIndicator = null;*/
                 mEntire.setImageBitmap(mEntireBm);
                 mEntire.invalidate();
                 //setBackgroundColor(Color.TRANSPARENT);
@@ -285,17 +248,5 @@ public class PDFView extends ViewGroup implements ScaleGestureDetector.OnScaleGe
         mDrawEntire.execute();
 
         requestLayout();
-    }
-
-    class OpaqueImageView extends ImageView {
-
-        public OpaqueImageView(Context context) {
-            super(context);
-        }
-
-        @Override
-        public boolean isOpaque() {
-            return true;
-        }
     }
 }

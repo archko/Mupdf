@@ -9,11 +9,11 @@ import android.widget.TextView;
 import cn.archko.pdf.R;
 
 public class OutlineAdapter extends BaseAdapter {
-	private final OutlineItem    mItems[];
+	private final OutlineItem mItems[];
 	private final LayoutInflater mInflater;
 	public OutlineAdapter(LayoutInflater inflater, OutlineItem items[]) {
 		mInflater = inflater;
-		mItems    = items;
+		mItems = items;
 	}
 
 	public int getCount() {

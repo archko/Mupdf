@@ -24,6 +24,9 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
+
+import com.artifex.mupdf.example.PDFDocViewActivity;
+
 import org.vudroid.pdfdroid.PdfViewerActivity;
 
 import java.io.File;
@@ -74,6 +77,7 @@ public class BrowserFragment extends RefreshableFragment implements OnItemClickL
 	protected static final int otherContextMenuItem=Menu.FIRST+113;
 	protected static final int infoContextMenuItem=Menu.FIRST+114;
 	protected static final int LPDFContextMenuItem=Menu.FIRST+115;
+	protected static final int EXAMPLEContextMenuItem=Menu.FIRST+116;
 
     protected MenuItem backMenuItem = null;
     protected MenuItem restoreMenuItem = null;
@@ -405,6 +409,7 @@ public class BrowserFragment extends RefreshableFragment implements OnItemClickL
 			if (Build.VERSION_CODES.LOLLIPOP <= Build.VERSION.SDK_INT) {
 				menuBuilder.getMenu().add(0, LPDFContextMenuItem, 0, "LOLLIPOP_PDF_Viewer");
 			}
+			menuBuilder.getMenu().add(0, EXAMPLEContextMenuItem, 0, "EXAMPLE");
 
 			menuBuilder.getMenu().add(0, removeContextMenuItem, 0, getString(R.string.remove_from_recent));
 		} else if (! entry.isDirectory()&&entry.getType() != FileListEntry.HOME) {
@@ -416,6 +421,7 @@ public class BrowserFragment extends RefreshableFragment implements OnItemClickL
 			if (Build.VERSION_CODES.LOLLIPOP <= Build.VERSION.SDK_INT) {
 				menuBuilder.getMenu().add(0, LPDFContextMenuItem, 0, "LOLLIPOP_PDF_Viewer");
 			}
+			menuBuilder.getMenu().add(0, EXAMPLEContextMenuItem, 0, "EXAMPLE");
 
 			menuBuilder.getMenu().add(0, deleteContextMenuItem, 0, getString(R.string.delete));
 		}
@@ -474,6 +480,11 @@ public class BrowserFragment extends RefreshableFragment implements OnItemClickL
 					showFileInfoDialog(entry);
 				} else if (LPDFContextMenuItem==item.getItemId()) {
 					intent.setClass(getActivity(), LOLLIPOPPDFActivity.class);
+					intent.setDataAndType(Uri.fromFile(clickedFile), "application/pdf");
+					startActivity(intent);
+					return true;
+				} else if (EXAMPLEContextMenuItem==item.getItemId()) {
+					intent.setClass(getActivity(), PDFDocViewActivity.class);
 					intent.setDataAndType(Uri.fromFile(clickedFile), "application/pdf");
 					startActivity(intent);
 					return true;

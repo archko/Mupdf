@@ -107,11 +107,11 @@ public class AKAdapter extends BaseAdapter {
         }
 
         if (entry.getType()==FileListEntry.HOME) {
-            viewHolder.mIcon.setImageResource(R.drawable.browser_item_folder_open);
+            viewHolder.mIcon.setImageResource(R.drawable.ic_explorer_fldr);
         } else if (entry.getType()==FileListEntry.NORMAL&&entry.isDirectory()&&!entry.isUpFolder()) {
-            viewHolder.mIcon.setImageResource(R.drawable.browser_item_folder_open);
+            viewHolder.mIcon.setImageResource(R.drawable.ic_explorer_fldr);
         } else if (entry.isUpFolder()) {
-            viewHolder.mIcon.setImageResource(R.drawable.browser_item_folder_open);
+            viewHolder.mIcon.setImageResource(R.drawable.ic_explorer_fldr);
         } else {
             viewHolder.mIcon.setImageResource(R.drawable.browser_item_book);
         }
