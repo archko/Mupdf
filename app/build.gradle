@@ -1,28 +1,28 @@
 apply plugin: 'com.android.application'
+//apply plugin: 'com.antfortune.freeline'
 android {
+    /*freeline {
+        hack true
+    }*/
     signingConfigs {
-        debug {
-            keyAlias 'mupdf_release_key'
-            storeFile file('D:/Projects/PDF/Mupdf/mupdf_release_key.jks')
-            keyPassword 'Abc123456'
-            storePassword 'Abc123456'
-        }
         release {
             keyAlias 'mupdf_release_key'
             storeFile file('D:/Projects/PDF/Mupdf/mupdf_release_key.jks')
-            keyPassword 'Abc123456'
-            storePassword 'Abc123456'
+
         }
     }
-    compileSdkVersion 23
-    buildToolsVersion '23.0.2'
+    compileSdkVersion ANDROID_BUILD_SDK_VERSION as int
+    buildToolsVersion ANDROID_BUILD_TOOLS_VERSION
     defaultConfig {
         applicationId 'cn.archko.mupdf'
         minSdkVersion 14
         targetSdkVersion 23
-        versionCode 70
-        versionName '1.9'
+        versionCode VERSION_CODE as int
+        versionName VERSION_NAME
         signingConfig signingConfigs.debug
+    }
+    compileOptions {
+        encoding "UTF-8"
     }
 
     buildTypes {
@@ -45,9 +45,6 @@ android {
     productFlavors {
     }
     lintOptions { abortOnError false }
-    dexOptions {
-        incremental false
-    }
     sourceSets {
         main {
             jni.srcDirs = []
@@ -57,8 +54,8 @@ android {
 }
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile 'com.android.support:support-v4:23.1.1'
-    compile 'com.android.support:recyclerview-v7:23.2.1'
+    compile "com.android.support:support-v4:${SUPPORT_LIB_VERSION}"
+    compile "com.android.support:recyclerview-v7:${SUPPORT_LIB_VERSION}"
     compile project(':example')
 }
 
