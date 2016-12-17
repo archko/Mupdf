@@ -154,7 +154,7 @@ public class PDFView extends ViewGroup implements ScaleGestureDetector.OnScaleGe
     private void reinit() {
         // Cancel pending render task
         if (mDrawEntire != null) {
-            mDrawEntire.cancelAndWait();
+            mDrawEntire.cancel();
             mDrawEntire = null;
         }
 
@@ -210,7 +210,7 @@ public class PDFView extends ViewGroup implements ScaleGestureDetector.OnScaleGe
 
         // Cancel pending render task
         if (mDrawEntire != null) {
-            mDrawEntire.cancelAndWait();
+            mDrawEntire.cancel();
             mDrawEntire = null;
         }
 

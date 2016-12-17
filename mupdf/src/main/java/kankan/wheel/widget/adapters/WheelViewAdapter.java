@@ -60,5 +60,5 @@ public interface WheelViewAdapter {
 	 * Unregister an observer that has previously been registered
 	 * @param observer the observer to be unregistered
 	 */
-	void unregisterDataSetObserver(DataSetObserver observer);
+	void unregisterDataSetObserver (DataSetObserver observer);
 }

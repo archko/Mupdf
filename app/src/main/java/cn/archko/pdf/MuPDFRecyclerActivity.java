@@ -1,5 +1,6 @@
 package cn.archko.pdf;
 
+import android.annotation.TargetApi;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
@@ -17,6 +18,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -28,7 +30,6 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.BaseAdapter;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -179,7 +180,7 @@ public class MuPDFRecyclerActivity extends FragmentActivity implements SensorEve
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        //LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(HistoryFragment.ACTION_STOPPED));
+        LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(HistoryFragment.ACTION_STOPPED));
         mRecyclerView.setAdapter(null);
         if (null != core) {
             core.onDestroy();
@@ -339,7 +340,7 @@ public class MuPDFRecyclerActivity extends FragmentActivity implements SensorEve
                     } else {
                         pageNumberToast = Toast.makeText(MuPDFRecyclerActivity.this, pageText, 80);
                     }
-                    pageNumberToast.setGravity(Gravity.BOTTOM | Gravity.LEFT, 0, 0);
+                    pageNumberToast.setGravity(Gravity.BOTTOM | Gravity.START, 0, 0);
                     pageNumberToast.show();
                 }
                 return true;
@@ -492,6 +493,7 @@ public class MuPDFRecyclerActivity extends FragmentActivity implements SensorEve
         }
     }
 
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
@@ -510,7 +512,7 @@ public class MuPDFRecyclerActivity extends FragmentActivity implements SensorEve
     protected void onPause() {
         super.onPause();
 
-        //saveCurrentPage();
+        saveCurrentPage();
 
         if (sensorManager != null) {
             sensorManager.unregisterListener(this);
@@ -568,7 +570,7 @@ public class MuPDFRecyclerActivity extends FragmentActivity implements SensorEve
 
     //===========================================
 
-    class BaseRecyclerAdapter<T> extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+    private class BaseRecyclerAdapter<T> extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         @Override
         public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, final int viewType) {

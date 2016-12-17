@@ -15,7 +15,7 @@ public class MuPDFCore
 	private static boolean gs_so_available = false;
 	static {
 		System.out.println("Loading dll");
-		System.loadLibrary("mupdf_java");
+		System.loadLibrary("mupdf_java32");
 		System.out.println("Loaded dll");
 		if (gprfSupportedInternal())
 		{
@@ -331,7 +331,7 @@ public class MuPDFCore
 		return getWidgetAreasInternal(page);
 	}
 
-	public synchronized Annotation [] getAnnoations(int page) {
+	public synchronized Annotation [] getAnnotations(int page) {
 		return getAnnotationsInternal(page);
 	}
 

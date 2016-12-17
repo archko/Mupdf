@@ -22,7 +22,12 @@ public class DisplayList
 	}
 
 	public native Pixmap toPixmap(Matrix ctm, ColorSpace colorspace, boolean alpha);
-	public native StructuredText toStructuredText(int options);
+	public native StructuredText toStructuredText(String options);
+
+	public StructuredText toStructuredText() {
+		return toStructuredText(null);
+	}
+
 	public native Rect[] search(String needle);
 
 	public native void run(Device dev, Matrix ctm, Rect scissor, Cookie cookie);

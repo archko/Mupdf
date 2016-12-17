@@ -60,7 +60,7 @@ public class BrowserFragment extends RefreshableFragment implements OnItemClickL
 	private FileFilter fileFilter = null;
 	protected AKAdapter fileListAdapter = null;
 	protected ArrayList<FileListEntry> fileList = null;
-	
+
 	private Boolean dirsFirst = true;
 	private Boolean showExtension = false;
 	private Boolean history = true;
@@ -100,7 +100,7 @@ public class BrowserFragment extends RefreshableFragment implements OnItemClickL
     	this.optionsMenuItem = menu.add(R.string.options);
     	MenuItemCompat.setShowAsAction(this.optionsMenuItem, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
 	}
-    
+
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem menuItem) {
@@ -113,7 +113,7 @@ public class BrowserFragment extends RefreshableFragment implements OnItemClickL
     	}
 		return super.onOptionsItemSelected(menuItem);
 	}
-	
+
 	public void setAsHome() {
 		SharedPreferences.Editor edit = getActivity().getSharedPreferences(ChooseFileFragmentActivity.PREF_TAG, 0).edit();
 		edit.putString(ChooseFileFragmentActivity.PREF_HOME, currentPath);
@@ -188,7 +188,7 @@ public class BrowserFragment extends RefreshableFragment implements OnItemClickL
     			if (file.isDirectory())
 					return true;
 				String fname = file.getName().toLowerCase();
-				
+
 					if (fname.endsWith(".pdf"))
 						return true;
 					if (fname.endsWith(".xps"))
@@ -216,7 +216,7 @@ public class BrowserFragment extends RefreshableFragment implements OnItemClickL
 					return false;
     		}
     	};
-    	
+
     	if (null==fileList) {
 			this.fileList = new ArrayList<FileListEntry>();
 		}
@@ -226,7 +226,7 @@ public class BrowserFragment extends RefreshableFragment implements OnItemClickL
 		filesListView.setOnItemClickListener(this);
 		filesListView.setOnItemLongClickListener(this);
     }
-    
+
     public void updateAdapter() {
     	final Activity activity = getActivity();
     	if (null==fileListAdapter) {
@@ -234,7 +234,7 @@ public class BrowserFragment extends RefreshableFragment implements OnItemClickL
 		}
 		this.filesListView.setAdapter(this.fileListAdapter);
     	this.filesListView.setOnItemClickListener(this);
-    	
+
     	update();
 	}
 
@@ -251,13 +251,13 @@ public class BrowserFragment extends RefreshableFragment implements OnItemClickL
 
         entry=new FileListEntry(FileListEntry.HOME, getResources().getString(R.string.go_home));
         fileList.add(entry);
-    	
+
     	if (!this.currentPath.equals("/")) {
     		File upFolder = new File(this.currentPath).getParentFile();
             entry=new FileListEntry(FileListEntry.NORMAL, -1, upFolder, "..");
             fileList.add(entry);
     	}
-    	
+
     	File files[] = new File(this.currentPath).listFiles(this.fileFilter);
 
     	if (files != null) {
@@ -282,7 +282,7 @@ public class BrowserFragment extends RefreshableFragment implements OnItemClickL
 	    	} catch (NullPointerException e) {
 	    		throw new RuntimeException("failed to sort file list " + files + " for path " + this.currentPath, e);
 	    	}
-	    	
+
 	    	for (File file:files) {
 	    		entry = new FileListEntry(FileListEntry.NORMAL, -1, file, showExtension);
                 fileList.add(entry);
@@ -303,7 +303,7 @@ public class BrowserFragment extends RefreshableFragment implements OnItemClickL
 	}
 
 	private String getHome() {
-    	String defaultHome = Environment.getExternalStorageDirectory().getAbsolutePath(); 
+    	String defaultHome = Environment.getExternalStorageDirectory().getAbsolutePath();
 		String path = getActivity().getSharedPreferences(ChooseFileFragmentActivity.PREF_TAG, 0).
 				getString(ChooseFileFragmentActivity.PREF_HOME, defaultHome);
 		if (path.length()>1 && path.endsWith("/")) {
@@ -317,7 +317,7 @@ public class BrowserFragment extends RefreshableFragment implements OnItemClickL
 		else
 			return defaultHome;
     }
-	
+
 	public void pdfView(File f) {
 		Log.i(TAG, "post intent to open file "+f);
 		Intent intent = new Intent();
@@ -339,10 +339,10 @@ public class BrowserFragment extends RefreshableFragment implements OnItemClickL
     	else {
     		clickedFile = clickedEntry.getFile();
     	}
-    	
+
     	if (null==clickedFile||!clickedFile.exists())
     		return;
-    	
+
     	if (clickedFile.isDirectory()) {
 			mPathMap.put(currentPath, position);
     		this.currentPath = clickedFile.getAbsolutePath();
@@ -363,7 +363,7 @@ public class BrowserFragment extends RefreshableFragment implements OnItemClickL
 		mSelectedPos=-1;
 		return false;
 	}
-    
+
 	//--------------------- popupMenu ---------------------
 
 	/**
@@ -402,26 +402,26 @@ public class BrowserFragment extends RefreshableFragment implements OnItemClickL
 			//menuBuilder.getMenu().add(R.string.set_as_home);
 		} else if (entry.getType() == FileListEntry.RECENT) {
 			menuBuilder.getMenu().add(0, vudroidContextMenuItem, 0, getString(R.string.menu_vudroid));
-			menuBuilder.getMenu().add(0, apvContextMenuItem, 0, getString(R.string.menu_apv));
 			menuBuilder.getMenu().add(0, mupdfContextMenuItem, 0, getString(R.string.menu_mupdf));
+            menuBuilder.getMenu().add(0, EXAMPLEContextMenuItem, 0, "EXAMPLE");
+			menuBuilder.getMenu().add(0, apvContextMenuItem, 0, getString(R.string.menu_apv));
 			menuBuilder.getMenu().add(0, otherContextMenuItem, 0, getString(R.string.menu_other));
 			menuBuilder.getMenu().add(0, infoContextMenuItem, 0, getString(R.string.menu_info));
-			if (Build.VERSION_CODES.LOLLIPOP <= Build.VERSION.SDK_INT) {
+			/*if (Build.VERSION_CODES.LOLLIPOP <= Build.VERSION.SDK_INT) {
 				menuBuilder.getMenu().add(0, LPDFContextMenuItem, 0, "LOLLIPOP_PDF_Viewer");
-			}
-			menuBuilder.getMenu().add(0, EXAMPLEContextMenuItem, 0, "EXAMPLE");
+			}*/
 
 			menuBuilder.getMenu().add(0, removeContextMenuItem, 0, getString(R.string.remove_from_recent));
 		} else if (! entry.isDirectory()&&entry.getType() != FileListEntry.HOME) {
 			menuBuilder.getMenu().add(0, vudroidContextMenuItem, 0, getString(R.string.menu_vudroid));
-			menuBuilder.getMenu().add(0, apvContextMenuItem, 0, getString(R.string.menu_apv));
 			menuBuilder.getMenu().add(0, mupdfContextMenuItem, 0, getString(R.string.menu_mupdf));
+            menuBuilder.getMenu().add(0, EXAMPLEContextMenuItem, 0, "EXAMPLE");
+			menuBuilder.getMenu().add(0, apvContextMenuItem, 0, getString(R.string.menu_apv));
 			menuBuilder.getMenu().add(0, otherContextMenuItem, 0, getString(R.string.menu_other));
 			menuBuilder.getMenu().add(0, infoContextMenuItem, 0, getString(R.string.menu_info));
-			if (Build.VERSION_CODES.LOLLIPOP <= Build.VERSION.SDK_INT) {
+			/*if (Build.VERSION_CODES.LOLLIPOP <= Build.VERSION.SDK_INT) {
 				menuBuilder.getMenu().add(0, LPDFContextMenuItem, 0, "LOLLIPOP_PDF_Viewer");
-			}
-			menuBuilder.getMenu().add(0, EXAMPLEContextMenuItem, 0, "EXAMPLE");
+			}*/
 
 			menuBuilder.getMenu().add(0, deleteContextMenuItem, 0, getString(R.string.delete));
 		}

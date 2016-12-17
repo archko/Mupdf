@@ -83,7 +83,6 @@ public class ChoosePDFActivity extends ListActivity {
 		// Create a list adapter...
 		adapter = new ChoosePDFAdapter(getLayoutInflater());
 		setListAdapter(adapter);
-        registerForContextMenu(getListView());
 
 		// ...that is updated dynamically when files are scanned
 		mHandler = new Handler();
@@ -121,6 +120,8 @@ public class ChoosePDFActivity extends ListActivity {
 							if (fname.endsWith(".cbz"))
 								return true;
 							if (fname.endsWith(".epub"))
+								return true;
+							if (fname.endsWith(".fb2"))
 								return true;
 							if (fname.endsWith(".png"))
 								return true;

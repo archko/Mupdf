@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.net.Uri;
@@ -17,6 +18,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
@@ -30,12 +32,16 @@ import android.widget.Toast;
 import com.artifex.mupdf.fitz.Document;
 import com.artifex.mupdf.fitz.Link;
 import com.artifex.mupdf.fitz.Outline;
+import com.artifex.mupdf.fitz.PDFDocument;
+import com.artifex.mupdf.fitz.PDFObject;
 import com.artifex.mupdf.fitz.R;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.UUID;
 
 public class DocActivityView extends FrameLayout implements TabHost.OnTabChangeListener, View.OnClickListener, DocView.SelectionChangeListener
@@ -78,6 +84,8 @@ public class DocActivityView extends FrameLayout implements TabHost.OnTabChangeL
 	private ImageButton mLineThicknessButton;
 
 	private ImageButton mProofButton;
+
+	private String mEmbeddedProfile = null;
 
 	public DocActivityView(Context context)
 	{
@@ -766,6 +774,39 @@ public class DocActivityView extends FrameLayout implements TabHost.OnTabChangeL
 		}
 	}
 
+	private String getEmbeddedProfileName()
+	{
+		PDFObject outputIntents = mDoc.toPDFDocument().getTrailer().get("Root").get("OutputIntents");
+		if (outputIntents == null)
+			return null;
+
+		int length = outputIntents.size();
+		int i;
+
+		for (i = 0 ; i < length; i++) {
+			PDFObject intent = outputIntents.get(i);
+
+			String name = intent.get("S").asName();
+			if (!name.equals("GTS_PDFX"))
+				continue;
+
+			/* We can't use the embedded profile if it's not CMYK based. */
+			if (intent.get("DestOutputProfile").get("N").asInteger() != 4)
+				continue;
+
+			PDFObject id = intent.get("Info");
+			if (id.isString())
+				return id.asString();
+			id = intent.get("OutputConditionIdentifier");
+			if (id.isString())
+				return id.asString();
+			id = intent.get("OutputCondition");
+			if (id.isString())
+				return id.asString();
+		}
+		return null;
+	}
+
 	private void onProof()
 	{
 		proofSetup();
@@ -774,10 +815,6 @@ public class DocActivityView extends FrameLayout implements TabHost.OnTabChangeL
 			Utilities.showMessage((Activity)getContext(), "gprf not supported", "gprf not supported");
 			return;
 		}
-
-
-
-
 
 		//  show a dialog to collect the resolution and profiles
 		final Activity activity = (Activity)getContext();
@@ -790,6 +827,18 @@ public class DocActivityView extends FrameLayout implements TabHost.OnTabChangeL
 		final Spinner sp2 = (Spinner)(dialog.findViewById(R.id.display_profile_spinner));
 		final Spinner sp3 = (Spinner)(dialog.findViewById(R.id.resolution_spinner));
 
+		mEmbeddedProfile = getEmbeddedProfileName();
+		if (mEmbeddedProfile!=null && !mEmbeddedProfile.isEmpty())
+		{
+			//  if the doc has an embedded profile, add it to the beginning of the list of print profiles.
+			String[] baseList = getResources().getStringArray(R.array.proof_print_profiles);
+			ArrayList<String> list = new ArrayList<String>(Arrays.asList(baseList));
+			list.add(0, "Output Intent: " + mEmbeddedProfile);
+			ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<String>(activity, android.R.layout.simple_spinner_item, list);
+			spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+			sp1.setAdapter(spinnerAdapter);
+		}
+
 		dialog.findViewById(R.id.cancel_button).setOnClickListener(new OnClickListener()
 		{
 			@Override
@@ -797,6 +846,12 @@ public class DocActivityView extends FrameLayout implements TabHost.OnTabChangeL
 			{
 				//  Cancel
 				dialog.dismiss();
+
+				//  remember the display profile selected
+				SharedPreferences sharedPref = activity.getPreferences(Context.MODE_PRIVATE);
+				SharedPreferences.Editor editor = sharedPref.edit();
+				editor.putInt("displayProfileSelected", sp2.getSelectedItemPosition());
+				editor.commit();
 			}
 		});
 
@@ -807,10 +862,22 @@ public class DocActivityView extends FrameLayout implements TabHost.OnTabChangeL
 			{
 				//  OK
 				dialog.dismiss();
+
+				//  remember the display profile selected
+				SharedPreferences sharedPref = activity.getPreferences(Context.MODE_PRIVATE);
+				SharedPreferences.Editor editor = sharedPref.edit();
+				editor.putInt("displayProfileSelected", sp2.getSelectedItemPosition());
+				editor.commit();
+
 				doProof(sp1.getSelectedItemPosition(), sp2.getSelectedItemPosition(), sp3.getSelectedItemPosition());
 
 			}
 		});
+
+		//  choose the last-selected display profile.
+		SharedPreferences sharedPref = activity.getPreferences(Context.MODE_PRIVATE);
+		int selected = sharedPref.getInt("displayProfileSelected", 0);
+		sp2.setSelection(selected);
 
 		dialog.show();
 	}
@@ -852,12 +919,26 @@ public class DocActivityView extends FrameLayout implements TabHost.OnTabChangeL
 		String resolutionString = resolutions[resolutionIndex];
 		int resolution = Integer.parseInt(resolutionString);
 
-		//  get the print profile as a temp file
+		//  get the print profile
+		String printProfilePath;
 		String[] printProfiles = getResources().getStringArray(R.array.proof_print_profile_files);
-		String printProfileFile = printProfiles[printProfileIndex];
-		String printProfilePath   = extractProfileAsset("profiles/CMYK/" + printProfileFile);
+		if (mEmbeddedProfile!=null && !mEmbeddedProfile.isEmpty())
+		{
+			if (printProfileIndex==0)
+			{
+				printProfilePath = "<EMBEDDED>";
+			}
+			else
+			{
+				printProfilePath   = extractProfileAsset("profiles/CMYK/" + printProfiles[printProfileIndex-1]);
+			}
+		}
+		else
+		{
+			printProfilePath   = extractProfileAsset("profiles/CMYK/" + printProfiles[printProfileIndex]);
+		}
 
-		//  get the display profile as a temp file
+		//  get the display profile
 		String[] displayProfiles = getResources().getStringArray(R.array.proof_display_profile_files);
 		String displayProfileFile = displayProfiles[displayProfileIndex];
 		String displayProfilePath = extractProfileAsset("profiles/RGB/"  + displayProfileFile);
@@ -868,12 +949,12 @@ public class DocActivityView extends FrameLayout implements TabHost.OnTabChangeL
 		String proofFile = mDocView.getDoc().makeProof(mDocView.getDoc().getPath(), printProfilePath, displayProfilePath, resolution);
 
 		Uri uri = Uri.parse("file://" + proofFile);
-		Intent intent = new Intent((Activity)getContext(), ProofActivity.class);
+		Intent intent = new Intent(getContext(), ProofActivity.class);
 		intent.setAction(Intent.ACTION_VIEW);
 		intent.setData(uri);
 		// add the current page so it can be found when the activity is running
 		intent.putExtra("startingPage", thePage);
-		((Activity)getContext()).startActivity(intent);
+		(getContext()).startActivity(intent);
 	}
 
 	private String extractProfileAsset(String profile)
@@ -881,7 +962,7 @@ public class DocActivityView extends FrameLayout implements TabHost.OnTabChangeL
 		try
 		{
 			InputStream inStream = getContext().getAssets().open(profile);
-			String tempfile = getContext().getExternalCacheDir() + "/shared/" + UUID.randomUUID() + ".profile";
+			String tempfile = getContext().getExternalCacheDir() + "/shared/" + profile;
 			new File(tempfile).mkdirs();
 			Utilities.deleteFile(tempfile);
 

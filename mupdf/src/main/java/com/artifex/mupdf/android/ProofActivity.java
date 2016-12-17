@@ -61,7 +61,7 @@ public class ProofActivity extends Activity implements View.OnClickListener, Doc
 		mPath = path;
 
 		//  get the starting page
-		int startPage = getIntent().getIntExtra("startingPage", 0);
+		final int startingPage = getIntent().getIntExtra("startingPage", 0);
 
 		//  set up UI
 		setContentView(R.layout.activity_proof_view);
@@ -90,20 +90,28 @@ public class ProofActivity extends Activity implements View.OnClickListener, Doc
 
 		mApplyButton = (Button) findViewById(R.id.proof_apply_button);
 		mApplyButton.setOnClickListener(this);
+		mApplyButton.setEnabled(false);
 
 		//  wait for layout to open the document
 		final ProofActivity activity = this;
 		mDocView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
 			public void onGlobalLayout() {
-				mDocView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+				mDocView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
 
 				spinner = createAndShowWaitSpinner(activity);
 
-				//  Go!
-				mWaitingForIdle = true;
-				mDoc = new Document(path);
-				mDocView.start(mDoc);
-				mDocView.setIdleRenderListener(activity);
+				mDocView.post(new Runnable() {
+					@Override
+					public void run()
+					{
+						//  Go!
+						mWaitingForIdle = true;
+						mDoc = new Document(path);
+						mDocView.start(mDoc);
+						mDocView.setIdleRenderListener(activity);
+						mDocView.setCurrentPage(startingPage);
+					}
+				});
 			}
 		});
 	}
@@ -179,6 +187,7 @@ public class ProofActivity extends Activity implements View.OnClickListener, Doc
 		}
 		else if (v == mApplyButton)
 		{
+			mApplyButton.setEnabled(false);
 			updateColors();
 		}
 	}
@@ -278,7 +287,12 @@ public class ProofActivity extends Activity implements View.OnClickListener, Doc
 
 			//  set up the list
 			mColorList = (ListView)findViewById(R.id.proof_color_list);
-			mColorAdapter = new ChooseColorAdapter(getLayoutInflater());
+			mColorAdapter = new ChooseColorAdapter(getLayoutInflater(), new ColorChangeListener() {
+				@Override
+				public void onColorChange() {
+					mApplyButton.setEnabled(true);
+				}
+			});
 			mColorList.setAdapter(mColorAdapter);
 
 			//  get each one
@@ -289,10 +303,10 @@ public class ProofActivity extends Activity implements View.OnClickListener, Doc
 				String name = sep.name;
 
 				//  transform to a color that can be used to colorize icons
-				int alpha = (sep.rgba >> 24) & 0xFF;
-				int red   = (sep.rgba >> 16) & 0xFF;
-				int green = (sep.rgba >> 8 ) & 0xFF;
-				int blue  = (sep.rgba >> 0 ) & 0xFF;
+				int alpha = (sep.bgra >> 24) & 0xFF;
+				int red   = (sep.bgra >> 16) & 0xFF;
+				int green = (sep.bgra >> 8 ) & 0xFF;
+				int blue  = (sep.bgra >> 0 ) & 0xFF;
 				int color = (alpha << 24) | (red << 16) | (green << 8) | (blue << 0);
 
 				mColorAdapter.add(new ChooseColorItem(sep.name, color, true, sep));
@@ -377,14 +391,21 @@ public class ProofActivity extends Activity implements View.OnClickListener, Doc
 
 	//---------------------------------------------------------------------------------------------------------
 
+	public interface ColorChangeListener
+	{
+		void onColorChange();
+	}
+
 	public class ChooseColorAdapter extends BaseAdapter
 	{
 		private final LinkedList<ChooseColorItem> mItems;
 		private final LayoutInflater mInflater;
+		ColorChangeListener mColorChangeListener = null;
 
-		public ChooseColorAdapter(LayoutInflater inflater)
+		public ChooseColorAdapter(LayoutInflater inflater, ColorChangeListener listener)
 		{
 			mInflater = inflater;
+			mColorChangeListener = listener;
 			mItems = new LinkedList<>();
 		}
 
@@ -441,6 +462,8 @@ public class ProofActivity extends Activity implements View.OnClickListener, Doc
 				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
 				{
 					item.checked = isChecked;
+					if (mColorChangeListener!=null)
+						mColorChangeListener.onColorChange();
 				}
 			});
 

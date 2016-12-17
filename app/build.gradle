@@ -8,15 +8,16 @@ android {
         release {
             keyAlias 'mupdf_release_key'
             storeFile file('D:/Projects/PDF/Mupdf/mupdf_release_key.jks')
-
+            keyPassword 'Abc123456'
+            storePassword 'Abc123456'
         }
     }
     compileSdkVersion ANDROID_BUILD_SDK_VERSION as int
     buildToolsVersion ANDROID_BUILD_TOOLS_VERSION
     defaultConfig {
         applicationId 'cn.archko.mupdf'
-        minSdkVersion 14
-        targetSdkVersion 23
+        minSdkVersion ANDROID_BUILD_MIN_SDK_VERSION
+        targetSdkVersion ANDROID_BUILD_TARGET_SDK_VERSION
         versionCode VERSION_CODE as int
         versionName VERSION_NAME
         signingConfig signingConfigs.debug
