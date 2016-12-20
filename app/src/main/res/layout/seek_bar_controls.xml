@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:gravity="center_horizontal"
+              android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/topBar0Main"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@color/toolbar">
+
+        <ImageButton
+            android:id="@+id/back_button"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginLeft="8dp"
+            android:scaleType="center"
+            android:src="@drawable/icon_back"
+            android:background="@drawable/button"/>
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text=""
+            android:singleLine="true"
+            android:ellipsize="marquee"
+            android:paddingLeft="4dp"
+            android:paddingRight="4dp"
+            android:textSize="16sp"
+            android:textColor="@android:color/white"/>
+
+        <!--<ImageButton
+            android:id="@+id/reflowButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/toggle_reflow_mode"
+            android:background="@drawable/button"
+            android:src="@drawable/ic_reflow"/>-->
+
+        <ImageButton
+            android:id="@+id/outlineButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/outline_title"
+            android:background="@drawable/button"
+            android:src="@drawable/ic_list"/>
+
+    </LinearLayout>
+
+    <SeekBar
+        android:id="@+id/seek_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="4dp"
+        android:background="@color/toolbar"
+        android:progressDrawable="@drawable/seek_progress"/>
+
+    <TextView
+        android:id="@+id/page_num"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/page_num"
+        android:textColor="@color/white"/>
+</LinearLayout>

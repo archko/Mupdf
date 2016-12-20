@@ -1,8 +1,10 @@
 package org.vudroid.core;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.RectF;
+import android.os.Build;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.GestureDetector;
@@ -16,11 +18,13 @@ import org.vudroid.core.models.CurrentPageModel;
 import org.vudroid.core.models.DecodingProgressModel;
 import org.vudroid.core.models.ZoomModel;
 import org.vudroid.core.multitouch.MultiTouchZoom;
+import org.vudroid.core.views.APageSeekBarControls;
 
 public class DocumentView extends View implements ZoomListener {
     final ZoomModel zoomModel;
     private final CurrentPageModel currentPageModel;
-    private CurrentPageModel mPageModel;
+    //private CurrentPageModel mPageModel;
+    APageSeekBarControls mAPageSeekBarControls;
     DecodeService decodeService;
     private final SparseArray<Page> pages = new SparseArray<Page>();
     private boolean isInitialized = false;
@@ -46,8 +50,12 @@ public class DocumentView extends View implements ZoomListener {
     int mMargin = 16;
     int preDecodePage = 1;
 
-    public void setPageModel(CurrentPageModel mPageModel) {
+    /*public void setPageModel(CurrentPageModel mPageModel) {
         this.mPageModel = mPageModel;
+    }*/
+
+    public void setAPageSeekBarControls(APageSeekBarControls pageSeekBarControls) {
+        this.mAPageSeekBarControls = pageSeekBarControls;
     }
 
     public DocumentView(Context context, final ZoomModel zoomModel, DecodingProgressModel progressModel, CurrentPageModel currentPageModel) {
@@ -452,11 +460,12 @@ public class DocumentView extends View implements ZoomListener {
         public boolean onDoubleTapEvent(MotionEvent ev) {
             if (ev.getEventTime() - lastDownEventTime < DOUBLE_TAP_TIME) {
                 zoomModel.toggleZoomControls();
-                if (null != mPageModel) {
+                /*if (null != mPageModel) {
                     mPageModel.setCurrentPage(currentPageModel.getCurrentPageIndex());
                     mPageModel.setPageCount(decodeService.getPageCount());
                     mPageModel.toggleSeekControls();
-                }
+                }*/
+                mAPageSeekBarControls.toggleSeekControls();
                 return true;
             } else {
                 lastDownEventTime = ev.getEventTime();
@@ -530,6 +539,7 @@ public class DocumentView extends View implements ZoomListener {
             }
         }
 
+        @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
         @Override
         public void run() {
             if (scroller.isFinished()) {
