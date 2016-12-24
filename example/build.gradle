@@ -1,12 +1,12 @@
 apply plugin: 'com.android.library'
 
 android {
-	compileSdkVersion 23
-	buildToolsVersion '23.0.2'
+	compileSdkVersion ANDROID_BUILD_SDK_VERSION as int
+	buildToolsVersion ANDROID_BUILD_TOOLS_VERSION
 	defaultConfig {
 		//applicationId "com.artifex.mupdf.example"
-		minSdkVersion 14
-		targetSdkVersion 23
+		minSdkVersion ANDROID_BUILD_MIN_SDK_VERSION
+		targetSdkVersion ANDROID_BUILD_TARGET_SDK_VERSION
 		versionCode 1
 		versionName "1.0"
 	}

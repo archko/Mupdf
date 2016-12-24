@@ -173,7 +173,8 @@ public class AKDecodeService implements DecodeService
         //Log.d(DECODE_SERVICE, "Converting map to bitmap finished");
         if (isTaskDead(currentDecodeTask))
         {
-            bitmap.recycle();
+            //bitmap.recycle();
+            BitmapPool.getInstance().release(bitmap);
             return;
         }
         finishDecoding(currentDecodeTask, bitmap);
@@ -347,6 +348,7 @@ public class AKDecodeService implements DecodeService
                 codecContext.recycle();
             }
         });
+        BitmapPool.getInstance().clear();
         executorService.shutdown();
     }
 

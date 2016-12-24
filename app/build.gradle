@@ -1,13 +1,10 @@
 apply plugin: 'com.android.application'
 //apply plugin: 'com.antfortune.freeline'
 android {
-    /*freeline {
-        hack true
-    }*/
     signingConfigs {
         release {
             keyAlias 'mupdf_release_key'
-            storeFile file('D:/Projects/PDF/Mupdf/mupdf_release_key.jks')
+            storeFile file('..D/mupdf_release_key.jks')
             keyPassword 'Abc123456'
             storePassword 'Abc123456'
         }
