@@ -1140,10 +1140,10 @@ public class MuPDFActivity extends Activity implements FilePicker.FilePickerSupp
 
 				//  set an icon that's the right color
 				int iconSize = 48;
-				int alpha = (sep.bgra >> 24) & 0xFF;
-				int red   = (sep.bgra >> 16) & 0xFF;
-				int green = (sep.bgra >> 8 ) & 0xFF;
-				int blue  = (sep.bgra >> 0 ) & 0xFF;
+				int alpha = (sep.rgba >> 24) & 0xFF;
+				int red   = (sep.rgba >> 16) & 0xFF;
+				int green = (sep.rgba >> 8 ) & 0xFF;
+				int blue  = (sep.rgba >> 0 ) & 0xFF;
 				int color = (alpha << 24) | (red << 16) | (green << 8) | (blue << 0);
 
 				ShapeDrawable swatch = new ShapeDrawable (new RectShape());

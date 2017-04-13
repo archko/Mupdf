@@ -98,7 +98,7 @@ public class SearchFragment extends DialogFragment implements AdapterView.OnItem
             String cs = s.toString();
             if (!TextUtils.isEmpty(cs)) {
                 if (!cs.equals(string)) {
-                    search(cs);
+                    search(cs.toLowerCase());
                 }
             } else {
                 clearList();
@@ -158,7 +158,7 @@ public class SearchFragment extends DialogFragment implements AdapterView.OnItem
             if (files != null && files.length > 0) {
                 for (File f : files) {
                     if (f.isFile()) {
-                        if (f.getName().contains(keyword)) {
+                        if (f.getName().toLowerCase().contains(keyword)) {
                             fileList.add(new FileListEntry(FileListEntry.NORMAL, -1, f, true));
                         }
                     } else {
