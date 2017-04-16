@@ -14,13 +14,13 @@
         android:textSize="18sp"
         android:textColor="#ff000000"
         android:paddingBottom="15dp"
-        android:text="Proof Settings:"/>
+        android:text="@string/proof_settings_label"/>
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textColor="#ff000000"
-        android:text="Print Profile:"/>
+        android:text="@string/proof_profile_label"/>
 
     <RelativeLayout
         android:padding="10dp"
@@ -49,7 +49,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textColor="#ff000000"
-        android:text="Soft Proof Profile:"/>
+        android:text="@string/soft_proof_profile_label"/>
 
     <RelativeLayout
         android:padding="10dp"
@@ -78,7 +78,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textColor="#ff000000"
-        android:text="Resolution:"/>
+        android:text="@string/resolution_label"/>
 
     <RelativeLayout
         android:padding="10dp"
@@ -118,7 +118,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             style="@style/proofButton"
-        android:text="CANCEL"/>
+            android:text="@string/cancel"/>
 
         <View
             android:layout_width="20dp"
@@ -130,7 +130,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             style="@style/proofButton"
-            android:text="OK"/>
+            android:text="@string/ok"/>
 
         <View
             android:layout_width="20dp"

@@ -8,6 +8,8 @@ import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.MotionEvent;
+import android.view.View;
+import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
@@ -119,39 +121,51 @@ public class DocView extends DocViewBase implements DragHandleListener
 		if (dpv == null)
 			return;
 
-		if (!getDrawMode())
+		if (getDrawMode())
 		{
-			if (dpv.onSingleTap(p.x, p.y))
-			{
-				onChangeSelection();
-				return;
-			}
-			onChangeSelection();
+			//  do nothing, this is handled elsewhere.
 		}
-
-		if (hasSelection())
+		else if (getNoteMode())
 		{
-			clearSelection();
+			//  create a note
+			dpv.createNote(p.x, p.y);
+			mNoteMode = false;
 			onChangeSelection();
 		}
 		else
 		{
-			//  point in screen coordinates, result in page coordinates
-			Rect r = dpv.selectWord(p);
-			if (r != null)
+			if (dpv.onSingleTap(p.x, p.y))
 			{
-				showSelectionHandles(true);
-
-				selectionStartPage = dpv;
-				selectionStartLoc.set(r.left, r.top);
-				selectionEndPage = dpv;
-				selectionEndLoc.set(r.right, r.bottom);
-
-				moveHandlesToCorners();
-
 				onChangeSelection();
 			}
+			else
+			{
+				if (hasSelection())
+				{
+					clearSelection();
+					onChangeSelection();
+				}
+				else
+				{
+					//  point in screen coordinates, result in page coordinates
+					Rect r = dpv.selectWord(p);
+					if (r != null)
+					{
+						showSelectionHandles(true);
+
+						selectionStartPage = dpv;
+						selectionStartLoc.set(r.left, r.top);
+						selectionEndPage = dpv;
+						selectionEndLoc.set(r.right, r.bottom);
+
+						moveHandlesToCorners();
+
+					}
+					onChangeSelection();
+				}
+			}
 		}
+
 	}
 
 	private void clearSelection()
@@ -187,6 +201,72 @@ public class DocView extends DocViewBase implements DragHandleListener
 		return false;
 	}
 
+	public boolean hasNoteAnnotationSelected()
+	{
+		int numPages = getPageCount();
+		for (int i = 0; i < numPages; i++)
+		{
+			DocPageView cv = (DocPageView) getOrCreateChild(i);
+			if (cv.hasNoteAnnotationSelected())
+				return true;
+		}
+
+		return false;
+	}
+
+
+	public DocPageView.NoteAnnotation getSelectedNoteAnnotation()
+	{
+		int numPages = getPageCount();
+		for (int i = 0; i < numPages; i++)
+		{
+			DocPageView cv = (DocPageView) getOrCreateChild(i);
+			DocPageView.NoteAnnotation annot = cv.getSelectedNoteAnnotation();
+			if (annot != null)
+				return annot;
+		}
+
+		return null;
+	}
+
+	public Point getSelectedNoteLocation()
+	{
+		int numPages = getPageCount();
+		for (int i = 0; i < numPages; i++)
+		{
+			DocPageView cv = (DocPageView) getOrCreateChild(i);
+			if (cv.hasNoteAnnotationSelected())
+			{
+				Point p = cv.getSelectedNoteLocation();
+				if (p != null)
+				{
+					//  offset to 0,0
+					p.offset(cv.getLeft(), cv.getTop());
+
+					//  offset to position in the scrolling view (this)
+					p.offset(-getScrollX(), -getScrollY());
+
+					return p;
+				}
+			}
+		}
+
+		return null;
+	}
+
+	public boolean hasAnnotationSelected()
+	{
+		int numPages = getPageCount();
+		for (int i = 0; i < numPages; i++)
+		{
+			DocPageView cv = (DocPageView) getOrCreateChild(i);
+			if (cv.hasAnnotationSelected())
+				return true;
+		}
+
+		return false;
+	}
+
 	public void setSelectedInkLineColor(int val)
 	{
 		int numPages = getPageCount();
@@ -207,6 +287,58 @@ public class DocView extends DocViewBase implements DragHandleListener
 			if (cv.hasInkAnnotationSelected())
 				cv.setSelectedInkLineThickness(val);
 		}
+	}
+
+	View noteEditor = null;
+	private void setNoteEditor(View v)
+	{
+		if (noteEditor == null)
+		{
+			noteEditor = v;
+
+			EditText txtEdit = (EditText) v.findViewById(R.id.doc_note_editor_text);
+
+			txtEdit.setOnFocusChangeListener(new OnFocusChangeListener() {
+				@Override
+				public void onFocusChange(View v, boolean hasFocus) {
+					if (hasFocus) {
+						scrollToViewEditor();
+					}
+				}
+			});
+
+		}
+
+
+	}
+
+
+	public void moveNoteEditor(View v)
+	{
+		if (v != null)
+		{
+			setNoteEditor(v);
+
+			if (hasNoteAnnotationSelected())
+			{
+				v.setVisibility(View.VISIBLE);
+
+				Point p = getSelectedNoteLocation();
+				if (p != null)
+				{
+					//  TODO move it
+					RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) v.getLayoutParams();
+					params.leftMargin = p.x;
+					params.topMargin = p.y;
+					v.setLayoutParams(params);
+				}
+			}
+			else
+			{
+				v.setVisibility(View.GONE);
+			}
+		}
+
 	}
 
 	private void onChangeSelection()
@@ -328,6 +460,7 @@ public class DocView extends DocViewBase implements DragHandleListener
 		super.onLayout(changed, left, top, right, bottom);
 
 		moveHandlesToCorners();
+		moveNoteEditor(noteEditor);
 	}
 
 	private void moveHandlesToCorners()
@@ -485,6 +618,41 @@ public class DocView extends DocViewBase implements DragHandleListener
 		}
 	}
 
+	public void scrollToViewEditor()
+	{
+		if (null != noteEditor && noteEditor.getVisibility()==View.VISIBLE)
+		{
+			RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) noteEditor.getLayoutParams();
+			int x = params.leftMargin;
+			int y = params.topMargin;
+			int w = noteEditor.getWidth();
+			int h = noteEditor.getHeight();
+
+			//  get our viewport
+			Rect viewport = new Rect();
+			getGlobalVisibleRect(viewport);
+			viewport.offset(0, -viewport.top);
+
+			//  if the point is outside the viewport, scroll so it is.
+			if (y < viewport.top || y >= viewport.bottom)
+			{
+				int diff = (viewport.top + viewport.bottom) / 2 - y;
+				smoothScrollBy(0, diff);
+			}
+			//  if the point is outside the viewport, scroll so it is.
+			if (y+h < viewport.top || y+h >= viewport.bottom)
+			{
+				int diff = (viewport.top + viewport.bottom) / 2 - (y+h);
+				smoothScrollBy(0, diff);
+			}
+
+
+
+
+
+		}
+	}
+
 	public void onHighlight()
 	{
 		if (hasSelection())
@@ -519,8 +687,11 @@ public class DocView extends DocViewBase implements DragHandleListener
 		for (int i = 0; i < numPages; i++)
 		{
 			DocPageView cv = (DocPageView) getOrCreateChild(i);
-			if (cv.hasInkAnnotationSelected())
-				cv.deleteSelectedInkAnnotation();
+			if (cv.hasAnnotationSelected())
+			{
+				cv.deleteSelectedAnnotation();
+				onChangeSelection();
+			}
 		}
 	}
 

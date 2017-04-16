@@ -4,6 +4,12 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.res.Resources;
+import android.graphics.Point;
+import android.os.Build;
+import android.util.DisplayMetrics;
+import android.util.Log;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.webkit.MimeTypeMap;
@@ -20,6 +26,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Method;
 
 public class Utilities
 {
@@ -345,11 +352,11 @@ public class Utilities
 		return json;
 	}
 
-	public static String removeExtention(String filePath)
+	public static String removeExtension(String filePath)
 	{
 		File f = new File(filePath);
 
-		// if it's a directory, don't remove the extention
+		// if it's a directory, don't remove the extension
 		if (f.isDirectory())
 			return filePath;
 
@@ -379,5 +386,57 @@ public class Utilities
 			mime = MimeTypeMap.getSingleton().getMimeTypeFromExtension(ext);
 		}
 		return mime;
+	}
+
+	//  this function returns the *actual* size of the screen.
+	public static Point getRealScreenSize(Activity activity)
+	{
+		Display display = activity.getWindowManager().getDefaultDisplay();
+		int realWidth;
+		int realHeight;
+
+		if (Build.VERSION.SDK_INT >= 17)
+		{
+			//  new pleasant way to get real metrics
+			DisplayMetrics realMetrics = new DisplayMetrics();
+			display.getRealMetrics(realMetrics);
+			realWidth = realMetrics.widthPixels;
+			realHeight = realMetrics.heightPixels;
+
+		}
+		else if (Build.VERSION.SDK_INT >= 14)
+		{
+			//  reflection for this weird in-between time
+			try
+			{
+				Method mGetRawH = Display.class.getMethod("getRawHeight");
+				Method mGetRawW = Display.class.getMethod("getRawWidth");
+				realWidth = (Integer) mGetRawW.invoke(display);
+				realHeight = (Integer) mGetRawH.invoke(display);
+			}
+			catch (Exception e)
+			{
+				//this may not be 100% accurate, but it's all we've got
+				realWidth = display.getWidth();
+				realHeight = display.getHeight();
+				Log.e("sonui", "Couldn't use reflection to get the real display metrics.");
+			}
+		}
+		else
+		{
+			//this may not be 100% accurate, but it's all we've got
+			realWidth = display.getWidth();
+			realHeight = display.getHeight();
+			Log.e("sonui", "Can't get real display matrix.");
+		}
+
+		return new Point(realWidth, realHeight);
+	}
+
+	public static int convertDpToPixel(float dp)
+	{
+		DisplayMetrics metrics = Resources.getSystem().getDisplayMetrics();
+		float px = dp * (metrics.densityDpi / 160f);
+		return (int)Math.round(px);
 	}
 }

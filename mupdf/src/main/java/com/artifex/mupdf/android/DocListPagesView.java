@@ -32,8 +32,11 @@ public class DocListPagesView extends DocViewBase
 		DocPageView v = findPageViewContainingPoint(p.x, p.y, false);
 		if (v != null)
 		{
+			//  change the current page
 			int pageNumber = v.getPageNumber();
+			setCurrentPage(pageNumber);
 
+			//  tell the main view
 			if (mSelectionListener != null)
 				mSelectionListener.onPageSelected(pageNumber);
 		}
@@ -79,27 +82,24 @@ public class DocListPagesView extends DocViewBase
 		return new Point(dx, dy);
 	}
 
-	public void setMostVisiblePage(int p)
+	public void setCurrentPage(int p)
 	{
-		//  set one of the pages in the  document to be the "most visible".
-		int numPages = getPageCount();
-		for (int i = 0; i < numPages; i++)
+		//  run through the pages and set one of them to be "current"
+		for (int i=0; i<getPageCount(); i++)
 		{
 			DocPageView cv = (DocPageView) getOrCreateChild(i);
-			cv.setMostVisible(i == p);
+			cv.setCurrent(i==p);
 		}
 	}
 
-	public int getMostVisiblePage()
+	@Override
+	protected void setMostVisiblePage()
 	{
-		int numPages = getPageCount();
-		for (int i = 0; i < numPages; i++)
-		{
-			DocPageView cv = (DocPageView) getOrCreateChild(i);
-			if (cv.getMostVisible())
-				return i;
-		}
-		return 0;
+	}
+
+	@Override
+	protected void onEndFling()
+	{
 	}
 
 	@Override

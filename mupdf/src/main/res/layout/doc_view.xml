@@ -177,6 +177,44 @@
                     android:layout_height="match_parent">
                 </com.artifex.mupdf.android.DocReflowView>
 
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="200dp"
+                    android:background="#ffffff00"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/doc_note_editor"
+                    >
+
+                    <TextView
+                        android:background="@color/transparent"
+                        android:textColor="@color/black"
+                        android:textStyle="bold"
+                        android:textSize="20sp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/note_title" />
+
+                    <TextView
+                        android:background="@color/transparent"
+                        android:textColor="@color/black"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="16sp"
+                        android:id="@+id/doc_note_editor_date"
+                        android:text="@string/note_date" />
+
+                    <EditText
+                        android:textColor="@color/black"
+                        android:background="@color/transparent"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/doc_note_editor_text"
+                        android:minLines="6"
+                        android:gravity="top"
+                        android:text=""/>
+
+                </LinearLayout>
+
             </RelativeLayout>
 
         </LinearLayout>

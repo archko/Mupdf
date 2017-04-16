@@ -89,7 +89,7 @@ public class DragHandle extends FrameLayout implements View.OnTouchListener
 
 	//  this view is shown at the corners of a selection.
 	//  We use a touch listener to drag it within its parent.
-	//  It's parent is a RelativeLayout, so we effect moving by adjusting
+	//  Its parent is a RelativeLayout, so we effect moving by adjusting
 	//  offsets.  The actual top and left are always 0,0.
 
 	@Override

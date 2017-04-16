@@ -41,12 +41,12 @@ public class ProofActivity extends Activity implements View.OnClickListener, Doc
 	private Document mDoc=null;
 	private String mPath;
 
-	private ToolbarButton mFirstPageButton;
-	private ToolbarButton mPreviousPageButton;
-	private ToolbarButton mNextPageButton;
-	private ToolbarButton mLastPageButton;
-	private ToolbarButton mColorsUpButton;
-	private ToolbarButton mColorsDownButton;
+	private Button mFirstPageButton;
+	private Button mPreviousPageButton;
+	private Button mNextPageButton;
+	private Button mLastPageButton;
+	private Button mColorsUpButton;
+	private Button mColorsDownButton;
 	private ImageButton mBackButton;
 	private Button mApplyButton;
 
@@ -67,25 +67,25 @@ public class ProofActivity extends Activity implements View.OnClickListener, Doc
 		setContentView(R.layout.activity_proof_view);
 		mDocView = (DocProofView) findViewById(R.id.proof_view);
 
-		mFirstPageButton = (ToolbarButton)findViewById(R.id.proof_first_page);
+		mFirstPageButton = (Button)findViewById(R.id.proof_first_page);
 		mFirstPageButton.setOnClickListener(this);
 
-		mPreviousPageButton = (ToolbarButton)findViewById(R.id.proof_previous_page);
+		mPreviousPageButton = (Button)findViewById(R.id.proof_previous_page);
 		mPreviousPageButton.setOnClickListener(this);
 
-		mNextPageButton = (ToolbarButton)findViewById(R.id.proof_next_page);
+		mNextPageButton = (Button)findViewById(R.id.proof_next_page);
 		mNextPageButton.setOnClickListener(this);
 
-		mLastPageButton = (ToolbarButton)findViewById(R.id.proof_last_page);
+		mLastPageButton = (Button)findViewById(R.id.proof_last_page);
 		mLastPageButton.setOnClickListener(this);
 
 		mBackButton = (ImageButton) findViewById(R.id.proof_back_button);
 		mBackButton.setOnClickListener(this);
 
-		mColorsUpButton = (ToolbarButton) findViewById(R.id.proof_colors_button_up);
+		mColorsUpButton = (Button) findViewById(R.id.proof_colors_button_up);
 		mColorsUpButton.setOnClickListener(this);
 
-		mColorsDownButton = (ToolbarButton) findViewById(R.id.proof_colors_button_down);
+		mColorsDownButton = (Button) findViewById(R.id.proof_colors_button_down);
 		mColorsDownButton.setOnClickListener(this);
 
 		mApplyButton = (Button) findViewById(R.id.proof_apply_button);
@@ -154,7 +154,7 @@ public class ProofActivity extends Activity implements View.OnClickListener, Doc
 	@Override
 	public void onClick(View v)
 	{
-		int pageCount = mDocView.getDoc().countPages();  //  the real page count
+		int pageCount = mDocView.getAdapter().getCount();
 		int currentPage = mDocView.getCurrentPage();
 
 		if (v == mFirstPageButton)
@@ -251,7 +251,7 @@ public class ProofActivity extends Activity implements View.OnClickListener, Doc
 	private void setPageLabel()
 	{
 		int page = mDocView.getCurrentPage()+1;
-		int count = mDocView.getDoc().countPages();
+		int count = mDocView.getAdapter().getCount();
 		String s = String.format("Page %d of %d", page, count);
 		TextView tv = (TextView) findViewById(R.id.proof_page_n_of_n);
 		tv.setText(s);

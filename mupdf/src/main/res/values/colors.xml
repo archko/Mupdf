@@ -5,6 +5,8 @@
     <color name="button_outline">#FF000000</color>
     <color name="button_pressed">#FF2572AC</color>
 
+    <color name="doc_background">#ffbcbcbc</color>
+
     <color name="toolbar">#DDDFE0</color>
     <color name="transparent">#00000000</color>
     <color name="my_blue">#FF65FFFF</color>
@@ -44,6 +46,6 @@
     <!-- text highlighting -->
     <color name="text_highlight_color">#66CCFF</color>
 
-    <color name="blue_dot_color">#0080FF</color>
+    <color name="selected_page_border_color">#ffaa00</color>
 
 </resources>

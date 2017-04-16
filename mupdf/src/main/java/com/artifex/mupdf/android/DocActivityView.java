@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.graphics.Point;
 import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.util.AttributeSet;
@@ -19,6 +21,7 @@ import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
@@ -42,13 +45,32 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.UUID;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class DocActivityView extends FrameLayout implements TabHost.OnTabChangeListener, View.OnClickListener, DocView.SelectionChangeListener
 {
+	/*
+	This class displays a DocView, and optionally, a DocListPagesView to its right.
+	Both views show the document content, but the DocListPagesView is narrow,
+	and always shows one column.
+
+	There is logic here, and in Docview, DocViewBase and DocListPagesView,
+	to keep them both in sync, as follows:
+
+	When the DocListPagesView is showing, and the user taps on one of its pages,
+	that page is highlighted, and the DocView on the left is auto-scrolled to bring that page into view.
+	When the user scrolls the DocListPagesView, nothing more is done.
+
+	When the user scrolls the DocView on the left, a "most visible" page is determined, and the
+	DocListPagesView is auto-scrolled to bring that page into view, and that page is
+	highlighted.
+	*/
+
 	private DocView mDocView;
-	private DocReflowView mDocReflowView;
 	private DocListPagesView mDocPagesView;
+
+	private DocReflowView mDocReflowView;
 
 	private boolean mShowUI = true;
 
@@ -58,48 +80,53 @@ public class DocActivityView extends FrameLayout implements TabHost.OnTabChangeL
 	private String mTagAnnotate;
 	private String mTagPages;
 
-	private ImageButton mReflowButton;
-	private ImageButton mFirstPageButton;
-	private ImageButton mLastPageButton;
+	private Button mReflowButton;
+	private Button mFirstPageButton;
+	private Button mLastPageButton;
 
 	private ImageButton mSearchButton;
 	private EditText mSearchText;
-	private ImageButton mSearchNextButton;
-	private ImageButton mSearchPreviousButton;
+	private Button mSearchNextButton;
+	private Button mSearchPreviousButton;
 	private ImageButton mBackButton;
 
-	private ImageButton mSaveButton;
-	private ImageButton mSaveAsButton;
-	private ImageButton mPrintButton;
-	private ImageButton mShareButton;
-	private ImageButton mOpenInButton;
+	private Button mSaveButton;
+	private Button mSaveAsButton;
+	private Button mPrintButton;
+	private Button mShareButton;
+	private Button mOpenInButton;
 
-	private ImageButton mToggleAnnotButton;
-	private ImageButton mHighlightButton;
-	private ImageButton mDeleteButton;
+	private Button mToggleAnnotButton;
+	private Button mHighlightButton;
+	private Button mDeleteButton;
 
-	private ImageButton mNoteButton;
-	private ImageButton mDrawButton;
-	private ImageButton mLineColorButton;
-	private ImageButton mLineThicknessButton;
+	private Button mNoteButton;
+	private Button mDrawButton;
+	private Button mLineColorButton;
+	private Button mLineThicknessButton;
 
-	private ImageButton mProofButton;
+	private Button mProofButton;
 
 	private String mEmbeddedProfile = null;
+
+	private Context mContext;
 
 	public DocActivityView(Context context)
 	{
 		super(context);
+		mContext = context;
 	}
 
 	public DocActivityView(Context context, AttributeSet attrs)
 	{
 		super(context, attrs);
+		mContext = context;
 	}
 
 	public DocActivityView(Context context, AttributeSet attrs, int defStyle)
 	{
 		super(context, attrs, defStyle);
+		mContext = context;
 	}
 
 	protected boolean usePagesView()
@@ -195,14 +222,29 @@ public class DocActivityView extends FrameLayout implements TabHost.OnTabChangeL
 			return;
 
 		pages.setVisibility(View.VISIBLE);
-		ViewTreeObserver observer = mDocView.getViewTreeObserver();
+
+		final ViewTreeObserver observer = mDocView.getViewTreeObserver();
 		observer.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener()
 		{
 			@Override
 			public void onGlobalLayout()
 			{
-				mDocView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+				observer.removeOnGlobalLayoutListener(this);
 				mDocView.onShowPages();
+			}
+		});
+
+		final ViewTreeObserver observer2 = getViewTreeObserver();
+		observer2.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener()
+		{
+			@Override
+			public void onGlobalLayout()
+			{
+				observer2.removeOnGlobalLayoutListener(this);
+				mDocPagesView.onOrientationChange();
+				int page = mDocView.getMostVisiblePage();
+				mDocPagesView.setCurrentPage(page);
+				mDocPagesView.scrollToPage(page);
 			}
 		});
 	}
@@ -227,6 +269,17 @@ public class DocActivityView extends FrameLayout implements TabHost.OnTabChangeL
 				mDocView.onHidePages();
 			}
 		});
+	}
+
+	//  called from the main DocView whenever the pages list needs to be updated.
+	public void setCurrentPage(int pageNumber)
+	{
+		if (usePagesView())
+		{
+			//  set the new current page and scroll there.
+			mDocPagesView.setCurrentPage(pageNumber);
+			mDocPagesView.scrollToPage(pageNumber);
+		}
 	}
 
 	public boolean showKeyboard()
@@ -281,6 +334,7 @@ public class DocActivityView extends FrameLayout implements TabHost.OnTabChangeL
 	{
 		//  main view
 		mDocView = (DocView) findViewById(R.id.doc_view_inner);
+		mDocView.setHost(this);
 		mDocReflowView = (DocReflowView) findViewById(R.id.doc_reflow_view);
 
 		//  page list
@@ -292,7 +346,7 @@ public class DocActivityView extends FrameLayout implements TabHost.OnTabChangeL
 				@Override
 				public void onPageSelected(int pageNumber)
 				{
-					goToPage(pageNumber);
+					mDocView.scrollToPage(pageNumber);
 				}
 			});
 
@@ -308,22 +362,14 @@ public class DocActivityView extends FrameLayout implements TabHost.OnTabChangeL
 		RelativeLayout layout = (RelativeLayout) v;
 		mDocView.setupHandles(layout);
 
-		//  listen for layout changes on the main doc view, and
-		//  copy the "most visible" value to the page list.
-		ViewTreeObserver observer2 = mDocView.getViewTreeObserver();
-		observer2.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener()
+		//  watch for a possible orientation change
+		ViewTreeObserver observer3 = getViewTreeObserver();
+		observer3.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener()
 		{
 			@Override
 			public void onGlobalLayout()
 			{
-				if (usePagesView())
-				{
-					if (mDocView.getVisibility() == View.VISIBLE)
-					{
-						int mvp = mDocView.getMostVisiblePage();
-						mDocPagesView.setMostVisiblePage(mvp);
-					}
-				}
+				onPossibleOrientationChange();
 			}
 		});
 
@@ -332,13 +378,13 @@ public class DocActivityView extends FrameLayout implements TabHost.OnTabChangeL
 		mBackButton = (ImageButton)findViewById(R.id.back_button);
 		mBackButton.setOnClickListener(this);
 
-		mReflowButton = (ImageButton)findViewById(R.id.reflow_button);
+		mReflowButton = (Button)findViewById(R.id.reflow_button);
 		mReflowButton.setOnClickListener(this);
 
-		mFirstPageButton = (ImageButton)findViewById(R.id.first_page_button);
+		mFirstPageButton = (Button)findViewById(R.id.first_page_button);
 		mFirstPageButton.setOnClickListener(this);
 
-		mLastPageButton = (ImageButton)findViewById(R.id.last_page_button);
+		mLastPageButton = (Button)findViewById(R.id.last_page_button);
 		mLastPageButton.setOnClickListener(this);
 
 		mSearchButton = (ImageButton)findViewById(R.id.search_button);
@@ -347,22 +393,22 @@ public class DocActivityView extends FrameLayout implements TabHost.OnTabChangeL
 		mSearchText = (EditText) findViewById(R.id.search_text_input);
 		mSearchText.setOnClickListener(this);
 
-		mSaveButton = (ImageButton)findViewById(R.id.save_button);
+		mSaveButton = (Button)findViewById(R.id.save_button);
 		mSaveButton.setOnClickListener(this);
 
-		mSaveAsButton = (ImageButton)findViewById(R.id.save_as_button);
+		mSaveAsButton = (Button)findViewById(R.id.save_as_button);
 		mSaveAsButton.setOnClickListener(this);
 
-		mPrintButton = (ImageButton)findViewById(R.id.print_button);
+		mPrintButton = (Button)findViewById(R.id.print_button);
 		mPrintButton.setOnClickListener(this);
 
-		mShareButton = (ImageButton)findViewById(R.id.share_button);
+		mShareButton = (Button)findViewById(R.id.share_button);
 		mShareButton.setOnClickListener(this);
 
-		mOpenInButton = (ImageButton)findViewById(R.id.open_in_button);
+		mOpenInButton = (Button)findViewById(R.id.open_in_button);
 		mOpenInButton.setOnClickListener(this);
 
-		mProofButton = (ImageButton)findViewById(R.id.proof_button);
+		mProofButton = (Button)findViewById(R.id.proof_button);
 		mProofButton.setOnClickListener(this);
 
 		//  this listener will
@@ -380,31 +426,31 @@ public class DocActivityView extends FrameLayout implements TabHost.OnTabChangeL
 			}
 		});
 
-		mSearchNextButton = (ImageButton)findViewById(R.id.search_next_button);
+		mSearchNextButton = (Button)findViewById(R.id.search_next_button);
 		mSearchNextButton.setOnClickListener(this);
 
-		mSearchPreviousButton = (ImageButton)findViewById(R.id.search_previous_button);
+		mSearchPreviousButton = (Button)findViewById(R.id.search_previous_button);
 		mSearchPreviousButton.setOnClickListener(this);
 
-		mToggleAnnotButton = (ImageButton)findViewById(R.id.show_annot_button);
+		mToggleAnnotButton = (Button)findViewById(R.id.show_annot_button);
 		mToggleAnnotButton.setOnClickListener(this);
 
-		mHighlightButton = (ImageButton)findViewById(R.id.highlight_button);
+		mHighlightButton = (Button)findViewById(R.id.highlight_button);
 		mHighlightButton.setOnClickListener(this);
 
-		mNoteButton = (ImageButton)findViewById(R.id.note_button);
+		mNoteButton = (Button)findViewById(R.id.note_button);
 		mNoteButton.setOnClickListener(this);
 
-		mDrawButton = (ImageButton)findViewById(R.id.draw_button);
+		mDrawButton = (Button)findViewById(R.id.draw_button);
 		mDrawButton.setOnClickListener(this);
 
-		mLineColorButton = (ImageButton)findViewById(R.id.line_color_button);
+		mLineColorButton = (Button)findViewById(R.id.line_color_button);
 		mLineColorButton.setOnClickListener(this);
 
-		mLineThicknessButton = (ImageButton)findViewById(R.id.line_thickness_button);
+		mLineThicknessButton = (Button)findViewById(R.id.line_thickness_button);
 		mLineThicknessButton.setOnClickListener(this);
 
-		mDeleteButton = (ImageButton)findViewById(R.id.delete_button);
+		mDeleteButton = (Button)findViewById(R.id.delete_button);
 		mDeleteButton.setOnClickListener(this);
 
 		mDoc = new Document(path);
@@ -416,6 +462,33 @@ public class DocActivityView extends FrameLayout implements TabHost.OnTabChangeL
 		else
 		{
 			afterPassword();
+		}
+	}
+
+	private static final int ORIENTATION_PORTAIT = 1;
+	private static final int ORIENTATION_LANDSCAPE = 2;
+	private int mLastOrientation = 0;
+	private void onPossibleOrientationChange()
+	{
+		//  get current orientation
+		Point p = Utilities.getRealScreenSize((Activity)mContext);
+		int orientation = ORIENTATION_PORTAIT;
+		if (p.x>p.y)
+			orientation = ORIENTATION_LANDSCAPE;
+
+		//  see if it's changed
+		if (orientation != mLastOrientation)
+			onOrientationChange();
+
+		mLastOrientation = orientation;
+	}
+
+	private void onOrientationChange()
+	{
+		mDocView.onOrientationChange();
+
+		if (usePagesView()) {
+			mDocPagesView.onOrientationChange();
 		}
 	}
 
@@ -646,7 +719,7 @@ public class DocActivityView extends FrameLayout implements TabHost.OnTabChangeL
 		if (mDocReflowView.getVisibility() == View.VISIBLE)
 		{
 			setReflowText(pageNumber);
-			mDocPagesView.setMostVisiblePage(pageNumber);
+			mDocPagesView.setCurrentPage(pageNumber);
 		}
 	}
 
@@ -749,7 +822,8 @@ public class DocActivityView extends FrameLayout implements TabHost.OnTabChangeL
 				{
 					int icolor = Color.parseColor(color);
 					mDocView.setInkLineColor(icolor);
-					mLineColorButton.setColorFilter(icolor, PorterDuff.Mode.SRC_IN);
+					Drawable drawables[] = mLineColorButton.getCompoundDrawables();
+					drawables[1].setColorFilter(icolor, PorterDuff.Mode.SRC_IN);
 				}
 			}, true);
 			dlg.setShowTitle(false);
@@ -993,10 +1067,14 @@ public class DocActivityView extends FrameLayout implements TabHost.OnTabChangeL
 		mDocView.onDelete();
 	}
 
+	private DocPageView.NoteAnnotation lastNote = null;
+
 	public void onSelectionChanged()
 	{
 		boolean hasSel = mDocView.hasSelection();
 		boolean hasInkAnnotSel = mDocView.hasInkAnnotationSelected();
+		boolean hasAnnotSel = mDocView.hasAnnotationSelected();
+		boolean hasNoteAnnotSel = mDocView.hasNoteAnnotationSelected();
 
 		mHighlightButton.setEnabled(hasSel);
 
@@ -1008,9 +1086,36 @@ public class DocActivityView extends FrameLayout implements TabHost.OnTabChangeL
 		mDrawButton.setSelected(drawMode);
 		mLineColorButton.setEnabled(drawMode || hasInkAnnotSel);
 		mLineThicknessButton.setEnabled(drawMode || hasInkAnnotSel);
-		mDeleteButton.setEnabled(!drawMode && hasInkAnnotSel);
+		mDeleteButton.setEnabled(!drawMode && hasAnnotSel);
 
 		findViewById(R.id.draw_tools_holder).setSelected(drawMode);
+
+		View v = findViewById(R.id.doc_note_editor);
+		mDocView.moveNoteEditor(v);
+
+		DocPageView.NoteAnnotation note = mDocView.getSelectedNoteAnnotation();
+		if (note != lastNote)
+		{
+			TextView tv = (TextView)findViewById(R.id.doc_note_editor_date);
+			EditText te = (EditText)findViewById(R.id.doc_note_editor_text);
+
+			//  save the old one
+			if (lastNote != null)
+			{
+				SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy HH:mm");
+				String date = sdf.format(new Date());
+				lastNote.setDate(date);
+				lastNote.setText(te.getText().toString());
+			}
+
+			if (note != null)
+			{
+				tv.setText(note.getDate());
+				te.setText(note.getText());
+			}
+
+			lastNote = note;
+		}
 	}
 
 	private OnDoneListener mDoneListener = null;

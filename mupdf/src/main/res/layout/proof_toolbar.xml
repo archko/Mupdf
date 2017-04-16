@@ -33,112 +33,65 @@
                 android:layout_height="match_parent"
                 android:background="#FF8E8F90" />
 
-            <LinearLayout
+            <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:gravity="center_horizontal"
+                android:layout_centerVertical="true"
+                android:scaleType="fitXY"
                 android:paddingLeft="10dp"
-                android:paddingRight="10dp">
+                android:paddingRight="10dp"
+                android:textColor="@color/black"
+                android:textSize="11sp"
+                android:textAllCaps="true"
+                android:background="@drawable/toolbar_button"
+                android:id="@+id/proof_first_page"
+                android:drawableTop="@drawable/icon_first_page"
+                android:text="@string/first_page_button" />
 
-                <com.artifex.mupdf.android.ToolbarButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:scaleType="fitXY"
-                    android:layout_centerVertical="true"
-                    android:background="@drawable/toolbar_button"
-                    android:id="@+id/proof_first_page"
-                    android:src="@drawable/icon_first_page" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:textColor="@color/black"
-                    android:textSize="11sp"
-                    android:text="FIRST PAGE"/>
-            </LinearLayout>
-
-
-            <LinearLayout
+            <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:gravity="center_horizontal"
+                android:layout_centerVertical="true"
+                android:scaleType="fitXY"
                 android:paddingLeft="10dp"
-                android:paddingRight="10dp">
+                android:paddingRight="10dp"
+                android:textColor="@color/black"
+                android:textSize="11sp"
+                android:textAllCaps="true"
+                android:background="@drawable/toolbar_button"
+                android:id="@+id/proof_previous_page"
+                android:drawableTop="@drawable/icon_prev_page"
+                android:text="@string/previous_page_button" />
 
-                <com.artifex.mupdf.android.ToolbarButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:scaleType="fitXY"
-                    android:layout_centerVertical="true"
-                    android:background="@drawable/toolbar_button"
-                    android:id="@+id/proof_previous_page"
-                    android:src="@drawable/icon_prev_page" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:textColor="@color/black"
-                    android:textSize="11sp"
-                    android:text="PREVIOUS PAGE"/>
-            </LinearLayout>
-
-
-            <LinearLayout
+            <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:gravity="center_horizontal"
+                android:layout_centerVertical="true"
+                android:scaleType="fitXY"
                 android:paddingLeft="10dp"
-                android:paddingRight="10dp">
+                android:paddingRight="10dp"
+                android:textColor="@color/black"
+                android:textSize="11sp"
+                android:textAllCaps="true"
+                android:background="@drawable/toolbar_button"
+                android:id="@+id/proof_next_page"
+                android:drawableTop="@drawable/icon_next_page"
+                android:text="@string/next_page_button" />
 
-                <com.artifex.mupdf.android.ToolbarButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:scaleType="fitXY"
-                    android:layout_centerVertical="true"
-                    android:background="@drawable/toolbar_button"
-                    android:id="@+id/proof_next_page"
-                    android:src="@drawable/icon_next_page" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:textColor="@color/black"
-                    android:textSize="11sp"
-                    android:text="NEXT PAGE"/>
-            </LinearLayout>
-
-
-            <LinearLayout
+            <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:gravity="center_horizontal"
+                android:layout_centerVertical="true"
+                android:scaleType="fitXY"
                 android:paddingLeft="10dp"
-                android:paddingRight="10dp">
-
-                <com.artifex.mupdf.android.ToolbarButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:scaleType="fitXY"
-                    android:layout_centerVertical="true"
-                    android:background="@drawable/toolbar_button"
-                    android:id="@+id/proof_last_page"
-                    android:src="@drawable/icon_last_page" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:textColor="@color/black"
-                    android:textSize="11sp"
-                    android:text="LAST PAGE"/>
-            </LinearLayout>
+                android:paddingRight="10dp"
+                android:textColor="@color/black"
+                android:textSize="11sp"
+                android:textAllCaps="true"
+                android:background="@drawable/toolbar_button"
+                android:id="@+id/proof_last_page"
+                android:drawableTop="@drawable/icon_last_page"
+                android:text="@string/last_page_button" />
 
             <!--a divider-->
             <View
@@ -171,7 +124,7 @@
                 android:paddingLeft="10dp"
                 android:paddingRight="10dp">
 
-                <com.artifex.mupdf.android.ToolbarButton
+                <Button
                     android:visibility="gone"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -181,7 +134,7 @@
                     android:id="@+id/proof_colors_button_up"
                     android:src="@drawable/icon_proof_colors_up" />
 
-                <com.artifex.mupdf.android.ToolbarButton
+                <Button
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:scaleType="fitXY"
@@ -196,7 +149,7 @@
                     android:gravity="center"
                     android:textColor="@color/black"
                     android:textSize="11sp"
-                    android:text="COLORS"/>
+                    android:text="@string/colors"/>
 
             </LinearLayout>
 

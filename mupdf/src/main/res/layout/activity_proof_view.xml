@@ -50,7 +50,7 @@
                 android:textSize="18sp"
                 android:padding="10dp"
                 android:layout_margin="10dp"
-                android:text="APPLY"/>
+                android:text="@string/apply"/>
 
             <ListView android:id="@+id/proof_color_list"
                       android:background="@color/transparent"

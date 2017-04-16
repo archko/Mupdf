@@ -29,7 +29,9 @@ import com.artifex.mupdf.fitz.R;
 import com.artifex.mupdf.fitz.StructuredText;
 import com.artifex.mupdf.fitz.android.AndroidDrawDevice;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.ListIterator;
 
@@ -42,6 +44,8 @@ public class DocPageView extends View implements Callback
 
 	private float mScale = 1.0f;
 	private float mZoom = 1.0f;
+	private int setupW;
+	private int setupH;
 
 	//  rendering
 	private Bitmap mRenderBitmap = null;
@@ -61,9 +65,10 @@ public class DocPageView extends View implements Callback
 	private final Paint mSelectionHighlightPainter;
 	private final Paint mSearchHighlightPainter;
 	private final Paint mBlankPainter;
-	private final Paint mDotPainter;
+	private final Paint mBorderPainter;
 	private final Rect mSrcRect = new Rect();
 	private final Rect mDstRect = new Rect();
+	private final Rect mBorderRect = new Rect();
 
 	private Rect mHighlightingRect = new Rect();
 
@@ -81,8 +86,8 @@ public class DocPageView extends View implements Callback
 	public static int bitmapMarginX = 0;
 	public static int bitmapMarginY = 0;
 
-	//  use this to control whether the blue dot is drawn in the upper left corner.
-	private boolean isMostVisible = false;
+	//  use this to control whether the selected border is drawn.
+	private boolean isCurrent = false;
 
 	//  currently selected TextChars
 	private ArrayList<StructuredText.TextChar> mSelection = null;
@@ -112,9 +117,10 @@ public class DocPageView extends View implements Callback
 		mBlankPainter.setStyle(Paint.Style.FILL);
 		mBlankPainter.setColor(Color.WHITE);
 
-		mDotPainter = new Paint();
-		mDotPainter.setStyle(Paint.Style.FILL);
-		mDotPainter.setColor(ContextCompat.getColor(context, R.color.blue_dot_color));
+		mBorderPainter = new Paint();
+		mBorderPainter.setColor(ContextCompat.getColor(context, R.color.selected_page_border_color));
+		mBorderPainter.setStyle(Paint.Style.STROKE);
+		mBorderPainter.setStrokeWidth(Utilities.convertDpToPixel(context.getResources().getInteger(R.integer.selected_page_border_width)));
 
 		setFocusable(true);
 		setFocusableInTouchMode(true);
@@ -122,27 +128,58 @@ public class DocPageView extends View implements Callback
 
 	public void setupPage(final int thePageNum, int w, int h)
 	{
-		//  if the page number has not yet been set, or has changed,
-		//  make a new page object.
 		if (thePageNum != mPageNum)
 		{
+			//  the page number has not yet been set, or has changed
+
 			//  destroy current page and lists
 			destroyPageAndLists();
 
-			//  switch to the new page
+			//  switch to the new page number
 			mPageNum = thePageNum;
-			mPage = mDoc.loadPage(mPageNum);
+
+			//  remember the inputs
+			setupW = w;
+			setupH = h;
+
+			//  we defer the actual loading of the page until it's needed,
+			//  at render time.
 		}
 
 		//  calculate zoom that makes page fit
+		sizePage(w, h);
+	}
 
-		com.artifex.mupdf.fitz.Rect pageBounds = mPage.getBounds();
+	private void loadPage()
+	{
+		if (mPage == null)
+		{
+			//  load and size the page
+			mPage = mDoc.loadPage(mPageNum);
+			sizePage(setupW, setupH);
+		}
+	}
 
-		float pagew = (pageBounds.x1 - pageBounds.x0) * mResolution / 72f;
-		float pageH = (pageBounds.y1 - pageBounds.y0) * mResolution / 72f;
+	private void sizePage(int w, int h)
+	{
+		float pagew, pageh;
+		if (mPage != null)
+		{
+			//  page exists, use it's actual size
+			com.artifex.mupdf.fitz.Rect pageBounds = mPage.getBounds();
+			pagew = (pageBounds.x1 - pageBounds.x0) * mResolution / 72f;
+			pageh = (pageBounds.y1 - pageBounds.y0) * mResolution / 72f;
+		}
+		else
+		{
+			//  page does not yet exist.  Give it a default size.
+			//  this will be recalculated when the page is loaded later
+			pagew = 8.5f * mResolution;
+			pageh = 11f * mResolution;
+		}
 
 		mZoom = w / pagew;
-		mSize = new Point((int) (pagew * mZoom), (int) (pageH * mZoom));
+		mSize = new Point((int) (pagew * mZoom), (int) (pageh * mZoom));
 	}
 
 	private void destroyPageAndLists()
@@ -167,6 +204,7 @@ public class DocPageView extends View implements Callback
 
 	public Page getPage()
 	{
+		loadPage();
 		return mPage;
 	}
 
@@ -180,14 +218,16 @@ public class DocPageView extends View implements Callback
 		mScale = scale;
 	}
 
-	public int getCalculatedWidth()
+	public int getUnscaledWidth() {return mSize.x;}
+	public int getScaledWidth()
 	{
-		return (int) (mSize.x * mScale);
+		return (int)(getUnscaledWidth() * mScale);
 	}
 
-	public int getCalculatedHeight()
+	public int getUnscaledHeight() {return mSize.y;}
+	public int getScaledHeight()
 	{
-		return (int) (mSize.y * mScale);
+		return (int)(getUnscaledHeight() * mScale);
 	}
 
 	//  a test for real visibility
@@ -266,6 +306,7 @@ public class DocPageView extends View implements Callback
 			renderNoPage(bitmap, listener, localVisRect, globalVisRect);
 		else
 		{
+			loadPage();
 			cachePage();
 			renderPage(bitmap, listener, localVisRect, globalVisRect, showAnnotations);
 		}
@@ -277,7 +318,7 @@ public class DocPageView extends View implements Callback
 		//  make a rect representing the entire page; this might be outside the bounds of the bitmap
 		int[] locations = new int[2];
 		getLocationOnScreen(locations);
-		Rect pageRect = new Rect(locations[0], locations[1], locations[0] + getCalculatedWidth(), locations[1] + getCalculatedHeight());
+		Rect pageRect = new Rect(locations[0], locations[1], locations[0] + getScaledWidth(), locations[1] + getScaledHeight());
 
 		//  Set rects for rendering and display
 		mPatchRect.set(globalVisRect);
@@ -321,6 +362,14 @@ public class DocPageView extends View implements Callback
 		int patchY0 = mPatchRect.top;
 		int patchX1 = mPatchRect.right;
 		int patchY1 = mPatchRect.bottom;
+
+		//  the patch should be a subset of the page.  If not, bail.
+		//  this happens when rotating the device.
+		if (patchX0>=pageX1 || patchX1<=pageX0 || patchY0>=pageY1 || patchY1<=pageY0)
+		{
+			listener.progress(0);
+			return;
+		}
 
 		//  set up a matrix for scaling
 		Matrix ctm = Matrix.Identity();
@@ -436,11 +485,11 @@ public class DocPageView extends View implements Callback
 		return new Point((int)tchar.bbox.x1, (int)tchar.bbox.y1);
 	}
 
-	//  Find the collection ot TextChars belonging to lines
+	//  Find the collection of TextChars belonging to lines
 	//  that intersect the rectangle define by two points.
 	//  For the first line, include those to the right of upperLeft.x
 	//  For the last line, include those to the left of lowerLeft.x
-	//  ASSUMPTION: this algorith does not handle right-to-left languages.
+	//  ASSUMPTION: this algorithm does not handle right-to-left languages.
 
 	public void setSelection(Point upperLeft, Point lowerLeft)
 	{
@@ -570,21 +619,25 @@ public class DocPageView extends View implements Callback
 			canvas.drawRect(mHighlightingRect, mSearchHighlightPainter);
 		}
 
-		//  draw ink annotations
-		if (mInkAnnots != null)
+		//  draw annotations
+		if (mAnnotations != null)
 		{
-			Iterator<InkAnnotation> it = mInkAnnots.iterator();
+			Iterator<PageAnnotation> it = mAnnotations.iterator();
 			while (it.hasNext())
 			{
-				InkAnnotation annot = it.next();
-				annot.draw(canvas);
+				PageAnnotation annot = it.next();
+				if (annot != null)
+				{
+					annot.draw(canvas);
+				}
 			}
 		}
 
-		//  draw blue dot
-		if (isMostVisible)
+		if (isCurrent)
 		{
-			canvas.drawCircle(30, 30, 15, mDotPainter);
+			//  draw selected border
+			mBorderRect.set(0, 0, getChildRect().width(), getChildRect().height());
+			canvas.drawRect(mBorderRect, mBorderPainter);
 		}
 
 		canvas.restore();
@@ -758,6 +811,13 @@ public class DocPageView extends View implements Callback
 		return new Point(viewX, viewY);
 	}
 
+	public int pageToView(int pval)
+	{
+		double factor = getFactor();
+
+		return (int) (((double) pval) * factor);
+	}
+
 	public void pageToView(Point pageP, Point viewP)
 	{
 		double factor = getFactor();
@@ -818,23 +878,21 @@ public class DocPageView extends View implements Callback
 		destroyPageAndLists();
 	}
 
-	public boolean getMostVisible() {return isMostVisible;}
+	public boolean getCurrent() {return isCurrent;}
 
-	public void setMostVisible(boolean val)
+	public void setCurrent(boolean val)
 	{
-		boolean wasMostVisible = isMostVisible;
-		isMostVisible = val;
-		if (isMostVisible != wasMostVisible)
+		if (val != isCurrent)
 		{
-			//  "most visible" has changed, so redraw.
+			isCurrent = val;
 			invalidate();
 		}
 	}
 
 	public boolean onSingleTap(int x, int y)
 	{
-		//  see if an ink annotation has been tapped on
-		if (mInkAnnots != null)
+		//  see if a page annotation has been tapped on
+		if (mAnnotations != null)
 		{
 			boolean hit = false;
 
@@ -842,10 +900,10 @@ public class DocPageView extends View implements Callback
 			Point pt = screenToPage(x, y);
 
 			//  iterate in reverse order
-			ListIterator<InkAnnotation> li = mInkAnnots.listIterator(mInkAnnots.size());
+			ListIterator<PageAnnotation> li = mAnnotations.listIterator(mAnnotations.size());
 			while (li.hasPrevious())
 			{
-				InkAnnotation annot = li.previous();
+				PageAnnotation annot = li.previous();
 				annot.setSelected(false);
 				if(annot.hitTest(pt))
 				{
@@ -885,19 +943,19 @@ public class DocPageView extends View implements Callback
 		return mChildRect;
 	}
 
-	private ArrayList<InkAnnotation> mInkAnnots;
+	private ArrayList<PageAnnotation> mAnnotations;
 
 	public void startDraw(float x, float y, int color, float thickness)
 	{
 		//  create annotation list
-		if (mInkAnnots == null)
-			mInkAnnots = new ArrayList<>();
+		if (mAnnotations == null)
+			mAnnotations = new ArrayList<>();
 
 		//  add a new annotation to the list
 		//  convert thickness from pt to pixels
 		float px = thickness * (float)getFactor();
 		InkAnnotation annot = new InkAnnotation(color, px);
-		mInkAnnots.add(annot);
+		mAnnotations.add(annot);
 
 		//  add first point to the new annot, in page coords
 		PointF pScreen = new PointF(x, y);
@@ -909,18 +967,42 @@ public class DocPageView extends View implements Callback
 
 	public void continueDraw(float x, float y)
 	{
-		if (mInkAnnots!=null && mInkAnnots.size()>0)
+		if (mAnnotations !=null && mAnnotations.size()>0)
 		{
 			//  get the most recent annotation
-			InkAnnotation annot = mInkAnnots.get(mInkAnnots.size()-1);
+			InkAnnotation annot = (InkAnnotation) mAnnotations.get(mAnnotations.size()-1);
+			if (annot != null)
+			{
+				//  add the point, in page coords
+				PointF pScreen = new PointF(x, y);
+				PointF pPage = screenToPage(pScreen);
+				annot.add(pPage);
 
-			//  add the point, in page coords
-			PointF pScreen = new PointF(x, y);
-			PointF pPage = screenToPage(pScreen);
-			annot.add(pPage);
-
-			invalidate();
+				invalidate();
+			}
 		}
+	}
+
+	public void createNote(float x, float y)
+	{
+		//  create annotation list
+		if (mAnnotations == null)
+			mAnnotations = new ArrayList<>();
+
+		//  where, in page coordinates
+		PointF pScreen = new PointF(x, y);
+		PointF pPage = screenToPage(pScreen);
+
+		//  add a new annotation to the list
+		NoteAnnotation annot = new NoteAnnotation(pPage);
+
+		SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy HH:mm");
+		String date = sdf.format(new Date());
+		annot.setDate(date);
+
+		mAnnotations.add(annot);
+
+		invalidate();
 	}
 
 	private class RenderTaskParams
@@ -1014,15 +1096,55 @@ public class DocPageView extends View implements Callback
 
 	private InkAnnotation getSelectedInkAnnotation()
 	{
-		if (mInkAnnots != null)
+		if (mAnnotations != null)
 		{
 			//  iterate in reverse order
-			ListIterator<InkAnnotation> li = mInkAnnots.listIterator(mInkAnnots.size());
+			ListIterator<PageAnnotation> li = mAnnotations.listIterator(mAnnotations.size());
 			while (li.hasPrevious())
 			{
-				InkAnnotation annot = li.previous();
+				PageAnnotation annot = li.previous();
+				if ((annot instanceof InkAnnotation) && annot.isSelected())
+				{
+					return (InkAnnotation)annot;
+				}
+			}
+		}
+
+		return null;
+	}
+
+	public NoteAnnotation getSelectedNoteAnnotation()
+	{
+		if (mAnnotations != null)
+		{
+			//  iterate in reverse order
+			ListIterator<PageAnnotation> li = mAnnotations.listIterator(mAnnotations.size());
+			while (li.hasPrevious())
+			{
+				PageAnnotation annot = li.previous();
+				if ((annot instanceof NoteAnnotation) && annot.isSelected())
+				{
+					return (NoteAnnotation)annot;
+				}
+			}
+		}
+
+		return null;
+	}
+
+	private PageAnnotation getSelectedAnnotation()
+	{
+		if (mAnnotations != null)
+		{
+			//  iterate in reverse order
+			ListIterator<PageAnnotation> li = mAnnotations.listIterator(mAnnotations.size());
+			while (li.hasPrevious())
+			{
+				PageAnnotation annot = li.previous();
 				if (annot.isSelected())
+				{
 					return annot;
+				}
 			}
 		}
 
@@ -1032,6 +1154,30 @@ public class DocPageView extends View implements Callback
 	public boolean hasInkAnnotationSelected()
 	{
 		return (getSelectedInkAnnotation() != null);
+	}
+
+	public boolean hasNoteAnnotationSelected()
+	{
+		return (getSelectedNoteAnnotation() != null);
+	}
+
+	public Point getSelectedNoteLocation()
+	{
+		NoteAnnotation annot = getSelectedNoteAnnotation();
+		if (annot != null)
+		{
+			PointF pf = annot.location();
+			Point p = new Point((int)pf.x, (int)pf.y);
+			pageToView(p,p);
+			return p;
+		}
+
+		return null;
+	}
+
+	public boolean hasAnnotationSelected()
+	{
+		return (getSelectedAnnotation() != null);
 	}
 
 	public void setSelectedInkLineColor(int val)
@@ -1055,29 +1201,144 @@ public class DocPageView extends View implements Callback
 		}
 	}
 
-	public void deleteSelectedInkAnnotation()
+	public void deleteSelectedAnnotation()
 	{
-		InkAnnotation annot = getSelectedInkAnnotation();
+		PageAnnotation annot = getSelectedAnnotation();
 		if (annot != null)
 		{
-			mInkAnnots.remove(annot);
+			mAnnotations.remove(annot);
 			invalidate();
 		}
 	}
 
 //-----------------------------------------------------
 
-	public class InkAnnotation
+	public class PageAnnotation
+	{
+		private boolean mSelected = false;
+		public void setSelected(boolean sel) {mSelected = sel;}
+		public boolean isSelected() {return mSelected;}
+
+		public boolean hitTest(Point pt)
+		{
+			return false;
+		}
+
+		public void draw(Canvas canvas)
+		{
+		}
+	}
+
+	public class NoteAnnotation extends PageAnnotation
+	{
+		PointF mPoint;
+		PointF location() {return mPoint;}
+		public NoteAnnotation(PointF pt)
+		{
+			mPoint = pt;
+		}
+
+		private String mDate = "";
+		public void setDate(String date) {mDate = date;}
+		public String getDate() {return mDate;}
+
+		private String mText = "";
+		public void setText(String text) {mText = text;}
+		public String getText() {return mText;}
+
+		public boolean hitTest(Point pt)
+		{
+			PointF ul = new PointF(mPoint.x, mPoint.y-50);
+			PointF dr = new PointF(mPoint.x+50, mPoint.y);
+			Rect rect = new Rect((int)ul.x, (int)ul.y, (int)dr.x, (int)dr.y);
+
+			if (rect.contains(pt.x, pt.y))
+				return true;
+
+			return false;
+		}
+
+		public void draw(Canvas canvas)
+		{
+			//  various dimensions and colors
+			int size = 28;
+			int hightlightBorderWidth = Math.max(1, pageToView(5));
+			int highlightBorderColor = Color.parseColor("#0080FF");
+			int highlightColor = Color.parseColor("#0080FF");
+			int highlightAlpha = 50;
+			int bubbleBorderColor = Color.parseColor("#000000");
+			int bubbleBorderWidth = Math.max(1, pageToView(1));
+			int bubbleColor = Color.parseColor("#FFFF00");
+			int bubbleAlpha = 128;
+			int cornerRadius = pageToView(4);
+
+			//  get the rect in view coordinates
+			PointF ul = new PointF(mPoint.x, mPoint.y-size);
+			PointF dr = new PointF(mPoint.x+size, mPoint.y);
+			pageToView(ul, ul);
+			pageToView(dr, dr);
+			Rect rt = new Rect((int)ul.x, (int)ul.y, (int)dr.x, (int)dr.y);
+
+			if (isSelected())
+			{
+				//  paint a selection highligt
+				Paint paint = new Paint();
+				paint.setStyle(Paint.Style.STROKE);
+				paint.setAlpha(255);
+				paint.setColor(highlightBorderColor);
+				paint.setStrokeWidth(hightlightBorderWidth);
+				canvas.drawRect(rt, paint);
+
+				paint.setStyle(Paint.Style.FILL);
+				paint.setColor(highlightColor);
+				paint.setAlpha(highlightAlpha);
+				canvas.drawRect(rt, paint);
+			}
+
+			//  create a path for the bubble
+			Path path = new Path();
+			path.moveTo(rt.left, rt.bottom-cornerRadius);
+			path.lineTo(rt.left, rt.top+cornerRadius);
+			final RectF oval = new RectF();
+			oval.set(rt.left, rt.top, rt.left+2*cornerRadius, rt.top+2*cornerRadius);
+			path.arcTo(oval, 180, 90);
+			path.lineTo(rt.right-cornerRadius, rt.top);
+			oval.set(rt.right-2*cornerRadius, rt.top, rt.right, rt.top+2*cornerRadius);
+			path.arcTo(oval, 270, 90);
+			path.lineTo(rt.right, rt.bottom-cornerRadius);
+			oval.set(rt.right-2*cornerRadius, rt.bottom-2*cornerRadius, rt.right, rt.bottom);
+			path.arcTo(oval, 0, 90);
+			path.lineTo(rt.left+3*cornerRadius, rt.bottom);
+			path.lineTo(rt.left, rt.bottom+rt.height()/3);
+			path.lineTo(rt.left+cornerRadius, rt.bottom);
+			oval.set(rt.left, rt.bottom-2*cornerRadius, rt.left+2*cornerRadius, rt.bottom);
+			path.arcTo(oval, 90, 90);
+			path.lineTo(rt.left, rt.bottom-cornerRadius);
+			path.close();
+
+			//  paint the bubble interior
+			Paint p1 = new Paint();
+			p1.setStyle(Paint.Style.FILL);
+			p1.setColor(bubbleColor);
+			p1.setAlpha(bubbleAlpha);
+			canvas.drawPath(path, p1);
+
+			//  paint the bubble border
+			Paint p2 = new Paint();
+			p2.setStyle(Paint.Style.STROKE);
+			p2.setColor(bubbleBorderColor);
+			p2.setStrokeWidth(bubbleBorderWidth);
+			canvas.drawPath(path, p2);
+		}
+	}
+
+	public class InkAnnotation extends PageAnnotation
 	{
 		private float mLineThickness;
 		public void setLineThickness(float lineThickness) {mLineThickness = lineThickness;}
 
 		private int mLineColor;
 		public void setLineColor(int lineColor) {mLineColor = lineColor;}
-
-		private boolean mSelected = false;
-		public void setSelected(boolean sel) {mSelected = sel;}
-		public boolean isSelected() {return mSelected;}
 
 		private ArrayList<PointF> mArc;
 

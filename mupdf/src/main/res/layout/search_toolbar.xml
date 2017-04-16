@@ -54,55 +54,35 @@
 
             </LinearLayout>
 
-            <LinearLayout
+            <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
+                android:layout_centerVertical="true"
+                android:scaleType="fitXY"
                 android:paddingLeft="10dp"
                 android:paddingRight="10dp"
-                android:gravity="center"
-                >
+                android:textColor="@color/black"
+                android:textSize="11sp"
+                android:textAllCaps="true"
+                android:background="@drawable/toolbar_button"
+                android:id="@+id/search_next_button"
+                android:drawableTop="@drawable/icon_find_next"
+                android:text="@string/find_next" />
 
-                <com.artifex.mupdf.android.ToolbarButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:scaleType="fitXY"
-                    android:background="@drawable/toolbar_button"
-                    android:id="@+id/search_next_button"
-                    android:src="@drawable/icon_find_next" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/black"
-                    android:textSize="11sp"
-                    android:text="@string/next_upper"/>
-            </LinearLayout>
-
-            <LinearLayout
+            <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
+                android:layout_centerVertical="true"
+                android:scaleType="fitXY"
                 android:paddingLeft="10dp"
                 android:paddingRight="10dp"
-                android:gravity="center"
-                >
-
-                <com.artifex.mupdf.android.ToolbarButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:scaleType="fitXY"
-                    android:background="@drawable/toolbar_button"
-                    android:id="@+id/search_previous_button"
-                    android:src="@drawable/icon_find_previous" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/black"
-                    android:textSize="11sp"
-                    android:text="@string/previous_upper"/>
-            </LinearLayout>
+                android:textColor="@color/black"
+                android:textSize="11sp"
+                android:textAllCaps="true"
+                android:background="@drawable/toolbar_button"
+                android:id="@+id/search_previous_button"
+                android:drawableTop="@drawable/icon_find_previous"
+                android:text="@string/find_previous" />
 
         </LinearLayout>
 

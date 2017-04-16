@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <integer name="page_width_percentage">90</integer>
-    <integer name="pagelist_width_percentage">10</integer>
+    <integer name="page_width_percentage">85</integer>
+    <integer name="pagelist_width_percentage">15</integer>
 
     <integer name="text_highlight_alpha">60</integer>
 
@@ -10,5 +10,7 @@
     <integer name="selection_dot_padding">16</integer>
 
     <item name="selection_dot_scale" format="float" type="dimen">0.80</item>
+
+    <integer name="selected_page_border_width">15</integer>
 
 </resources>

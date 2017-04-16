@@ -24,7 +24,6 @@ public class PageAdapter extends BaseAdapter
 	}
 
 	private int mWidth;
-
 	public void setWidth(int w)
 	{
 		mWidth = w;

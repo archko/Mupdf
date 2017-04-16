@@ -8,10 +8,38 @@
 	<string name="annotate_tab">ANNOTATE</string>
 	<string name="pages_tab">PAGES</string>
 
-	<string name="next_upper">NEXT</string>
-	<string name="previous_upper">PREVIOUS</string>
+	<string name="highlight_button">HIGHLIGHT</string>
+	<string name="draw_button">DRAW</string>
+	<string name="note_button">NOTE</string>
+	<string name="delete_button">DELETE</string>
+	<string name="toggle_button">TOGGLE</string>
+	<string name="save_button">SAVE</string>
+	<string name="save_as_button">SAVE AS</string>
+	<string name="print_button">PRINT</string>
+	<string name="share_button">SHARE</string>
+	<string name="open_in_button">OPEN IN</string>
+	<string name="proof_button">PROOF</string>
+	<string name="first_page_button">FIRST PAGE</string>
+	<string name="previous_page_button">PREVIOUS PAGE</string>
+	<string name="next_page_button">NEXT PAGE</string>
+	<string name="last_page_button">LAST PAGE</string>
+	<string name="reflow_button">REFLOW</string>
+
+	<string name="proof_settings_label">Proof Settings:</string>
+	<string name="proof_profile_label">Proof Profile:</string>
+	<string name="soft_proof_profile_label">Soft Proof Profile:</string>
+	<string name="resolution_label">Resolution:</string>
+	<string name="password_label">Password for document:</string>
+
+	<string name="colors">COLORS</string>
+	<string name="find_next">NEXT</string>
+	<string name="find_previous">PREVIOUS</string>
+	<string name="apply">APPLY</string>
 	<string name="ok">OK</string>
 	<string name="cancel">Cancel</string>
+
+	<string name="note_title">MuPDF Mobile</string>
+	<string name="note_date">1/1/2016 12:00</string>
 
 	<string name="background">Background</string>
 	<string name="color">Color</string>

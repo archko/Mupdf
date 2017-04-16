@@ -116,7 +116,7 @@ public class ColorDialog implements View.OnTouchListener, PopupWindow.OnDismissL
 			}
 		}
 
-		//  Set up the transaparent button if we're doing background colors.
+		//  Set up the transparent button if we're doing background colors.
 		Button tpb = (Button) popupView.findViewById(R.id.transparent_color_button);
 		if (mDialogType==ColorDialog.BG_COLORS) {
 			tpb.setVisibility(View.VISIBLE);
