@@ -72,7 +72,7 @@ public class DocActivityView extends FrameLayout implements TabHost.OnTabChangeL
 
 	private DocReflowView mDocReflowView;
 
-	private boolean mShowUI = true;
+	private boolean mShowUI = false;
 
 	//  tab tags
 	private String mTagHidden;
@@ -134,9 +134,10 @@ public class DocActivityView extends FrameLayout implements TabHost.OnTabChangeL
 		return true;
 	}
 
+	TabHost tabHost;
 	protected void setupTabs()
 	{
-		TabHost tabHost = (TabHost) findViewById(R.id.tabhost);
+		tabHost = (TabHost) findViewById(R.id.tabhost);
 		tabHost.setup();
 
 		//  get the tab tags.
@@ -160,6 +161,11 @@ public class DocActivityView extends FrameLayout implements TabHost.OnTabChangeL
 		tabHost.setCurrentTabByTag(mTagFile);
 
 		tabHost.setOnTabChangedListener(this);
+	}
+
+	public void switchTabHost(){
+		int visibility = tabHost.getVisibility() == VISIBLE ? GONE : VISIBLE;
+		tabHost.setVisibility(visibility);
 	}
 
 	protected void setupTab(TabHost tabHost, String text, int viewId, int tabId)

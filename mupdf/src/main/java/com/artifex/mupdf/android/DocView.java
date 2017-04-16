@@ -9,6 +9,7 @@ import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
@@ -73,6 +74,13 @@ public class DocView extends DocViewBase implements DragHandleListener
 
 		selectionHandlePadPx = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, padDp, metrics);
 		selectionHandleSizePx = (int) (scale * TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, sizeDp, metrics));
+		int height=getHeight();
+		if (height<=0) {
+			height=new ViewConfiguration().getScaledTouchSlop()*2;
+		} else {
+			height=(int) (height*0.03);
+		}
+		mMargin=(height);
 	}
 
 	//  create the selection handles
@@ -357,6 +365,7 @@ public class DocView extends DocViewBase implements DragHandleListener
 	@Override
 	protected void doDoubleTap(float fx, float fy)
 	{
+		mHostActivity.switchTabHost();
 	}
 
 	private Point viewToScreen(Point p)
@@ -593,6 +602,24 @@ public class DocView extends DocViewBase implements DragHandleListener
 
 		//  look on the next page
 		return doSearch(direction, startPage);
+	}
+
+	int mMargin=16;
+
+	@Override
+	protected void singleTap(MotionEvent e) {
+		int height = getHeight();
+		int top = height / 4;
+		int bottom = height * 3 / 4;
+
+		height = height - mMargin;
+		if ((int) e.getY() < top) {
+			smoothScrollBy(0, height, 200);
+		} else if ((int) e.getY() > bottom) {
+			smoothScrollBy(0, -height, 200);
+		} else {
+			super.singleTap(e);
+		}
 	}
 
 	public void scrollRectIntoView(int pageNum, com.artifex.mupdf.fitz.Rect box)

@@ -36,7 +36,7 @@ public class PDFDocViewActivity extends FragmentActivity implements SensorEventL
         parseIntent();
 
         //  start the view
-        mDocActivityView.showUI(true);  //  set to false for no built-in UI
+        mDocActivityView.showUI(false);  //  set to false for no built-in UI
         mDocActivityView.start(mPath);
     }
 

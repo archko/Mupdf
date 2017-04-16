@@ -391,11 +391,16 @@ public class DocViewBase
 			mLastTapTime = now;
 			lastTapX = e.getX();
 			lastTapY = e.getY();
-			doSingleTap(lastTapX, lastTapY);
+			//doSingleTap(lastTapX, lastTapY);
+			singleTap(e);
 			mTapStatus = 1;
 		}
 
 		return false;
+	}
+
+	protected void singleTap(MotionEvent e){
+		doSingleTap(lastTapX, lastTapY);
 	}
 
 	private void scaleChildren()
