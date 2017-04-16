@@ -34,7 +34,10 @@ public class BitmapPool {
         simplePool.release(bitmap);
     }
 
-    public void clear() {
+    public synchronized void clear() {
+        if (null == simplePool) {
+            return;
+        }
         Bitmap bitmap;
         while ((bitmap = simplePool.acquire()) != null) {
             bitmap.recycle();
