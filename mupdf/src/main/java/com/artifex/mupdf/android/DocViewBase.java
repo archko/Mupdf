@@ -13,6 +13,8 @@ import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.Scroller;
@@ -24,7 +26,7 @@ public class DocViewBase
 		extends AdapterView<Adapter>
 		implements GestureDetector.OnGestureListener, ScaleGestureDetector.OnScaleGestureListener, Runnable
 {
-	private static final int UNSCALED_GAP = 20;
+	//private static final int UNSCALED_GAP = 20;
 
 	private static final float MIN_SCALE = .15f;
 	private static final float MAX_SCALE = 5.0f;
@@ -74,10 +76,10 @@ public class DocViewBase
 	private static final long  FLING_THROTTLE_TIME = 10;
 
 	private static final int MIN_FLING_TIME = 400;
-	private static final int MAX_FLING_TIME = 1000;
+	private static final int MAX_FLING_TIME = 2400;
 
 	private static final float MIN_FLING_FACTOR = 0.333f;
-	private static final float MAX_FLING_FACTOR = 1.0f;
+	private static final float MAX_FLING_FACTOR = 3.6f;
 
 	private Scroller mScroller;
 	private Stepper mStepper;
@@ -145,7 +147,7 @@ public class DocViewBase
 		mContext = context;
 		mGestureDetector = new GestureDetector(context, this);
 		mScaleGestureDetector = new ScaleGestureDetector(context, this);
-		mScroller = new Scroller(context);
+		mScroller = new Scroller(context, new DecelerateInterpolator());
 		mStepper = new Stepper(this, this);
 
 		makeBitmaps();
@@ -248,8 +250,8 @@ public class DocViewBase
 
 		//  adjust the distance and the time based on fling velocity
 		float ratio =(Math.abs(velocityY)-MIN_FLING_VELOCITY)/(MAX_FLING_VELOCITY-MIN_FLING_VELOCITY);
-		float dy = getHeight()*MIN_FLING_FACTOR + ratio*getHeight()*(MAX_FLING_FACTOR-MIN_FLING_FACTOR);
-		float dt = MIN_FLING_TIME + ratio*(MAX_FLING_TIME-MIN_FLING_TIME);
+		float dy = getHeight()*MIN_FLING_FACTOR + ratio*getHeight()*(MAX_FLING_FACTOR);
+		float dt = MIN_FLING_TIME + ratio*(MAX_FLING_TIME);
 
 		if (velocityY<0)
 			smoothScrollBy(0, -(int)dy, (int)dt);
@@ -303,13 +305,13 @@ public class DocViewBase
 			child.getGlobalVisibleRect(childRect);
 
 			//  add in the margin
-			if (includeMargin)
+			/*if (includeMargin)
 			{
 				childRect.left   -= UNSCALED_GAP*mScale/2;
 				childRect.right  += UNSCALED_GAP*mScale/2;
 				childRect.top    -= UNSCALED_GAP*mScale/2;
 				childRect.bottom += UNSCALED_GAP*mScale/2;
-			}
+			}*/
 
 			//  see if the rect contains the point
 			if (childRect.contains(x, y))
@@ -486,7 +488,7 @@ public class DocViewBase
 				float ratio = ((float) (viewport.width())) / ((float) (mPageCollectionWidth));
 
 				//  set a new scale factor that will result in the same number of columns
-				int unscaledTotal = unscaledMaxw*mLastLayoutColumns + UNSCALED_GAP*(mLastLayoutColumns-1);
+				int unscaledTotal = unscaledMaxw*mLastLayoutColumns /*+ UNSCALED_GAP*(mLastLayoutColumns-1)*/;
 				mScale = (float)viewport.width()/(float)unscaledTotal;
 				scaleChildren();
 
@@ -574,7 +576,7 @@ public class DocViewBase
 		int maxw = (int)(unscaledMaxw*mScale);
 
 		//  how many columns?
-		int scaledGap = (int)(UNSCALED_GAP*mScale);
+		int scaledGap = 0;//(int)(UNSCALED_GAP*mScale);
 		double dcol = (double)(mViewport.width()+scaledGap)/(double)(maxw+scaledGap);
 		int columns = (int) dcol;
 
@@ -604,7 +606,7 @@ public class DocViewBase
 
 			childWidth = cv.getUnscaledWidth();
 			childHeight = cv.getUnscaledHeight();
-			childLeft = column * (unscaledMaxw + UNSCALED_GAP);
+			childLeft = column * (unscaledMaxw /*+ UNSCALED_GAP*/);
 			childRight = childLeft + childWidth;
 			childBottom = childTop + childHeight;
 
@@ -664,7 +666,7 @@ public class DocViewBase
 			{
 				column = 0;
 				childTop += rowh;
-				childTop += UNSCALED_GAP;
+				//childTop += UNSCALED_GAP;
 				//  reset the row height
 				rowh = 0;
 			}
