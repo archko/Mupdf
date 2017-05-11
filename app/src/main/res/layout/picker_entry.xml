@@ -7,8 +7,8 @@
 	<ImageView
 		android:id="@+id/icon"
         android:src="@drawable/browser_item_book"
-        android:layout_marginBottom="2dp" android:layout_marginTop="2dp"
-		android:layout_width="42dp"
+		android:layout_marginBottom="4dp" android:layout_marginTop="4dp"
+		android:layout_width="40dp"
 		android:layout_height="42dp"
 		android:layout_centerVertical="true"
 		android:layout_alignParentLeft="true" />

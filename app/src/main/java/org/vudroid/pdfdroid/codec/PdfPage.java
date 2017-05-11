@@ -6,7 +6,6 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import com.artifex.mupdfdemo.MuPDFCore;
 
-import org.vudroid.core.BitmapPool;
 import org.vudroid.core.codec.CodecPage;
 
 import java.nio.ByteBuffer;
@@ -94,15 +93,12 @@ public class PdfPage implements CodecPage
         int patchH;
         pageW=(int) (getWidth()*scale);
         pageH=(int) (getHeight()*scale);
-        //PointF size=core.getPageSize((int) pageHandle);
-        //pageW=(int) (size.x*scale);
-        //pageH=(int) (size.y*scale);
 
         patchX=(int) (pageSliceBounds.left*pageW);
         patchY=(int) (pageSliceBounds.top*pageH);
         patchW=width;
         patchH=height;
-        Bitmap bitmap= BitmapPool.getInstance().acquire(width,height);//Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        Bitmap bitmap= Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         core.renderPage(bitmap, (int) pageHandle,
             pageW, pageH,
             patchX, patchY,
