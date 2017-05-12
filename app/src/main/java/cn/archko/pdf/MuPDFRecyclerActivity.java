@@ -186,7 +186,6 @@ public class MuPDFRecyclerActivity extends FragmentActivity implements SensorEve
         if (null != core) {
             core.onDestroy();
         }
-        BitmapPool.getInstance().clear();
     }
 
     private void initView() {
@@ -617,12 +616,7 @@ public class MuPDFRecyclerActivity extends FragmentActivity implements SensorEve
             PointF result = core.getPageSize(position);
             int width = (int) result.x / scale;
             int height = (int) result.y / scale;
-            Bitmap bm = null;
-            if (scale == 1) {
-                bm = BitmapPool.getInstance().acquire(width, height);
-            } else {
-                Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-            }
+            Bitmap bm = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
             core.drawPage(bm, position, width, height, 0, 0, width, height, core.new Cookie());
             return bm;
         }
@@ -641,8 +635,7 @@ public class MuPDFRecyclerActivity extends FragmentActivity implements SensorEve
                 pdfHolder.mThumbnail.recycle();
             }
             if (null != pdfHolder && null != pdfHolder.mBitmap && !pdfHolder.mBitmap.isRecycled()) {
-                //pdfHolder.mBitmap.recycle();
-                BitmapPool.getInstance().release(pdfHolder.mBitmap);
+                pdfHolder.mBitmap.recycle();
             }
         }
 

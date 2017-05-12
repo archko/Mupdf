@@ -196,7 +196,6 @@ public class NewMuPDFActivity extends FragmentActivity implements SensorEventLis
         if (null != core) {
             core.destroy();
         }
-        BitmapPool.getInstance().clear();
     }
 
     private void initView() {

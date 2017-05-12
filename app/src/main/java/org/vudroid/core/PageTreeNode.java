@@ -172,8 +172,7 @@ class PageTreeNode {
         if (this.bitmap != bitmap) {
             if (bitmap != null) {
                 if (this.bitmap != null) {
-                    //this.bitmap.recycle();
-                    BitmapPool.getInstance().release(bitmap);
+                    this.bitmap.recycle();
                 }
                 bitmapWeakReference = new SoftReference<Bitmap>(bitmap);
                 documentView.postInvalidate();
