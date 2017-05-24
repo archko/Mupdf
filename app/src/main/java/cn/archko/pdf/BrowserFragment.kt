@@ -256,7 +256,7 @@ open class BrowserFragment : RefreshableFragment(), OnItemClickListener, SwipeRe
             }
         }
 
-        fileListAdapter!!.setData(fileList)
+        fileListAdapter!!.setData(fileList!!)
         //System.out.println("mPathMap.get(currentPath):"+mPathMap.get(currentPath)+ " size:"+fileList.size());
         if (null != mPathMap[currentPath!!]) {
             val pos = mPathMap[currentPath!!]

@@ -127,7 +127,7 @@ open class SearchFragment : DialogFragment(), AdapterView.OnItemClickListener, A
         val home = getHome()
         doSearch(fileList!!, keyword, File(home))
 
-        fileListAdapter!!.setData(fileList)
+        fileListAdapter!!.setData(fileList!!)
         fileListAdapter!!.notifyDataSetChanged()
         //this.filesListView.setSelection(0);
     }

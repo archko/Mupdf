@@ -302,7 +302,7 @@ class HistoryFragment : BrowserFragment(), AbsListView.OnScrollListener {
                         fileList!!.clear()
                     }
                     fileList!!.addAll(entries)
-                    fileListAdapter!!.setData(fileList)
+                    fileListAdapter!!.setData(fileList!!)
                     fileListAdapter!!.notifyDataSetChanged()
                     //filesListView.setSelection(0);
                 }
