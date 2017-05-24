@@ -1,5 +1,9 @@
 apply plugin: 'com.android.application'
 //apply plugin: 'com.antfortune.freeline'
+
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+
 android {
     signingConfigs {
         release {
@@ -54,6 +58,8 @@ dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile "com.android.support:support-v4:${SUPPORT_LIB_VERSION}"
     compile "com.android.support:recyclerview-v7:${SUPPORT_LIB_VERSION}"
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    compile "org.jetbrains.anko:anko-common:$anko_version"
     compile project(':example')
 }
 
