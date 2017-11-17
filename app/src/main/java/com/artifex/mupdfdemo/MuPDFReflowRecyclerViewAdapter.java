@@ -77,10 +77,10 @@ public class MuPDFReflowRecyclerViewAdapter extends RecyclerView.Adapter {
             mAdapter = adapter;
             mPaint = getPaint();
             mTextSize = mPaint.getTextSize();
-            mPaint.setTextSize(mTextSize * 1.4f);
+            mPaint.setTextSize(mTextSize * 1.2f);
             //setTextSize(getTextSize()*1.1f);
             setPadding(40, 50, 40, 30);
-            setLineSpacing(0, 1.4f);
+            setLineSpacing(0, 1.2f);
             setTextColor(context.getResources().getColor(R.color.text_reflow_color));
             setBackgroundColor(context.getResources().getColor(R.color.text_reflow_bg_color));
             setWidth(Util.getScreenWidthPixelWithOrientation(context));
