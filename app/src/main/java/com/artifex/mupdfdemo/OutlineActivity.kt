@@ -23,7 +23,7 @@ class OutlineActivity() : Activity() {
         setContentView(R.layout.outline_list)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            val toolbar = findViewById(R.id.toolbar) as Toolbar
+            val toolbar = findViewById<Toolbar>(R.id.toolbar) as Toolbar
             setActionBar(toolbar)
             actionBar!!.setDisplayHomeAsUpEnabled(true)
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
@@ -33,7 +33,7 @@ class OutlineActivity() : Activity() {
             setTheme(R.style.AppFullscreen)
         }
 
-        val listView = findViewById(R.id.list) as ListView
+        val listView = findViewById<ListView>(R.id.list)
         listView.onItemClickListener = AdapterView.OnItemClickListener { parent, view, position, id -> onListItemClick(parent as ListView, view, position, id) }
 
         mItems = OutlineActivityData.get().items

@@ -61,17 +61,17 @@ class AKAdapter(internal var mContext: Context) : BaseAdapter() {
                 TYPE_FILE -> convertView = View.inflate(mContext, R.layout.picker_entry, null)
                 TYPE_RENCENT -> {
                     convertView = View.inflate(mContext, R.layout.picker_entry_history, null)
-                    viewHolder.mProgressBar = convertView!!.findViewById(R.id.progressbar) as ProgressBar
+                    viewHolder.mProgressBar = convertView!!.findViewById<ProgressBar>(R.id.progressbar)
                 }
                 TYPE_SEARCH -> {
                     convertView = View.inflate(mContext, R.layout.picker_entry_search, null)
-                    viewHolder.mPath = convertView!!.findViewById(R.id.fullpath) as TextView
+                    viewHolder.mPath = convertView!!.findViewById<TextView>(R.id.fullpath)
                 }
             }
 
-            viewHolder.mIcon = convertView!!.findViewById(R.id.icon) as ImageView
-            viewHolder.mName = convertView.findViewById(R.id.name) as TextView
-            viewHolder.mSize = convertView.findViewById(R.id.size) as TextView
+            viewHolder.mIcon = convertView!!.findViewById<ImageView>(R.id.icon)
+            viewHolder.mName = convertView.findViewById<TextView>(R.id.name)
+            viewHolder.mSize = convertView.findViewById<TextView>(R.id.size)
             convertView.tag = viewHolder
         } else {
             viewHolder = convertView.tag as ViewHolder
@@ -129,8 +129,11 @@ class AKAdapter(internal var mContext: Context) : BaseAdapter() {
 
     companion object {
 
-       @JvmField val TYPE_FILE = 0
-       @JvmField val TYPE_RENCENT = 1
-       @JvmField val TYPE_SEARCH = 2
+        @JvmField
+        val TYPE_FILE = 0
+        @JvmField
+        val TYPE_RENCENT = 1
+        @JvmField
+        val TYPE_SEARCH = 2
     }
 }

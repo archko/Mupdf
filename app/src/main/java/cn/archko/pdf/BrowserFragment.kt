@@ -136,9 +136,9 @@ open class BrowserFragment : RefreshableFragment(), OnItemClickListener, SwipeRe
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater!!.inflate(R.layout.filechooser, container, false)
 
-        this.pathTextView = view.findViewById(R.id.path) as TextView
-        this.filesListView = view.findViewById(R.id.files) as ListView
-        mSwipeRefreshWidget = view.findViewById(R.id.swipe_refresh_widget) as SwipeRefreshLayout
+        this.pathTextView = view.findViewById<TextView>(R.id.path)
+        this.filesListView = view.findViewById<ListView>(R.id.files)
+        mSwipeRefreshWidget = view.findViewById<SwipeRefreshLayout>(R.id.swipe_refresh_widget) as SwipeRefreshLayout
         mSwipeRefreshWidget!!.setColorSchemeResources(R.color.text_border_pressed, R.color.text_border_pressed,
                 R.color.text_border_pressed, R.color.text_border_pressed)
         mSwipeRefreshWidget!!.setOnRefreshListener(this)

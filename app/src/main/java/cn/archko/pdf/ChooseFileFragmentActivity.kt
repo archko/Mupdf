@@ -94,9 +94,9 @@ open class ChooseFileFragmentActivity : FragmentActivity() {
     }
 
     private fun loadView() {
-        mViewPager = findViewById(R.id.pager) as ViewPager
+        mViewPager = findViewById<ViewPager>(R.id.pager)
 
-        mSlidingTabLayout = findViewById(R.id.sliding_tabs) as SlidingTabLayout
+        mSlidingTabLayout = findViewById<SlidingTabLayout>(R.id.sliding_tabs)
         addTab()
         mPagerAdapter = TabsAdapter(this)
         mViewPager!!.setOnPageChangeListener(mPagerAdapter)
@@ -323,8 +323,10 @@ open class ChooseFileFragmentActivity : FragmentActivity() {
          */
         private val TAG = "pdfviewpro"
 
-        @JvmField val PREF_TAG = "ChooseFileActivity"
-        @JvmField val PREF_HOME = "Home"
+        @JvmField
+        val PREF_TAG = "ChooseFileActivity"
+        @JvmField
+        val PREF_HOME = "Home"
         private val REQUEST_PERMISSION_CODE = 0x001
     }
 }

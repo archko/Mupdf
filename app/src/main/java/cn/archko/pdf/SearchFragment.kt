@@ -55,9 +55,9 @@ open class SearchFragment : DialogFragment(), AdapterView.OnItemClickListener, A
         val view = inflater!!.inflate(R.layout.filesearcher, container, false)
 
         dialog.setTitle(R.string.menu_search)
-        editView = view.findViewById(R.id.searchEdit) as EditText
-        imgClose = view.findViewById(R.id.img_close) as ImageView
-        filesListView = view.findViewById(R.id.files) as ListView
+        editView = view.findViewById<EditText>(R.id.searchEdit)
+        imgClose = view.findViewById<ImageView>(R.id.img_close)
+        filesListView = view.findViewById<ListView>(R.id.files)
 
         imgClose.setOnClickListener { clear() }
 

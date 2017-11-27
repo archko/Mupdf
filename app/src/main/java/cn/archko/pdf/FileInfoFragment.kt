@@ -50,14 +50,14 @@ class FileInfoFragment : DialogFragment() {
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater!!.inflate(R.layout.file_info, container, false)
-        mLocation = view.findViewById(R.id.location) as TextView
-        mFileName = view.findViewById(R.id.fileName) as TextView
-        mFileSize = view.findViewById(R.id.fileSize) as TextView
+        mLocation = view.findViewById<TextView>(R.id.location)
+        mFileName = view.findViewById<TextView>(R.id.fileName)
+        mFileSize = view.findViewById<TextView>(R.id.fileSize)
         mLastReadLayout = view.findViewById(R.id.lay_last_read)
-        mLastRead = view.findViewById(R.id.lastRead) as TextView
-        mProgressBar = view.findViewById(R.id.progressbar) as ProgressBar
-        mLastModified = view.findViewById(R.id.lastModified) as TextView
-        val button = view.findViewById(R.id.btn_ok) as Button
+        mLastRead = view.findViewById<TextView>(R.id.lastRead)
+        mProgressBar = view.findViewById<ProgressBar>(R.id.progressbar)
+        mLastModified = view.findViewById<TextView>(R.id.lastModified)
+        val button = view.findViewById<Button>(R.id.btn_ok)
         button.setOnClickListener { this@FileInfoFragment.dismiss() }
 
         dialog.setTitle(R.string.menu_info)

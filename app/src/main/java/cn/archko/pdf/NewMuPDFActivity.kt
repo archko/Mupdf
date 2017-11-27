@@ -233,9 +233,9 @@ class NewMuPDFActivity : FragmentActivity(), SensorEventListener {
 
     private fun makeButtonsView() {
         mButtonsView = layoutInflater.inflate(R.layout.view_buttons, null)
-        mReflowButton = mButtonsView!!.findViewById(R.id.reflowButton) as ImageButton
-        mOutlineButton = mButtonsView!!.findViewById(R.id.outlineButton) as ImageButton
-        mTitle = mButtonsView!!.findViewById(R.id.title) as TextView
+        mReflowButton = mButtonsView!!.findViewById<ImageButton>(R.id.reflowButton) as ImageButton
+        mOutlineButton = mButtonsView!!.findViewById<ImageButton>(R.id.outlineButton) as ImageButton
+        mTitle = mButtonsView!!.findViewById<TextView>(R.id.title) as TextView
 
         mReflowButton!!.setOnClickListener { toggleReflow() }
     }
