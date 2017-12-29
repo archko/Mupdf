@@ -2,9 +2,11 @@ package cn.archko.pdf
 
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.preference.PreferenceManager
+import android.support.v4.content.FileProvider
 import android.support.v4.view.MenuItemCompat
 import android.support.v4.widget.SwipeRefreshLayout
 import android.util.Log
@@ -436,7 +438,12 @@ open class BrowserFragment : RefreshableFragment(), OnItemClickListener, SwipeRe
                     return true
                 } else if (item.itemId == otherContextMenuItem) {
                     intent.action = Intent.ACTION_VIEW
-                    intent.setDataAndType(Uri.fromFile(clickedFile), "application/pdf")
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        intent.setDataAndType(FileProvider.getUriForFile(getContext(), "cn.archko.pdf.fileProvider", clickedFile), "application/pdf");
+                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    } else {
+                        intent.setDataAndType(Uri.fromFile(clickedFile), "application/pdf")
+                    }
                     startActivity(intent)
                 } else if (infoContextMenuItem == item.itemId) {
                     showFileInfoDialog(entry)
