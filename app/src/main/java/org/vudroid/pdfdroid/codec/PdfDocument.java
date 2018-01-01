@@ -1,18 +1,24 @@
 package org.vudroid.pdfdroid.codec;
 
-import com.artifex.mupdf.viewer.MuPDFCore;
+import com.artifex.mupdf.fitz.Document;
+import com.artifex.mupdf.fitz.Outline;
+import com.artifex.mupdf.viewer.OutlineActivity;
 
 import org.vudroid.core.codec.CodecDocument;
 import org.vudroid.core.codec.CodecPage;
 
-public class PdfDocument implements CodecDocument {
-    MuPDFCore core;
+import java.util.ArrayList;
 
-    public void setCore(MuPDFCore core) {
+public class PdfDocument implements CodecDocument {
+    Document core;
+    private Outline[] outline;
+    ArrayList<OutlineActivity.Item> items;
+
+    public void setCore(Document core) {
         this.core = core;
     }
 
-    public MuPDFCore getCore() {
+    public Document getCore() {
         return core;
     }
 
@@ -24,26 +30,45 @@ public class PdfDocument implements CodecDocument {
         return core.countPages();
     }
 
-    static PdfDocument openDocument(String fname, String pwd) {
+    public static PdfDocument openDocument(String fname, String pwd) {
         //return new PdfDocument(open(FITZMEMORY, fname, pwd));
         PdfDocument document = new PdfDocument();
-        MuPDFCore core = null;
+        Document core = null;
         System.out.println("Trying to open " + fname);
         try {
-            core = new MuPDFCore(fname);
+            core = Document.openDocument(fname);
             document.setCore(core);
         } catch (Exception e) {
-            System.out.println(e);
+            e.printStackTrace();
             return null;
         }
         return document;
     }
 
-    private static native long open(int fitzmemory, String fname, String pwd);
+    public boolean hasOutline() {
+        if (outline == null)
+            outline = core.loadOutline();
+        return outline != null;
+    }
 
-    private static native void free(long handle);
+    public ArrayList<OutlineActivity.Item> getOutline() {
+        if (null != items) {
+            return items;
+        } else {
+            items = new ArrayList<>();
+            flattenOutlineNodes(items, outline, "");
+        }
+        return items;
+    }
 
-    private static native int getPageCount(long handle);
+    private void flattenOutlineNodes(ArrayList<OutlineActivity.Item> result, Outline list[], String indent) {
+        for (Outline node : list) {
+            if (node.title != null)
+                result.add(new OutlineActivity.Item(indent + node.title, node.page));
+            if (node.down != null)
+                flattenOutlineNodes(result, node.down, indent + "    ");
+        }
+    }
 
     @Override
     protected void finalize() throws Throwable {
@@ -53,7 +78,9 @@ public class PdfDocument implements CodecDocument {
 
     public synchronized void recycle() {
         if (null != core) {
-            core.onDestroy();
+            core.destroy();
+            outline = null;
+            items = null;
         }
     }
 }

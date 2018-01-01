@@ -25,7 +25,8 @@ import android.util.Log
 import android.view.*
 import android.widget.*
 import com.artifex.mini.OutlineActivity
-import com.artifex.mupdf.viewer.MuPDFCore
+import com.artifex.mupdf.fitz.Matrix
+import com.artifex.mupdf.fitz.android.AndroidDrawDevice
 import com.artifex.mupdfdemo.MuPDFReflowRecyclerViewAdapter
 import cx.hell.android.pdfviewpro.Bookmark
 import cx.hell.android.pdfviewpro.BookmarkEntry
@@ -33,6 +34,7 @@ import cx.hell.android.pdfviewpro.Options
 import org.vudroid.core.events.CurrentPageListener
 import org.vudroid.core.models.CurrentPageModel
 import org.vudroid.core.views.PageSeekBarControls
+import org.vudroid.pdfdroid.codec.PdfDocument
 
 /**
  * @author: archko 2016/5/9 :12:43
@@ -47,7 +49,7 @@ class MuPDFRecyclerActivity : FragmentActivity(), SensorEventListener {
     private var bookmarkToRestore: BookmarkEntry? = null
     private var pageNumberToast: Toast? = null
 
-    private var core: MuPDFCore? = null
+    private var core: PdfDocument? = null
     private var mPageModel: CurrentPageModel? = null
     lateinit var mPageSeekBarControls: PageSeekBarControls
     private var mButtonsView: View? = null
@@ -75,7 +77,7 @@ class MuPDFRecyclerActivity : FragmentActivity(), SensorEventListener {
         setStartBookmark()
 
         try {
-            core = MuPDFCore(mPath)
+            core = PdfDocument.openDocument(mPath, null)
 
             restoreBookmark()
 
@@ -163,7 +165,7 @@ class MuPDFRecyclerActivity : FragmentActivity(), SensorEventListener {
         LocalBroadcastManager.getInstance(this).sendBroadcast(Intent(HistoryFragment.ACTION_STOPPED))
         mRecyclerView.adapter = null
         if (null != core) {
-            core!!.onDestroy()
+            core!!.recycle()
         }
     }
 
@@ -180,7 +182,7 @@ class MuPDFRecyclerActivity : FragmentActivity(), SensorEventListener {
             override fun onScrollStateChanged(recyclerView: RecyclerView?, newState: Int) {
                 super.onScrollStateChanged(recyclerView, newState)
                 if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-                    mRecyclerView.adapter.notifyDataSetChanged()
+                    mRecyclerView.adapter!!.notifyDataSetChanged()
                 }
             }
 
@@ -294,7 +296,7 @@ class MuPDFRecyclerActivity : FragmentActivity(), SensorEventListener {
                     mRecyclerView.scrollBy(0, scrollY - finalMargin)
                     return true
                 } else {
-                    val pageText = (pos + 1).toString() + "/" + core!!.countPages()
+                    val pageText = (pos + 1).toString() + "/" + core!!.pageCount
                     if (pageNumberToast != null) {
                         pageNumberToast!!.setText(pageText)
                     } else {
@@ -308,7 +310,7 @@ class MuPDFRecyclerActivity : FragmentActivity(), SensorEventListener {
 
             override fun onDoubleTap(e: MotionEvent): Boolean {
                 mPageModel!!.setCurrentPage(pos)
-                mPageModel!!.pageCount = core!!.countPages()
+                mPageModel!!.pageCount = core!!.pageCount
                 mPageModel!!.toggleSeekControls()
                 if (mButtonsView!!.visibility == View.GONE) {
                     mButtonsView!!.visibility = View.VISIBLE
@@ -354,11 +356,11 @@ class MuPDFRecyclerActivity : FragmentActivity(), SensorEventListener {
     }
 
     internal fun restoreBookmark() {
-        if (bookmarkToRestore == null || core == null || core!!.countPages() <= 0) {
+        if (bookmarkToRestore == null || core == null || core!!.pageCount <= 0) {
             return
         }
 
-        if (bookmarkToRestore!!.numberOfPages != core!!.countPages() || bookmarkToRestore!!.page > core!!.countPages()) {
+        if (bookmarkToRestore!!.numberOfPages != core!!.pageCount || bookmarkToRestore!!.page > core!!.pageCount) {
             bookmarkToRestore = null
             return
         }
@@ -390,10 +392,10 @@ class MuPDFRecyclerActivity : FragmentActivity(), SensorEventListener {
     fun toBookmarkEntry(): BookmarkEntry {
         if (null != bookmarkToRestore) {
             bookmarkToRestore!!.page = pos
-            bookmarkToRestore!!.numberOfPages = core!!.countPages()
+            bookmarkToRestore!!.numberOfPages = core!!.pageCount
             return bookmarkToRestore!!
         }
-        return BookmarkEntry(core!!.countPages(),
+        return BookmarkEntry(core!!.pageCount,
                 pos, (1 * 1000).toFloat(), 0,
                 0, 0)
     }
@@ -554,12 +556,19 @@ class MuPDFRecyclerActivity : FragmentActivity(), SensorEventListener {
         }
 
         private fun renderBitmap(position: Int, scale: Int): Bitmap {
-            val result = core!!.getPageSize(position)
-            val width = result.x.toInt() / scale
-            val height = result.y.toInt() / scale
-            val bm = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-            core!!.drawPage(bm, position, width, height, 0, 0, width, height, null)
-            return bm
+            //val result = core!!.getPage(position) as PdfPage
+            //val width = result.width / scale
+            //val height = result.height / scale
+            //val bm = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+            //result.renderBitmap(bm, position, width, height, 0, 0, width, height, null)
+            //return result.renderBitmap(width, height, RectF(0f, 0f, width.toFloat(), height.toFloat()), 1.0f);
+            //return bm
+            val page = core!!.core.loadPage(position)
+            //Log.i(APP, "draw page " + pageNumber)
+            val ctm: Matrix
+            ctm = AndroidDrawDevice.fitPageWidth(page, width)
+            val bitmap = AndroidDrawDevice.drawPage(page, ctm)
+            return bitmap
         }
 
         private fun updateBitmap(pdfHolder: PdfHolder, bitmap: Bitmap) {
@@ -580,7 +589,7 @@ class MuPDFRecyclerActivity : FragmentActivity(), SensorEventListener {
         }
 
         override fun getItemCount(): Int {
-            return core!!.countPages()
+            return core!!.pageCount
         }
 
         inner class PdfHolder(internal var imageView: ImageView) : RecyclerView.ViewHolder(imageView) {

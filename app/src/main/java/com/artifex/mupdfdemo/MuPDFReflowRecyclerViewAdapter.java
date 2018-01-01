@@ -7,7 +7,8 @@ import android.view.MotionEvent;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.artifex.mupdf.viewer.MuPDFCore;
+import org.vudroid.pdfdroid.codec.PdfDocument;
+import org.vudroid.pdfdroid.codec.PdfPage;
 
 import cn.archko.pdf.R;
 import cn.archko.pdf.utils.Util;
@@ -17,21 +18,20 @@ import cn.archko.pdf.utils.Util;
  */
 public class MuPDFReflowRecyclerViewAdapter extends RecyclerView.Adapter {
     private final Context mContext;
-    private final MuPDFCore mCore;
+    private final PdfDocument mCore;
 
-    public MuPDFReflowRecyclerViewAdapter(Context c, MuPDFCore core) {
+    public MuPDFReflowRecyclerViewAdapter(Context c, PdfDocument core) {
         mContext = c;
         mCore = core;
     }
 
-
-    public long getItemId(int arg0) {
-        return 0;
+    public long getItemId(int position) {
+        return position;
     }
 
     @Override
     public int getItemCount() {
-        return mCore.countPages();
+        return mCore.getPageCount();
     }
 
     @Override
@@ -48,7 +48,7 @@ public class MuPDFReflowRecyclerViewAdapter extends RecyclerView.Adapter {
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int pos) {
         final int position = pos;
         PDFTextView reflowView = (PDFTextView) holder.itemView;
-        byte[] result = mCore.asHtml(position);
+        byte[] result =((PdfPage) mCore.getPage(position)).asHtml(position);
 
         String text = new String(result);
         //Spanned spanned = Html.fromHtml(text);

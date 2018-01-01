@@ -6,18 +6,21 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 
 import com.artifex.mupdf.fitz.Cookie;
-import com.artifex.mupdf.viewer.MuPDFCore;
+import com.artifex.mupdf.fitz.Document;
+import com.artifex.mupdf.fitz.Page;
+import com.artifex.mupdf.fitz.android.AndroidDrawDevice;
 
 import org.vudroid.core.codec.CodecPage;
 
 public class PdfPage implements CodecPage {
 
     private long pageHandle;
-    MuPDFCore core;
+    Document core;
+    Page page;
     int pdfPageWidth;
     int pdfPageHeight;
 
-    public PdfPage(MuPDFCore core, long pageHandle) {
+    public PdfPage(Document core, long pageHandle) {
         this.core = core;
         this.pageHandle = pageHandle;
     }
@@ -33,7 +36,7 @@ public class PdfPage implements CodecPage {
     public int getWidth() {
         //return (int) getMediaBox().width();
         if (pdfPageWidth == 0) {
-            pdfPageWidth = (int) (core.getPDFPageWidth());
+            pdfPageWidth = (int) (page.getBounds().x1 - page.getBounds().x0);
         }
         return pdfPageWidth;
     }
@@ -41,7 +44,7 @@ public class PdfPage implements CodecPage {
     public int getHeight() {
         //return (int) getMediaBox().height();
         if (pdfPageHeight == 0) {
-            pdfPageHeight = (int) (core.getPDFPageHeight());
+            pdfPageHeight = (int) (page.getBounds().y1 - page.getBounds().y0);
         }
         return pdfPageHeight;
     }
@@ -56,13 +59,13 @@ public class PdfPage implements CodecPage {
     }
 
     /**
-     * ��Ⱦλͼ
+     * 解码
      *
-     * @param width           ͼ���
-     * @param height          ͼ���
-     * @param pageSliceBounds �и�ľ���,�и�4����Ϊ1/4,8��Ϊ1/8,����.
-     * @param scale           ���ż���
-     * @return λ��
+     * @param width           一个页面的宽
+     * @param height          一个页面的高
+     * @param pageSliceBounds 每个页面的边框
+     * @param scale           缩放级别
+     * @return 位图
      */
     public Bitmap renderBitmap(int width, int height, RectF pageSliceBounds, float scale) {
         //Matrix matrix=new Matrix();
@@ -75,26 +78,25 @@ public class PdfPage implements CodecPage {
         int pageH;
         int patchX;
         int patchY;
-        int patchW;
-        int patchH;
         pageW = (int) (getWidth() * scale);
         pageH = (int) (getHeight() * scale);
 
         patchX = (int) (pageSliceBounds.left * pageW);
         patchY = (int) (pageSliceBounds.top * pageH);
-        patchW = width;
-        patchH = height;
         Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        core.drawPage(bitmap, (int) pageHandle,
-                pageW, pageH,
-                patchX, patchY,
-                patchW, patchH, (Cookie) null);
+
+        com.artifex.mupdf.fitz.Matrix ctm = new com.artifex.mupdf.fitz.Matrix(scale);
+        AndroidDrawDevice dev = new AndroidDrawDevice(bitmap, patchX, patchY, 0, 0, width, height);
+        page.run(dev, ctm, (Cookie) null);
+        dev.close();
+        dev.destroy();
+
         return bitmap;
     }
 
-    static PdfPage createPage(MuPDFCore core, int pageno) {
+    static PdfPage createPage(Document core, int pageno) {
         PdfPage pdfPage = new PdfPage(core, pageno);
-        core.gotoPage(pageno);
+        pdfPage.page = core.loadPage(pageno);
         return pdfPage;
     }
 
@@ -106,11 +108,10 @@ public class PdfPage implements CodecPage {
 
     public synchronized void recycle() {
         if (pageHandle != 0) {
-            //core.freePage((int) pageHandle);
             pageHandle = 0;
+            page.destroy();
         }
     }
-
 
     public Bitmap render(Rect viewbox, Matrix matrix) {
         int[] mRect = new int[4];
@@ -134,5 +135,12 @@ public class PdfPage implements CodecPage {
         int[] bufferarray = new int[width * height];
         //nativeCreateView(docHandle, pageHandle, mRect, matrixArray, bufferarray);
         return Bitmap.createBitmap(bufferarray, width, height, Bitmap.Config.RGB_565);
+    }
+
+    public byte[] asHtml(int pageno) {
+        if (page == null) {
+            page = core.loadPage(pageno);
+        }
+        return page.textAsHtml();
     }
 }

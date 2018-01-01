@@ -30,11 +30,11 @@ public class PdfViewerActivity extends BaseViewerActivity {
     public void openOutline() {
         AKDecodeService service = (AKDecodeService) getDecodeService();
         PdfDocument document = (PdfDocument) service.getDocument();
-        if (document.getCore().hasOutline() && null != document.getCore().getOutline()) {
+        if (document.hasOutline() && null != document.getOutline()) {
             Intent intent = new Intent(this, OutlineActivity.class);
             intent.putExtra("cp", getDocumentView().getCurrentPage());
             intent.putExtra("POSITION", getDocumentView().getCurrentPage());
-            intent.putExtra("OUTLINE", document.getCore().getOutline());
+            intent.putExtra("OUTLINE", document.getOutline());
             startActivityForResult(intent, OUTLINE_REQUEST);
         }
     }
