@@ -1,47 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-	package="cn.archko.pdf"
-	android:versionCode="50"
-	android:versionName="@string/version"
-	android:installLocation="auto">
+    package="cn.archko.pdf"
+    android:versionCode="50"
+    android:versionName="@string/version"
+    android:installLocation="auto">
 
-	<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-	<uses-permission android:name="android.permission.INTERNET" />
-	<supports-screens
-		android:smallScreens="true"
-		android:normalScreens="true"
-		android:largeScreens="true"
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <supports-screens
+        android:smallScreens="true"
+        android:normalScreens="true"
+        android:largeScreens="true"
         android:xlargeScreens="true"
-		android:anyDensity="true" />
+        android:anyDensity="true"/>
 
-	<uses-sdk android:minSdkVersion="16" android:targetSdkVersion="27"/>
+    <uses-sdk android:minSdkVersion="16" android:targetSdkVersion="27"/>
 
-	<application android:name="cx.hell.android.pdfviewpro.APVApplication"
-		android:label="@string/app_name"
-		android:icon="@drawable/icon" android:largeHeap="true"
+    <application android:name="cx.hell.android.pdfviewpro.APVApplication"
+        android:label="@string/app_name"
+        android:icon="@drawable/ic_mupdf" android:largeHeap="true"
         android:theme="@style/AppBaseTheme"
-		android:hardwareAccelerated="true">
+        android:hardwareAccelerated="true">
 
-		<provider
-			android:name="android.support.v4.content.FileProvider"
-			android:authorities="cn.archko.mupdf.fileProvider"
-			android:exported="false"
-			android:grantUriPermissions="true">
-			<meta-data
-				android:name="android.support.FILE_PROVIDER_PATHS"
-				android:resource="@xml/provider_paths" />
-		</provider>
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="cn.archko.mupdf.fileProvider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths"/>
+        </provider>
 
-		<activity
-			android:name="com.artifex.mupdfdemo.ChoosePDFActivity"
-			android:configChanges="orientation|keyboardHidden|screenSize"
-			android:label="@string/app_name">
-			<intent-filter>
-				<action android:name="android.intent.action.MAIN"/>
-				<!--<category android:name="android.intent.category.LAUNCHER"/>-->
-			</intent-filter>
-		</activity>
         <activity
             android:name=".ChooseFileFragmentActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
@@ -51,230 +42,74 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-		<activity
-			android:name="com.artifex.mupdfdemo.MuPDFActivity" android:theme="@style/AppFullscreen"
-			android:configChanges="orientation|keyboardHidden|screenSize"
-			android:label="@string/app_name">
-			<!--<intent-filter>
-				<action android:name="android.intent.action.VIEW"/>
-				<category android:name="android.intent.category.DEFAULT"/>
-				<data android:mimeType="application/vnd.ms-xpsdocument"/>
-				<data android:mimeType="application/xps"/>
-			</intent-filter>
-			<intent-filter>
-				<action android:name="android.intent.action.VIEW"/>
-				<category android:name="android.intent.category.DEFAULT"/>
-				<data android:mimeType="application/pdf"/>
-			</intent-filter>
-			<intent-filter>
-				<action android:name="android.intent.action.VIEW"/>
-				<category android:name="android.intent.category.DEFAULT"/>
-				<data android:mimeType="application/x-cbz"/>
-			</intent-filter>
-			<intent-filter>
-				<action android:name="android.intent.action.VIEW"/>
-				<category android:name="android.intent.category.DEFAULT"/>
-				<data android:mimeType="application/epub+zip"/>
-			</intent-filter>
-			<intent-filter>
-				<action android:name="android.intent.action.VIEW"/>
-				<category android:name="android.intent.category.DEFAULT"/>
-				<category android:name="android.intent.category.BROWSABLE"/>
-				<data android:scheme="file"/>
-				<data android:mimeType="*/*"/>
-				<data android:pathPattern=".*\\.pdf"/>
-				<data android:host="*"/>
-			</intent-filter>
-			<intent-filter>
-				<action android:name="android.intent.action.VIEW"/>
-				<category android:name="android.intent.category.DEFAULT"/>
-				<category android:name="android.intent.category.BROWSABLE"/>
-				<data android:scheme="file"/>
-				<data android:mimeType="*/*"/>
-				<data android:pathPattern=".*\\.cbz"/>
-				<data android:host="*"/>
-			</intent-filter>-->
-		</activity>
-		<activity
-			android:name="cx.hell.android.pdfviewpro.OpenFileActivity"
-			android:theme="@style/AppTheme"
-			android:configChanges="orientation|keyboardHidden|screenSize"
-			android:label="APV">
-			<intent-filter>
-				<action android:name="android.intent.action.VIEW"/>
-				<category android:name="android.intent.category.DEFAULT"/>
-				<data android:mimeType="application/vnd.ms-xpsdocument"/>
-			</intent-filter>
-			<intent-filter>
-				<action android:name="android.intent.action.VIEW"/>
-				<category android:name="android.intent.category.DEFAULT"/>
-				<data android:mimeType="application/vnd.ms-xpsdocument"/>
-				<data android:mimeType="application/xps"/>
-			</intent-filter>
-			<intent-filter>
-				<action android:name="android.intent.action.VIEW"/>
-				<category android:name="android.intent.category.DEFAULT"/>
-				<data android:mimeType="application/pdf"/>
-			</intent-filter>
-			<intent-filter>
-				<action android:name="android.intent.action.VIEW"/>
-				<category android:name="android.intent.category.DEFAULT"/>
-				<data android:mimeType="application/x-cbz"/>
-			</intent-filter>
-			<intent-filter>
-				<action android:name="android.intent.action.VIEW"/>
-				<category android:name="android.intent.category.DEFAULT"/>
-				<data android:mimeType="application/epub+zip"/>
-			</intent-filter>
-			<intent-filter>
-				<action android:name="android.intent.action.VIEW"/>
-				<category android:name="android.intent.category.DEFAULT"/>
-				<category android:name="android.intent.category.BROWSABLE"/>
-				<data android:scheme="file"/>
-				<data android:mimeType="*/*"/>
-				<data android:pathPattern=".*\\.xps"/>
-				<data android:host="*"/>
-			</intent-filter>
-			<intent-filter>
-				<action android:name="android.intent.action.VIEW"/>
-				<category android:name="android.intent.category.DEFAULT"/>
-				<category android:name="android.intent.category.BROWSABLE"/>
-				<data android:scheme="file"/>
-				<data android:mimeType="*/*"/>
-				<data android:pathPattern=".*\\.pdf"/>
-				<data android:host="*"/>
-			</intent-filter>
-			<intent-filter>
-				<action android:name="android.intent.action.VIEW"/>
-				<category android:name="android.intent.category.DEFAULT"/>
-				<category android:name="android.intent.category.BROWSABLE"/>
-				<data android:scheme="file"/>
-				<data android:mimeType="*/*"/>
-				<data android:pathPattern=".*\\.cbz"/>
-				<data android:host="*"/>
-			</intent-filter>
-			<intent-filter>
-				<action android:name="android.intent.action.VIEW"/>
-				<category android:name="android.intent.category.DEFAULT"/>
-				<data android:mimeType="application/epub+zip"/>
-			</intent-filter>
-			<intent-filter>
-				<action android:name="android.intent.action.VIEW"/>
-				<category android:name="android.intent.category.DEFAULT"/>
-				<category android:name="android.intent.category.BROWSABLE"/>
-				<data android:scheme="file"/>
-				<data android:mimeType="*/*"/>
-				<data android:pathPattern=".*\\.epub"/>
-				<data android:host="*"/>
-			</intent-filter>
-		</activity>
-        <activity android:name="cx.hell.android.pdfviewpro.Options" android:label="@string/options" />
+        <activity
+            android:name="com.artifex.mupdf.viewer.DocumentActivity"
+            android:theme="@style/AppTheme"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="DocumentAc">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:mimeType="application/pdf"/>
+                <data android:mimeType="application/vnd.ms-xpsdocument"/>
+                <data android:mimeType="application/oxps"/>
+                <data android:mimeType="application/x-cbz"/>
+                <data android:mimeType="application/epub+zip"/>
+                <data android:mimeType="text/xml"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:pathPattern=".*\\.pdf"/>
+                <data android:pathPattern=".*\\.xps"/>
+                <data android:pathPattern=".*\\.oxps"/>
+                <data android:pathPattern=".*\\.cbz"/>
+                <data android:pathPattern=".*\\.epub"/>
+                <data android:pathPattern=".*\\.fb2"/>
+            </intent-filter>
+        </activity>
+        <activity android:name="cx.hell.android.pdfviewpro.Options" android:label="@string/options"/>
         <activity android:name="org.vudroid.pdfdroid.PdfViewerActivity" android:screenOrientation="landscape"
-			android:theme="@style/AppTheme"
+            android:theme="@style/AppTheme"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="Vudroid">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
-                <data android:mimeType="application/vnd.ms-xpsdocument"/>
-            </intent-filter>
-			<intent-filter>
-				<action android:name="android.intent.action.VIEW"/>
-				<category android:name="android.intent.category.DEFAULT"/>
-				<data android:mimeType="application/vnd.ms-xpsdocument"/>
-				<data android:mimeType="application/xps"/>
-			</intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
-                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
                 <data android:mimeType="application/pdf"/>
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
-                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:mimeType="application/vnd.ms-xpsdocument"/>
+                <data android:mimeType="application/oxps"/>
                 <data android:mimeType="application/x-cbz"/>
+                <data android:mimeType="application/epub+zip"/>
+                <data android:mimeType="text/xml"/>
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
-                <data android:scheme="file"/>
-                <data android:mimeType="*/*"/>
-                <data android:pathPattern=".*\\.xps"/>
-                <data android:host="*"/>
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
-                <data android:scheme="file"/>
-                <data android:mimeType="*/*"/>
                 <data android:pathPattern=".*\\.pdf"/>
-                <data android:host="*"/>
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
-                <data android:scheme="file"/>
-                <data android:mimeType="*/*"/>
+                <data android:pathPattern=".*\\.xps"/>
+                <data android:pathPattern=".*\\.oxps"/>
                 <data android:pathPattern=".*\\.cbz"/>
-                <data android:host="*"/>
+                <data android:pathPattern=".*\\.epub"/>
+                <data android:pathPattern=".*\\.fb2"/>
             </intent-filter>
-			<intent-filter>
-				<action android:name="android.intent.action.VIEW"/>
-				<category android:name="android.intent.category.DEFAULT"/>
-				<data android:mimeType="application/epub+zip"/>
-			</intent-filter>
-			<intent-filter>
-				<action android:name="android.intent.action.VIEW"/>
-				<category android:name="android.intent.category.DEFAULT"/>
-				<category android:name="android.intent.category.BROWSABLE"/>
-				<data android:scheme="file"/>
-				<data android:mimeType="*/*"/>
-				<data android:pathPattern=".*\\.epub"/>
-				<data android:host="*"/>
-			</intent-filter>
         </activity>
-		<activity
-			android:name="com.artifex.mupdfdemo.OutlineActivity"
-			android:configChanges="orientation|keyboardHidden|screenSize"
-			android:theme="@style/AppTheme"
-			android:label="@string/outline_title">
-		</activity>
-		<activity
-			android:name="com.artifex.mupdfdemo.PrintDialogActivity"
-			android:configChanges="orientation|keyboardHidden|screenSize"
-			android:theme="@style/AppFullscreen"
-			android:label="@string/print">
-		</activity>
+        <activity
+            android:name="com.artifex.mini.OutlineActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:theme="@style/AppTheme"
+            android:label="@string/outline_title">
+        </activity>
 
-		<activity
-			android:name=".LOLLIPOPPDFActivity"
-			android:theme="@style/AppFullscreen" android:screenOrientation="sensor"
-			android:configChanges="orientation|keyboardHidden|screenSize">
-		</activity>
+        <activity
+            android:name=".MuPDFRecyclerActivity" android:theme="@style/AppFullscreen"
+            android:configChanges="orientation|keyboardHidden|screenSize" android:screenOrientation="sensor"
+            android:label="@string/app_name">
+        </activity>
 
-		<activity
-			android:name=".MuPDFRecyclerActivity" android:theme="@style/AppFullscreen"
-			android:configChanges="orientation|keyboardHidden|screenSize"   android:screenOrientation="sensor"
-			android:label="@string/app_name">
-		</activity>
-
-		<activity
-			android:name="com.artifex.mupdf.example.PDFDocViewActivity" android:theme="@style/AppFullscreen"
-			android:configChanges="orientation|keyboardHidden|screenSize" android:screenOrientation="sensor"
-			android:label="@string/app_name">
-		</activity>
-
-		<activity
-			android:name=".NewMuPDFActivity" android:theme="@style/AppFullscreen"
-			android:configChanges="orientation|keyboardHidden|screenSize" android:screenOrientation="sensor"
-			android:label="@string/app_name">
-		</activity>
-
-		<activity android:name="com.artifex.mupdf.android.ProofActivity"
-				  android:configChanges="orientation|screenSize">
-		</activity>
-	</application>
+    </application>
 </manifest> 

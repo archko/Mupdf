@@ -11,7 +11,7 @@ import android.view.GestureDetector;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
-import cn.archko.pdf.Flinger;
+
 import org.vudroid.core.events.CurrentPageListener;
 import org.vudroid.core.events.ZoomListener;
 import org.vudroid.core.models.CurrentPageModel;
@@ -19,6 +19,8 @@ import org.vudroid.core.models.DecodingProgressModel;
 import org.vudroid.core.models.ZoomModel;
 import org.vudroid.core.multitouch.MultiTouchZoom;
 import org.vudroid.core.views.APageSeekBarControls;
+
+import cn.archko.pdf.Flinger;
 
 public class DocumentView extends View implements ZoomListener {
     final ZoomModel zoomModel;

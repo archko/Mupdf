@@ -8,11 +8,9 @@ import android.widget.BaseAdapter
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
-
 import cn.archko.pdf.utils.Util
 import cx.hell.android.pdfviewpro.FileListEntry
-
-import java.util.ArrayList
+import java.util.*
 
 /**
  * @author: archko 2014/4/17 :15:43

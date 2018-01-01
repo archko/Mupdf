@@ -22,6 +22,7 @@ android {
         versionCode VERSION_CODE as int
         versionName VERSION_NAME
         signingConfig signingConfigs.debug
+        ndk.abiFilters 'armeabi-v7a'
     }
     compileOptions {
         encoding "UTF-8"
@@ -60,9 +61,6 @@ dependencies {
     compile "com.android.support:recyclerview-v7:${SUPPORT_LIB_VERSION}"
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     compile "org.jetbrains.anko:anko-common:$anko_version"
-    compile project(':example')
-}
-
-repositories {
-    jcenter()
+	
+	compile project(':viewer')
 }

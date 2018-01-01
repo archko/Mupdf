@@ -1,0 +1,14 @@
+apply plugin: 'com.android.library'
+
+android {
+	compileSdkVersion ANDROID_BUILD_SDK_VERSION as int
+    buildToolsVersion ANDROID_BUILD_TOOLS_VERSION
+	defaultConfig {
+        minSdkVersion ANDROID_BUILD_MIN_SDK_VERSION
+		targetSdkVersion ANDROID_BUILD_TARGET_SDK_VERSION
+	}
+}
+
+dependencies {
+    compile(name: 'fitz-1.12.0', ext: 'aar')
+}

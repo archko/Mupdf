@@ -16,14 +16,11 @@ import android.widget.AdapterView
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.ListView
-
+import cx.hell.android.pdfviewpro.FileListEntry
 import org.vudroid.pdfdroid.PdfViewerActivity
-
 import java.io.File
 import java.io.FileFilter
-import java.util.ArrayList
-
-import cx.hell.android.pdfviewpro.FileListEntry
+import java.util.*
 
 /**
  * @author: archko 2016/2/14 :15:58

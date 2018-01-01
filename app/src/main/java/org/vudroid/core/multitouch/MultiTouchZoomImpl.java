@@ -1,6 +1,7 @@
 package org.vudroid.core.multitouch;
 
 import android.view.MotionEvent;
+
 import org.vudroid.core.models.ZoomModel;
 
 public class MultiTouchZoomImpl implements MultiTouchZoom {

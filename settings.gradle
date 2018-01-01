@@ -1,3 +1,4 @@
 include ':app'
-include ':example'
-include ':mupdf'
+include ':viewer'
+//include ':example'
+//include ':mupdf'

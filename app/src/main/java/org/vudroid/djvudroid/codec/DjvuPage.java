@@ -2,25 +2,20 @@ package org.vudroid.djvudroid.codec;
 
 import android.graphics.Bitmap;
 import android.graphics.RectF;
+
 import org.vudroid.core.codec.CodecPage;
 
-import java.nio.Buffer;
-import java.nio.ByteBuffer;
-
-public class DjvuPage implements CodecPage
-{
+public class DjvuPage implements CodecPage {
     private long pageHandle;
     //TODO: remove all async operations
     private final Object waitObject;
 
-    DjvuPage(long pageHandle, Object waitObject)
-    {
+    DjvuPage(long pageHandle, Object waitObject) {
         this.pageHandle = pageHandle;
         this.waitObject = waitObject;
     }
 
-    public boolean isDecoding()
-    {
+    public boolean isDecoding() {
         return false;
 //        return !isDecodingDone(pageHandle);
     }
@@ -32,36 +27,31 @@ public class DjvuPage implements CodecPage
     private static native boolean isDecodingDone(long pageHandle);
 
     private static native boolean renderPage(long pageHandle, int targetWidth, int targetHeight, float pageSliceX,
-                                    float pageSliceY,
-                                    float pageSliceWidth,
-                                    float pageSliceHeight, int[] buffer);
+                                             float pageSliceY,
+                                             float pageSliceWidth,
+                                             float pageSliceHeight, int[] buffer);
 
     private static native void free(long pageHandle);
 
-    public void waitForDecode()
-    {
+    public void waitForDecode() {
     }
 
-    public int getWidth()
-    {
+    public int getWidth() {
         return getWidth(pageHandle);
     }
 
-    public int getHeight()
-    {
+    public int getHeight() {
         return getHeight(pageHandle);
     }
 
-    public Bitmap renderBitmap(int width, int height, RectF pageSliceBounds)
-    {
+    public Bitmap renderBitmap(int width, int height, RectF pageSliceBounds) {
         final int[] buffer = new int[width * height];
         renderPage(pageHandle, width, height, pageSliceBounds.left, pageSliceBounds.top, pageSliceBounds.width(), pageSliceBounds.height(), buffer);
         return Bitmap.createBitmap(buffer, width, height, Bitmap.Config.RGB_565);
     }
 
     @Override
-    protected void finalize() throws Throwable
-    {
+    protected void finalize() throws Throwable {
         recycle();
         super.finalize();
     }

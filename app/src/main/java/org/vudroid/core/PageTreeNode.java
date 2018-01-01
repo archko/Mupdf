@@ -1,12 +1,17 @@
 package org.vudroid.core;
 
-import android.graphics.*;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Matrix;
+import android.graphics.Paint;
+import android.graphics.Rect;
+import android.graphics.RectF;
 
 import java.lang.ref.SoftReference;
 import java.util.Arrays;
 
 class PageTreeNode {
-    private static final int SLICE_SIZE = 65535*4;
+    private static final int SLICE_SIZE = 65535 * 4;
     private Bitmap bitmap;
     private SoftReference<Bitmap> bitmapWeakReference;
     private boolean decodingNow;
@@ -101,8 +106,8 @@ class PageTreeNode {
     }
 
     private void invalidateChildren() {
-        boolean isThresholdHit=thresholdHit();
-        boolean isVisible=isVisible();
+        boolean isThresholdHit = thresholdHit();
+        boolean isVisible = isVisible();
         if (isThresholdHit && children == null && isVisible) {
             final int newThreshold = treeNodeDepthLevel * 2;
             children = new PageTreeNode[]
@@ -272,15 +277,15 @@ class PageTreeNode {
 
     @Override
     public String toString() {
-        return "PageTreeNode{"+
-            "treeNodeDepthLevel="+treeNodeDepthLevel+
-            ", children="+Arrays.toString(children)+
-            ", pageSliceBounds="+pageSliceBounds+
-            ", bitmap="+bitmap+
-            ", bitmapWeakReference="+bitmapWeakReference+
-            ", targetRectF="+targetRectF+
-            ", targetRect="+targetRect+
-            ", matrix="+matrix+
-            '}';
+        return "PageTreeNode{" +
+                "treeNodeDepthLevel=" + treeNodeDepthLevel +
+                ", children=" + Arrays.toString(children) +
+                ", pageSliceBounds=" + pageSliceBounds +
+                ", bitmap=" + bitmap +
+                ", bitmapWeakReference=" + bitmapWeakReference +
+                ", targetRectF=" + targetRectF +
+                ", targetRect=" + targetRect +
+                ", matrix=" + matrix +
+                '}';
     }
 }

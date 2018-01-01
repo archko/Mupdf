@@ -9,9 +9,11 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import cn.archko.pdf.R;
+
 import org.vudroid.core.events.BringUpZoomControlsListener;
 import org.vudroid.core.models.CurrentPageModel;
+
+import cn.archko.pdf.R;
 
 /**
  * page seek controls
@@ -20,20 +22,20 @@ import org.vudroid.core.models.CurrentPageModel;
  */
 public class PageSeekBarControls extends LinearLayout implements BringUpZoomControlsListener {
 
-    private final static String TAG="PageSeekBarControls";
+    private final static String TAG = "PageSeekBarControls";
 
     private SeekBar mPageSlider;
     private int mPageSliderRes;
     private TextView mPageNumberView;
-    private Runnable gotoPageRunnable=null;
+    private Runnable gotoPageRunnable = null;
     CurrentPageModel mPageModel;
 
     public PageSeekBarControls(Context context, CurrentPageModel pageModel) {
         super(context);
-        this.mPageModel=pageModel;
+        this.mPageModel = pageModel;
         onCreate(context);
-        int smax=Math.max(mPageModel.getPageCount()-1, 1);
-        mPageSliderRes=((10+smax-1)/smax)*2;
+        int smax = Math.max(mPageModel.getPageCount() - 1, 1);
+        mPageSliderRes = ((10 + smax - 1) / smax) * 2;
     }
 
     public PageSeekBarControls(Context context, AttributeSet attrs) {
@@ -45,33 +47,33 @@ public class PageSeekBarControls extends LinearLayout implements BringUpZoomCont
         setOrientation(LinearLayout.VERTICAL);
         LayoutParams lp;
 
-        mPageSlider=new SeekBar(context);
+        mPageSlider = new SeekBar(context);
         //mPageSlider.setId(10000);
         //mPageSlider.setThumb(getResources().getDrawable(R.drawable.seek_thumb));
         mPageSlider.setProgressDrawable(getResources().getDrawable(R.drawable.seek_progress));
         mPageSlider.setBackgroundResource(R.color.toolbar);
-        lp=new LayoutParams(
-            RelativeLayout.LayoutParams.MATCH_PARENT,
-            RelativeLayout.LayoutParams.WRAP_CONTENT);
+        lp = new LayoutParams(
+                RelativeLayout.LayoutParams.MATCH_PARENT,
+                RelativeLayout.LayoutParams.WRAP_CONTENT);
         //lp.addRule(RelativeLayout.ALIGN_PARENT_TOP);
-        lp.leftMargin=16;
-        lp.rightMargin=16;
-        lp.topMargin=8;
-        lp.bottomMargin=16;
+        lp.leftMargin = 16;
+        lp.rightMargin = 16;
+        lp.topMargin = 8;
+        lp.bottomMargin = 16;
         addView(this.mPageSlider, lp);
 
-        mPageNumberView=new TextView(context);
+        mPageNumberView = new TextView(context);
         mPageNumberView.setBackgroundResource(R.drawable.page_num);
         mPageNumberView.setTextColor(getResources().getColor(android.R.color.white));
         //mPageNumberView.setTextAppearance(context, android.R.attr.textAppearanceMedium);
-        lp=new LayoutParams(
-            RelativeLayout.LayoutParams.WRAP_CONTENT,
-            RelativeLayout.LayoutParams.WRAP_CONTENT);
+        lp = new LayoutParams(
+                RelativeLayout.LayoutParams.WRAP_CONTENT,
+                RelativeLayout.LayoutParams.WRAP_CONTENT);
         //lp.addRule(RelativeLayout.ABOVE, 10000);
         //lp.addRule(RelativeLayout.CENTER_IN_PARENT);
-        lp.topMargin=20;
-        lp.bottomMargin=16;
-        lp.gravity=Gravity.CENTER_HORIZONTAL;
+        lp.topMargin = 20;
+        lp.bottomMargin = 16;
+        lp.gravity = Gravity.CENTER_HORIZONTAL;
         addView(this.mPageNumberView, lp);
 
         //mPageSlider.setVisibility(View.GONE);
@@ -79,7 +81,7 @@ public class PageSeekBarControls extends LinearLayout implements BringUpZoomCont
 
         mPageSlider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             public void onStopTrackingTouch(SeekBar seekBar) {
-                PageSeekBarControls.this.gotoPage((seekBar.getProgress()+mPageSliderRes/2)/mPageSliderRes);
+                PageSeekBarControls.this.gotoPage((seekBar.getProgress() + mPageSliderRes / 2) / mPageSliderRes);
                 showPageSlider(false);
             }
 
@@ -87,14 +89,14 @@ public class PageSeekBarControls extends LinearLayout implements BringUpZoomCont
             }
 
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if (null!=mPageModel) {
-                    int index=(progress+mPageSliderRes/2)/mPageSliderRes;
-                    mPageNumberView.setText(String.format("%d / %d", index+1, mPageModel.getPageCount()));
+                if (null != mPageModel) {
+                    int index = (progress + mPageSliderRes / 2) / mPageSliderRes;
+                    mPageNumberView.setText(String.format("%d / %d", index + 1, mPageModel.getPageCount()));
                     showPageSlider(false);
                 }
             }
         });
-        this.gotoPageRunnable=new Runnable() {
+        this.gotoPageRunnable = new Runnable() {
             public void run() {
                 fadePageSlider();
             }
@@ -114,30 +116,30 @@ public class PageSeekBarControls extends LinearLayout implements BringUpZoomCont
             return;
         }
 
-        int index=null!=mPageModel ? mPageModel.getCurrentPageIndex() : 0;
-        int count=null!=mPageModel ? mPageModel.getPageCount() : 0;
-        mPageNumberView.setText(String.format("%d / %d", index+1, count));
-        mPageSlider.setMax((count-1)*mPageSliderRes);
-        mPageSlider.setProgress(index*mPageSliderRes);
+        int index = null != mPageModel ? mPageModel.getCurrentPageIndex() : 0;
+        int count = null != mPageModel ? mPageModel.getPageCount() : 0;
+        mPageNumberView.setText(String.format("%d / %d", index + 1, count));
+        mPageSlider.setMax((count - 1) * mPageSliderRes);
+        mPageSlider.setProgress(index * mPageSliderRes);
     }
 
     public void showGotoPageView() {
-        if (null!=mPageModel) {
-            int smax=Math.max(mPageModel.getPageCount()-1, 1);
-            mPageSliderRes=((10+smax-1)/smax)*2;
+        if (null != mPageModel) {
+            int smax = Math.max(mPageModel.getPageCount() - 1, 1);
+            mPageSliderRes = ((10 + smax - 1) / smax) * 2;
             showPageSlider(true);
         }
     }
 
     private void gotoPage(int page) {
-        Log.i(TAG, "rewind to page "+page);
-        if (null!=mPageModel&&mPageModel.getCurrentPageIndex()!=page) {
+        Log.i(TAG, "rewind to page " + page);
+        if (null != mPageModel && mPageModel.getCurrentPageIndex() != page) {
             mPageModel.goToPageIndex(page);
         }
     }
 
     public void toggleZoomControls() {
-        if (getVisibility()==View.VISIBLE) {
+        if (getVisibility() == View.VISIBLE) {
             hide();
         } else {
             show();

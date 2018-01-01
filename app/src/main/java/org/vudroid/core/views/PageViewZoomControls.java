@@ -7,13 +7,12 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 import android.widget.LinearLayout;
+
 import org.vudroid.core.events.BringUpZoomControlsListener;
 import org.vudroid.core.models.ZoomModel;
 
-public class PageViewZoomControls extends LinearLayout implements BringUpZoomControlsListener
-{
-    public PageViewZoomControls(Context context, final ZoomModel zoomModel)
-    {
+public class PageViewZoomControls extends LinearLayout implements BringUpZoomControlsListener {
+    public PageViewZoomControls(Context context, final ZoomModel zoomModel) {
         super(context);
         show();
         setOrientation(LinearLayout.HORIZONTAL);
@@ -22,36 +21,28 @@ public class PageViewZoomControls extends LinearLayout implements BringUpZoomCon
     }
 
     @Override
-    public boolean onTouchEvent(MotionEvent event)
-    {
+    public boolean onTouchEvent(MotionEvent event) {
         return false;
     }
 
-    public void toggleZoomControls()
-    {
-        if (getVisibility() == View.VISIBLE)
-        {
+    public void toggleZoomControls() {
+        if (getVisibility() == View.VISIBLE) {
             hide();
-        }
-        else
-        {
+        } else {
             show();
         }
     }
 
-    public void show()
-    {
+    public void show() {
         fade(View.VISIBLE, getWidth(), 0.0f);
     }
 
-    public void hide()
-    {
+    public void hide() {
         fade(View.GONE, 0.0f, getWidth());
     }
 
-    private void fade(int visibility, float startDelta, float endDelta)
-    {
-        Animation anim = new TranslateAnimation(0,0, startDelta, endDelta);
+    private void fade(int visibility, float startDelta, float endDelta) {
+        Animation anim = new TranslateAnimation(0, 0, startDelta, endDelta);
         anim.setDuration(500);
         startAnimation(anim);
         setVisibility(visibility);

@@ -22,31 +22,17 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.text.TextUtils
 import android.util.Log
-import android.view.GestureDetector
-import android.view.Gravity
-import android.view.MotionEvent
-import android.view.View
-import android.view.ViewConfiguration
-import android.view.ViewGroup
-import android.view.WindowManager
-import android.widget.ImageButton
-import android.widget.ImageView
-import android.widget.RelativeLayout
-import android.widget.TextView
-import android.widget.Toast
-
-import com.artifex.mupdfdemo.MuPDFCore
+import android.view.*
+import android.widget.*
+import com.artifex.mini.OutlineActivity
+import com.artifex.mupdf.viewer.MuPDFCore
 import com.artifex.mupdfdemo.MuPDFReflowRecyclerViewAdapter
-import com.artifex.mupdfdemo.OutlineActivity
-import com.artifex.mupdfdemo.OutlineActivityData
-
-import org.vudroid.core.events.CurrentPageListener
-import org.vudroid.core.models.CurrentPageModel
-import org.vudroid.core.views.PageSeekBarControls
-
 import cx.hell.android.pdfviewpro.Bookmark
 import cx.hell.android.pdfviewpro.BookmarkEntry
 import cx.hell.android.pdfviewpro.Options
+import org.vudroid.core.events.CurrentPageListener
+import org.vudroid.core.models.CurrentPageModel
+import org.vudroid.core.views.PageSeekBarControls
 
 /**
  * @author: archko 2016/5/9 :12:43
@@ -89,7 +75,7 @@ class MuPDFRecyclerActivity : FragmentActivity(), SensorEventListener {
         setStartBookmark()
 
         try {
-            core = MuPDFCore(this, mPath)
+            core = MuPDFCore(mPath)
 
             restoreBookmark()
 
@@ -99,13 +85,7 @@ class MuPDFRecyclerActivity : FragmentActivity(), SensorEventListener {
             mTitle!!.text = mPath
             if (core!!.hasOutline()) {
                 mOutlineButton!!.setOnClickListener {
-                    val outline = core!!.outline
-                    if (outline != null) {
-                        OutlineActivityData.get().items = outline
-                        val intent = Intent(this@MuPDFRecyclerActivity, OutlineActivity::class.java)
-                        intent.putExtra("cp", pos)
-                        startActivityForResult(intent, OUTLINE_REQUEST)
-                    }
+                    openOutline(pos)
                 }
             } else {
                 mOutlineButton!!.visibility = View.GONE
@@ -114,6 +94,16 @@ class MuPDFRecyclerActivity : FragmentActivity(), SensorEventListener {
             e.printStackTrace()
         }
 
+    }
+
+    fun openOutline(pos: Int) {
+        if (core!!.hasOutline() && null != core!!.outline) {
+            val intent = Intent(this, OutlineActivity::class.java)
+            intent.putExtra("cp", pos)
+            intent.putExtra("POSITION", pos);
+            intent.putExtra("OUTLINE", core!!.getOutline());
+            startActivityForResult(intent, OUTLINE_REQUEST)
+        }
     }
 
     private fun parseIntent() {
@@ -345,7 +335,7 @@ class MuPDFRecyclerActivity : FragmentActivity(), SensorEventListener {
         when (requestCode) {
             OUTLINE_REQUEST -> {
                 if (resultCode >= 0) {
-                    pos = resultCode
+                    pos = resultCode - RESULT_FIRST_USER
                 }
                 mRecyclerView.layoutManager.scrollToPosition(resultCode)
             }
@@ -568,7 +558,7 @@ class MuPDFRecyclerActivity : FragmentActivity(), SensorEventListener {
             val width = result.x.toInt() / scale
             val height = result.y.toInt() / scale
             val bm = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-            core!!.drawPage(bm, position, width, height, 0, 0, width, height, core!!.Cookie())
+            core!!.drawPage(bm, position, width, height, 0, 0, width, height, null)
             return bm
         }
 
@@ -597,37 +587,6 @@ class MuPDFRecyclerActivity : FragmentActivity(), SensorEventListener {
             internal var mThumbnail: Bitmap? = null
             internal var mBitmap: Bitmap? = null
         }
-
-    }
-
-    internal inner class PDFRecyclerAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-            var holder: PdfHolder? = null
-            val view = PDFView(baseContext, core)
-            holder = PdfHolder(view)
-            return holder
-        }
-
-        override fun onBindViewHolder(viewHolder: RecyclerView.ViewHolder, position: Int) {
-            pos = viewHolder.adapterPosition
-            val pdfHolder = viewHolder as PdfHolder
-
-            val result = core!!.getPageSize(position)
-            pdfHolder.mPdfView.setPage(position, result)
-        }
-
-        override fun onViewRecycled(holder: RecyclerView.ViewHolder?) {
-            super.onViewRecycled(holder)
-            val pdfHolder = holder as PdfHolder?
-            pdfHolder!!.mPdfView.releaseBitmaps()
-        }
-
-        override fun getItemCount(): Int {
-            return core!!.countPages()
-        }
-
-        inner class PdfHolder(internal var mPdfView: PDFView) : RecyclerView.ViewHolder(mPdfView)
 
     }
 

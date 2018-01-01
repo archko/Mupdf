@@ -3,11 +3,11 @@ package com.artifex.mupdfdemo;
 import android.content.Context;
 import android.graphics.Paint;
 import android.support.v7.widget.RecyclerView;
-import android.text.Html;
-import android.text.Spanned;
 import android.view.MotionEvent;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import com.artifex.mupdf.viewer.MuPDFCore;
 
 import cn.archko.pdf.R;
 import cn.archko.pdf.utils.Util;
@@ -48,11 +48,11 @@ public class MuPDFReflowRecyclerViewAdapter extends RecyclerView.Adapter {
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int pos) {
         final int position = pos;
         PDFTextView reflowView = (PDFTextView) holder.itemView;
-        byte[] result = mCore.text(position);
+        byte[] result = mCore.asHtml(position);
 
         String text = new String(result);
-        Spanned spanned = Html.fromHtml(text);
-        reflowView.setText(spanned);
+        //Spanned spanned = Html.fromHtml(text);
+        reflowView.setText(text);
     }
 
     class ItemViewHolder extends RecyclerView.ViewHolder {

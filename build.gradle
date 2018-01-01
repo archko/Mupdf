@@ -21,5 +21,14 @@ buildscript {
 allprojects {
     repositories {
         jcenter()
+        // 引入AAR
+        flatDir {
+            List<String> dirs = new ArrayList<>()
+            rootProject.subprojects.each {
+                dirs.add(it.projectDir.absolutePath + "/aars")
+                dirs.add(it.projectDir.absolutePath + "/libs")
+            }
+            dir dirs
+        }
     }
 }

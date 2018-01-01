@@ -1,13 +1,10 @@
 package org.vudroid.core;
 
-public class VuDroidLibraryLoader
-{
+public class VuDroidLibraryLoader {
     private static boolean alreadyLoaded = false;
 
-    public static void load()
-    {
-        if (alreadyLoaded)
-        {
+    public static void load() {
+        if (alreadyLoaded) {
             return;
         }
         //System.loadLibrary("vudroid");

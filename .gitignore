@@ -1,0 +1,14 @@
+.svn
+/.idea
+/.gradle
+/freeline
+/freeline_core
+/build
+/*.iml
+/app/build
+/viewer/build
+
+/app/app.iml
+/viewer/viewer.iml
+/freeline*.zip
+

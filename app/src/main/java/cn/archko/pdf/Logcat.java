@@ -101,7 +101,7 @@ public class Logcat {
      * @throws java.io.IOException
      */
     public static void writeLogcat(String filename) throws IOException {
-        String[] args = { "logcat", "-v", "time", "-d" };
+        String[] args = {"logcat", "-v", "time", "-d"};
 
         Process process = Runtime.getRuntime().exec(args);
 
@@ -110,7 +110,7 @@ public class Logcat {
         FileOutputStream fileStream;
         try {
             fileStream = new FileOutputStream(filename);
-        } catch( FileNotFoundException e) {
+        } catch (FileNotFoundException e) {
             return;
         }
 
@@ -124,8 +124,8 @@ public class Logcat {
                 bw.write(line);
                 bw.newLine();
             }
-        }catch(Exception e) {}
-        finally {
+        } catch (Exception e) {
+        } finally {
             bw.close();
             output.close();
             br.close();
@@ -140,7 +140,7 @@ public class Logcat {
      * @throws java.io.IOException
      */
     public static String getLogcat() throws IOException {
-        String[] args = { "logcat", "-v", "time", "-d", "-t", "500" };
+        String[] args = {"logcat", "-v", "time", "-d", "-t", "500"};
 
         Process process = Runtime.getRuntime().exec(args);
         InputStreamReader input = new InputStreamReader(

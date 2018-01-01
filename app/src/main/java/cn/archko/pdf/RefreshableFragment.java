@@ -9,6 +9,6 @@ import android.support.v4.app.Fragment;
  */
 public class RefreshableFragment extends Fragment {
 
-    public void update() {		
-	}
+    public void update() {
+    }
 }

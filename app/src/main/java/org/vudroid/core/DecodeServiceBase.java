@@ -6,6 +6,7 @@ import android.graphics.RectF;
 import android.net.Uri;
 import android.util.Log;
 import android.view.View;
+
 import org.vudroid.core.codec.CodecContext;
 import org.vudroid.core.codec.CodecDocument;
 import org.vudroid.core.codec.CodecPage;
@@ -18,10 +19,12 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
-import java.util.concurrent.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
-public class DecodeServiceBase implements DecodeService
-{
+public class DecodeServiceBase implements DecodeService {
     private static final int PAGE_POOL_SIZE = 16;
     private final CodecContext codecContext;
 
@@ -35,72 +38,56 @@ public class DecodeServiceBase implements DecodeService
     private Queue<Integer> pageEvictionQueue = new LinkedList<Integer>();
     private boolean isRecycled;
 
-    public DecodeServiceBase(CodecContext codecContext)
-    {
+    public DecodeServiceBase(CodecContext codecContext) {
         this.codecContext = codecContext;
     }
 
-    public void setContentResolver(ContentResolver contentResolver)
-    {
+    public void setContentResolver(ContentResolver contentResolver) {
         this.contentResolver = contentResolver;
         codecContext.setContentResolver(contentResolver);
     }
 
-    public void setContainerView(View containerView)
-    {
+    public void setContainerView(View containerView) {
         this.containerView = containerView;
     }
 
-    public void open(Uri fileUri)
-    {
+    public void open(Uri fileUri) {
         document = codecContext.openDocument(PathFromUri.retrieve(contentResolver, fileUri));
     }
 
-    public void decodePage(Object decodeKey, int pageNum, final DecodeCallback decodeCallback, float zoom, RectF pageSliceBounds)
-    {
+    public void decodePage(Object decodeKey, int pageNum, final DecodeCallback decodeCallback, float zoom, RectF pageSliceBounds) {
         final DecodeTask decodeTask = new DecodeTask(pageNum, decodeCallback, zoom, decodeKey, pageSliceBounds);
-        synchronized (decodingFutures)
-        {
+        synchronized (decodingFutures) {
             if (isRecycled) {
                 return;
             }
-            final Future<?> future = executorService.submit(new Runnable()
-            {
-                public void run()
-                {
-                    try
-                    {
-                        Thread.currentThread().setPriority(Thread.NORM_PRIORITY-1);
+            final Future<?> future = executorService.submit(new Runnable() {
+                public void run() {
+                    try {
+                        Thread.currentThread().setPriority(Thread.NORM_PRIORITY - 1);
                         performDecode(decodeTask);
-                    }
-                    catch (IOException e)
-                    {
+                    } catch (IOException e) {
                         Log.e(DECODE_SERVICE, "Decode fail", e);
                     }
                 }
             });
             final Future<?> removed = decodingFutures.put(decodeKey, future);
-            if (removed != null)
-            {
+            if (removed != null) {
                 removed.cancel(false);
             }
         }
     }
 
-    public void stopDecoding(Object decodeKey)
-    {
+    public void stopDecoding(Object decodeKey) {
         final Future<?> future = decodingFutures.remove(decodeKey);
-        if (future != null)
-        {
+        if (future != null) {
             future.cancel(false);
         }
     }
 
     private void performDecode(DecodeTask currentDecodeTask)
-            throws IOException
-    {
-        if (isTaskDead(currentDecodeTask))
-        {
+            throws IOException {
+        if (isTaskDead(currentDecodeTask)) {
             Log.d(DECODE_SERVICE, "Skipping decode task for page " + currentDecodeTask.pageNumber);
             return;
         }
@@ -108,69 +95,57 @@ public class DecodeServiceBase implements DecodeService
         CodecPage vuPage = getPage(currentDecodeTask.pageNumber);
         preloadNextPage(currentDecodeTask.pageNumber);
 
-        if (isTaskDead(currentDecodeTask))
-        {
+        if (isTaskDead(currentDecodeTask)) {
             return;
         }
         //Log.d(DECODE_SERVICE, "Start converting map to bitmap");
         float scale = calculateScale(vuPage) * currentDecodeTask.zoom;
         //Log.d(DECODE_SERVICE, "scale:"+scale+" vuPage.getWidth():"+vuPage.getWidth());
-        final Bitmap bitmap = ((PdfPage)vuPage).renderBitmap(getScaledWidth(currentDecodeTask, vuPage, scale),
-            getScaledHeight(currentDecodeTask, vuPage, scale), currentDecodeTask.pageSliceBounds, scale);
+        final Bitmap bitmap = ((PdfPage) vuPage).renderBitmap(getScaledWidth(currentDecodeTask, vuPage, scale),
+                getScaledHeight(currentDecodeTask, vuPage, scale), currentDecodeTask.pageSliceBounds, scale);
         //Log.d(DECODE_SERVICE, "Converting map to bitmap finished");
-        if (isTaskDead(currentDecodeTask))
-        {
+        if (isTaskDead(currentDecodeTask)) {
             bitmap.recycle();
             return;
         }
         finishDecoding(currentDecodeTask, bitmap);
     }
 
-    private int getScaledHeight(DecodeTask currentDecodeTask, CodecPage vuPage, float scale)
-    {
+    private int getScaledHeight(DecodeTask currentDecodeTask, CodecPage vuPage, float scale) {
         return Math.round(getScaledHeight(vuPage, scale) * currentDecodeTask.pageSliceBounds.height());
     }
 
-    private int getScaledWidth(DecodeTask currentDecodeTask, CodecPage vuPage, float scale)
-    {
+    private int getScaledWidth(DecodeTask currentDecodeTask, CodecPage vuPage, float scale) {
         return Math.round(getScaledWidth(vuPage, scale) * currentDecodeTask.pageSliceBounds.width());
     }
 
-    private int getScaledHeight(CodecPage vuPage, float scale)
-    {
+    private int getScaledHeight(CodecPage vuPage, float scale) {
         return (int) (scale * vuPage.getHeight());
     }
 
-    private int getScaledWidth(CodecPage vuPage, float scale)
-    {
+    private int getScaledWidth(CodecPage vuPage, float scale) {
         return (int) (scale * vuPage.getWidth());
     }
 
-    private float calculateScale(CodecPage codecPage)
-    {
+    private float calculateScale(CodecPage codecPage) {
         return 1.0f * getTargetWidth() / codecPage.getWidth();
     }
 
-    private void finishDecoding(DecodeTask currentDecodeTask, Bitmap bitmap)
-    {
+    private void finishDecoding(DecodeTask currentDecodeTask, Bitmap bitmap) {
         updateImage(currentDecodeTask, bitmap);
         stopDecoding(currentDecodeTask.pageNumber);
     }
 
-    private void preloadNextPage(int pageNumber) throws IOException
-    {
+    private void preloadNextPage(int pageNumber) throws IOException {
         final int nextPage = pageNumber + 1;
-        if (nextPage >= getPageCount())
-        {
+        if (nextPage >= getPageCount()) {
             return;
         }
         getPage(nextPage);
     }
 
-    private CodecPage getPage(int pageIndex)
-    {
-        if (!pages.containsKey(pageIndex) || pages.get(pageIndex).get() == null)
-        {
+    private CodecPage getPage(int pageIndex) {
+        if (!pages.containsKey(pageIndex) || pages.get(pageIndex).get() == null) {
             pages.put(pageIndex, new SoftReference<CodecPage>(document.getPage(pageIndex)));
             pageEvictionQueue.remove(pageIndex);
             pageEvictionQueue.offer(pageIndex);
@@ -185,69 +160,57 @@ public class DecodeServiceBase implements DecodeService
         return pages.get(pageIndex).get();
     }
 
-    private void waitForDecode(CodecPage vuPage)
-    {
+    private void waitForDecode(CodecPage vuPage) {
         vuPage.waitForDecode();
     }
 
-    private int getTargetWidth()
-    {
+    private int getTargetWidth() {
         return containerView.getWidth();
     }
 
-    public int getEffectivePagesWidth()
-    {
+    public int getEffectivePagesWidth() {
         final CodecPage page = getPage(0);
         return getScaledWidth(page, calculateScale(page));
     }
 
-    public int getEffectivePagesHeight()
-    {
+    public int getEffectivePagesHeight() {
         final CodecPage page = getPage(0);
         return getScaledHeight(page, calculateScale(page));
     }
 
-    public int getPageWidth(int pageIndex)
-    {
+    public int getPageWidth(int pageIndex) {
         return getPage(pageIndex).getWidth();
     }
 
-    public int getPageHeight(int pageIndex)
-    {
+    public int getPageHeight(int pageIndex) {
         return getPage(pageIndex).getHeight();
     }
 
-    private void updateImage(final DecodeTask currentDecodeTask, Bitmap bitmap)
-    {
+    private void updateImage(final DecodeTask currentDecodeTask, Bitmap bitmap) {
         currentDecodeTask.decodeCallback.decodeComplete(bitmap);
     }
 
-    private boolean isTaskDead(DecodeTask currentDecodeTask)
-    {
-        synchronized (decodingFutures)
-        {
+    private boolean isTaskDead(DecodeTask currentDecodeTask) {
+        synchronized (decodingFutures) {
             return !decodingFutures.containsKey(currentDecodeTask.decodeKey);
         }
     }
 
-    public int getPageCount()
-    {
-        if (document==null) {
+    public int getPageCount() {
+        if (document == null) {
             return 0;
         }
         return document.getPageCount();
     }
 
-    private class DecodeTask
-    {
+    private class DecodeTask {
         private final Object decodeKey;
         private final int pageNumber;
         private final float zoom;
         private final DecodeCallback decodeCallback;
         private final RectF pageSliceBounds;
 
-        private DecodeTask(int pageNumber, DecodeCallback decodeCallback, float zoom, Object decodeKey, RectF pageSliceBounds)
-        {
+        private DecodeTask(int pageNumber, DecodeCallback decodeCallback, float zoom, Object decodeKey, RectF pageSliceBounds) {
             this.pageNumber = pageNumber;
             this.decodeCallback = decodeCallback;
             this.zoom = zoom;

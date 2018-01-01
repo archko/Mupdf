@@ -11,22 +11,15 @@ import android.os.Environment
 import android.support.v4.content.LocalBroadcastManager
 import android.support.v4.view.MenuItemCompat
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.AbsListView
 import android.widget.Toast
-
 import cn.archko.pdf.utils.LengthUtils
 import cn.archko.pdf.utils.Util
 import cx.hell.android.pdfviewpro.APVApplication
 import cx.hell.android.pdfviewpro.FileListEntry
-
 import java.io.File
-import java.util.ArrayList
+import java.util.*
 
 /**
  * @version 1.00.00
@@ -346,8 +339,11 @@ class HistoryFragment : BrowserFragment(), AbsListView.OnScrollListener {
 
         val TAG = "HistoryFragment"
         internal val PAGE_SIZE = 15
-        @JvmField val ACTION_STARTED = "com.example.android.supportv4.STARTED"
-        @JvmField val ACTION_UPDATE = "com.example.android.supportv4.UPDATE"
-        @JvmField val ACTION_STOPPED = "com.example.android.supportv4.STOPPED"
+        @JvmField
+        val ACTION_STARTED = "com.example.android.supportv4.STARTED"
+        @JvmField
+        val ACTION_UPDATE = "com.example.android.supportv4.UPDATE"
+        @JvmField
+        val ACTION_STOPPED = "com.example.android.supportv4.STOPPED"
     }
 }

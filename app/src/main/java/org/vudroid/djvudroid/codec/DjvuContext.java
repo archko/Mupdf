@@ -2,16 +2,15 @@ package org.vudroid.djvudroid.codec;
 
 import android.content.ContentResolver;
 import android.util.Log;
+
 import org.vudroid.core.VuDroidLibraryLoader;
 import org.vudroid.core.codec.CodecContext;
 
 import java.util.concurrent.Semaphore;
 
-public class DjvuContext implements Runnable, CodecContext
-{
-    static
-    {
-        VuDroidLibraryLoader.load();        
+public class DjvuContext implements Runnable, CodecContext {
+    static {
+        VuDroidLibraryLoader.load();
     }
 
     private long contextHandle;
@@ -19,66 +18,52 @@ public class DjvuContext implements Runnable, CodecContext
     private final Object waitObject = new Object();
     private final Semaphore docSemaphore = new Semaphore(0);
 
-    public DjvuContext()
-    {
+    public DjvuContext() {
         this.contextHandle = create();
         new Thread(this).start();
     }
 
-    public DjvuDocument  openDocument(String fileName)
-    {
+    public DjvuDocument openDocument(String fileName) {
         final DjvuDocument djvuDocument = DjvuDocument.openDocument(fileName, this, waitObject);
-        try
-        {
+        try {
             docSemaphore.acquire();
-        } catch (InterruptedException e)
-        {
+        } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
         return djvuDocument;
     }
 
-    long getContextHandle()
-    {
+    long getContextHandle() {
         return contextHandle;
     }
 
-    public void run()
-    {
-        for(;;)
-        {
-            try
-            {
+    public void run() {
+        for (; ; ) {
+            try {
                 synchronized (this) {
                     if (isRecycled()) return;
                     handleMessage(contextHandle);
                     wait(200);
                 }
-                synchronized (waitObject)
-                {
+                synchronized (waitObject) {
                     waitObject.notifyAll();
                 }
-            }
-            catch (Exception e)
-            {
+            } catch (Exception e) {
                 Log.e(DJVU_DROID_CODEC_LIBRARY, "Codec error", e);
             }
         }
     }
 
     @SuppressWarnings({"UnusedDeclaration"})
-    private void handleDocInfo()
-    {
+    private void handleDocInfo() {
         docSemaphore.release();
     }
 
-    public void setContentResolver(ContentResolver contentResolver)
-    {
+    public void setContentResolver(ContentResolver contentResolver) {
     }
 
     @Override
-    protected void finalize() throws Throwable
-    {
+    protected void finalize() throws Throwable {
         recycle();
         super.finalize();
     }
@@ -96,6 +81,8 @@ public class DjvuContext implements Runnable, CodecContext
     }
 
     private static native long create();
+
     private static native void free(long contextHandle);
+
     private native void handleMessage(long contextHandle);
 }

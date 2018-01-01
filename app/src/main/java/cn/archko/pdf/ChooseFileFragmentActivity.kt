@@ -9,7 +9,6 @@ import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentActivity
 import android.support.v4.app.FragmentPagerAdapter
-import android.support.v4.app.FragmentTransaction
 import android.support.v4.view.MenuItemCompat
 import android.support.v4.view.ViewPager
 import android.util.Log
@@ -18,11 +17,9 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.ViewGroup
 import android.widget.Toast
-
 import cx.hell.android.pdfviewpro.APVApplication
-
 import java.lang.ref.WeakReference
-import java.util.ArrayList
+import java.util.*
 
 /**
  * Minimalistic file browser.

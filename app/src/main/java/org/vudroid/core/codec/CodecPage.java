@@ -3,8 +3,7 @@ package org.vudroid.core.codec;
 import android.graphics.Bitmap;
 import android.graphics.RectF;
 
-public interface CodecPage
-{
+public interface CodecPage {
     boolean isDecoding();
 
     void waitForDecode();

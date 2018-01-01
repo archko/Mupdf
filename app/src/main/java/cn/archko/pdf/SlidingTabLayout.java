@@ -22,7 +22,6 @@ import android.os.Build;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -73,7 +72,8 @@ public class SlidingTabLayout extends HorizontalScrollView {
     }
 
     SelectPageListener mSelectPageListener;
-    public void setSelectPageListener(SelectPageListener listener){
+
+    public void setSelectPageListener(SelectPageListener listener) {
         mSelectPageListener = listener;
     }
 
@@ -85,7 +85,7 @@ public class SlidingTabLayout extends HorizontalScrollView {
 
     private int mTabViewLayoutId;
     private int mTabViewTextViewId;
-    private boolean isMatchWidth=false;
+    private boolean isMatchWidth = false;
 
     private ViewPager mViewPager;
     private ViewPager.OnPageChangeListener mViewPagerPageChangeListener;
@@ -116,7 +116,7 @@ public class SlidingTabLayout extends HorizontalScrollView {
 
     /**
      * Set the custom {@link com.jsmobile.route.view.SlidingTabLayout.TabColorizer} to be used.
-     *
+     * <p>
      * If you only require simple custmisation then you can use
      * {@link #setSelectedIndicatorColors(int...)} and {@link #setDividerColors(int...)} to achieve
      * similar effects.
@@ -156,7 +156,7 @@ public class SlidingTabLayout extends HorizontalScrollView {
      * Set the custom layout to be inflated for the tab views.
      *
      * @param layoutResId Layout id to be inflated
-     * @param textViewId id of the {@link android.widget.TextView} in the inflated view
+     * @param textViewId  id of the {@link android.widget.TextView} in the inflated view
      */
     public void setCustomTabView(int layoutResId, int textViewId) {
         mTabViewLayoutId = layoutResId;
@@ -164,7 +164,7 @@ public class SlidingTabLayout extends HorizontalScrollView {
     }
 
     public void setMatchWidth(boolean isMatchWidth) {
-        this.isMatchWidth=isMatchWidth;
+        this.isMatchWidth = isMatchWidth;
     }
 
     /**
@@ -206,7 +206,7 @@ public class SlidingTabLayout extends HorizontalScrollView {
         }
 
         int padding = (int) (TAB_VIEW_PADDING_DIPS * getResources().getDisplayMetrics().density);
-        textView.setPadding(padding, padding/2, padding, 2*padding/3);
+        textView.setPadding(padding, padding / 2, padding, 2 * padding / 3);
 
         return textView;
     }
@@ -240,9 +240,9 @@ public class SlidingTabLayout extends HorizontalScrollView {
             if (!isMatchWidth) {
                 mTabStrip.addView(tabView);
             } else {
-                LinearLayout.LayoutParams lp=(LinearLayout.LayoutParams) tabView.getLayoutParams();
-                if (lp==null) {
-                    lp=new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, 1);
+                LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) tabView.getLayoutParams();
+                if (lp == null) {
+                    lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, 1);
                 }
                 mTabStrip.addView(tabView, lp);
             }

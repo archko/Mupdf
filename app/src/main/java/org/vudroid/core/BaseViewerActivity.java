@@ -1,7 +1,6 @@
 package org.vudroid.core;
 
 import android.app.Activity;
-import android.app.Dialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
@@ -25,15 +24,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.Toast;
-import cn.archko.pdf.AKProgress;
-import cn.archko.pdf.AKRecent;
-import cn.archko.pdf.DataListener;
-import com.artifex.mupdfdemo.OutlineActivity;
-import com.artifex.mupdfdemo.OutlineActivityData;
-import cn.archko.pdf.R;
-import cx.hell.android.pdfviewpro.Bookmark;
-import cx.hell.android.pdfviewpro.BookmarkEntry;
-import cx.hell.android.pdfviewpro.Options;
+
 import org.vudroid.core.events.CurrentPageListener;
 import org.vudroid.core.events.DecodingProgressListener;
 import org.vudroid.core.events.PageViewPresenter;
@@ -43,15 +34,22 @@ import org.vudroid.core.models.ZoomModel;
 import org.vudroid.core.views.APageSeekBarControls;
 import org.vudroid.core.views.PageViewZoomControls;
 
-public abstract class BaseViewerActivity extends Activity implements DecodingProgressListener, CurrentPageListener, SensorEventListener
-{
+import cn.archko.pdf.AKProgress;
+import cn.archko.pdf.AKRecent;
+import cn.archko.pdf.DataListener;
+import cn.archko.pdf.R;
+import cx.hell.android.pdfviewpro.Bookmark;
+import cx.hell.android.pdfviewpro.BookmarkEntry;
+import cx.hell.android.pdfviewpro.Options;
+
+public abstract class BaseViewerActivity extends Activity implements DecodingProgressListener, CurrentPageListener, SensorEventListener {
     private static final int MENU_EXIT = 0;
     private static final int MENU_GOTO = 1;
     private static final int MENU_FULL_SCREEN = 2;
     private static final int MENU_OPTIONS = 3;
     private static final int MENU_OUTLINE = 4;
     private static final int DIALOG_GOTO = 0;
-    private static final String TAG="BaseViewer";
+    private static final String TAG = "BaseViewer";
     //private static final String DOCUMENT_VIEW_STATE_PREFERENCES = "DjvuDocumentViewState";
     private DecodeService decodeService;
     private DocumentView documentView;
@@ -71,14 +69,13 @@ public abstract class BaseViewerActivity extends Activity implements DecodingPro
      * Called when the activity is first created.
      */
     @Override
-    public void onCreate(Bundle savedInstanceState)
-    {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         initDecodeService();
         final ZoomModel zoomModel = new ZoomModel();
         setStartBookmark();
-        if (null!=bookmarkToRestore) {
-            zoomModel.setZoom(bookmarkToRestore.absoluteZoomLevel/1000);
+        if (null != bookmarkToRestore) {
+            zoomModel.setZoom(bookmarkToRestore.absoluteZoomLevel / 1000);
         }
         final DecodingProgressModel progressModel = new DecodingProgressModel();
         progressModel.addEventListener(this);
@@ -96,7 +93,7 @@ public abstract class BaseViewerActivity extends Activity implements DecodingPro
 
         final FrameLayout frameLayout = createMainContainer();
         frameLayout.addView(documentView);
-        mControls=createZoomControls(zoomModel);
+        mControls = createZoomControls(zoomModel);
         frameLayout.addView(mControls);
         //setFullScreen();
         getWindow().requestFeature(Window.FEATURE_NO_TITLE);
@@ -122,7 +119,7 @@ public abstract class BaseViewerActivity extends Activity implements DecodingPro
         });
         documentView.setPageModel(mPageModel);
         mPageSeekBarControls=createSeekControls(mPageModel);*/
-        mPageSeekBarControls=new APageSeekBarControls(this, new PageViewPresenter() {
+        mPageSeekBarControls = new APageSeekBarControls(this, new PageViewPresenter() {
             @Override
             public int getPageCount() {
                 return decodeService.getPageCount();
@@ -135,16 +132,12 @@ public abstract class BaseViewerActivity extends Activity implements DecodingPro
 
             @Override
             public void goToPageIndex(int page) {
-                 documentView.goToPage(page);
+                documentView.goToPage(page);
             }
 
             @Override
             public void showOutline() {
-                if (OutlineActivityData.get().items!=null) {
-                    Intent intent=new Intent(BaseViewerActivity.this, OutlineActivity.class);
-                    intent.putExtra("cp", documentView.getCurrentPage());
-                    startActivityForResult(intent, OUTLINE_REQUEST);
-                }
+                openOutline();
             }
 
             @Override
@@ -154,8 +147,8 @@ public abstract class BaseViewerActivity extends Activity implements DecodingPro
 
             @Override
             public String getTitle() {
-                Uri uri=getIntent().getData();
-                String filePath=Uri.decode(uri.getEncodedPath());
+                Uri uri = getIntent().getData();
+                String filePath = Uri.decode(uri.getEncodedPath());
                 return filePath;
             }
         });
@@ -164,8 +157,7 @@ public abstract class BaseViewerActivity extends Activity implements DecodingPro
         mPageSeekBarControls.hide();
     }
 
-    public void decodingProgressChanged(final int currentlyDecoding)
-    {
+    public void decodingProgressChanged(final int currentlyDecoding) {
         runOnUiThread(new Runnable() {
             public void run() {
                 //getWindow().setFeatureInt(Window.FEATURE_INDETERMINATE_PROGRESS, currentlyDecoding == 0 ? 10000 : currentlyDecoding);
@@ -173,37 +165,30 @@ public abstract class BaseViewerActivity extends Activity implements DecodingPro
         });
     }
 
-    public void currentPageChanged(int pageIndex)
-    {
+    public void currentPageChanged(int pageIndex) {
         final String pageText = (pageIndex + 1) + "/" + decodeService.getPageCount();
-        if (pageNumberToast != null)
-        {
+        if (pageNumberToast != null) {
             pageNumberToast.setText(pageText);
-        }
-        else
-        {
+        } else {
             pageNumberToast = Toast.makeText(this, pageText, 80);
         }
-        pageNumberToast.setGravity(Gravity.BOTTOM | Gravity.LEFT,0,0);
+        pageNumberToast.setGravity(Gravity.BOTTOM | Gravity.LEFT, 0, 0);
         pageNumberToast.show();
         //saveCurrentPage();
     }
 
-    private void setWindowTitle()
-    {
+    private void setWindowTitle() {
         final String name = getIntent().getData().getLastPathSegment();
         getWindow().setTitle(name);
     }
 
     @Override
-    protected void onPostCreate(Bundle savedInstanceState)
-    {
+    protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
         setWindowTitle();
     }
 
-    private void setFullScreen()
-    {
+    private void setFullScreen() {
         /*if (viewerPreferences.isFullScreen())
         {
             getWindow().requestFeature(Window.FEATURE_NO_TITLE);
@@ -215,8 +200,7 @@ public abstract class BaseViewerActivity extends Activity implements DecodingPro
         }*/
     }
 
-    private PageViewZoomControls createZoomControls(ZoomModel zoomModel)
-    {
+    private PageViewZoomControls createZoomControls(ZoomModel zoomModel) {
         final PageViewZoomControls controls = new PageViewZoomControls(this, zoomModel);
         controls.setGravity(Gravity.RIGHT | Gravity.BOTTOM);
         zoomModel.addEventListener(controls);
@@ -231,15 +215,12 @@ public abstract class BaseViewerActivity extends Activity implements DecodingPro
         return controls;
     }*/
 
-    private FrameLayout createMainContainer()
-    {
+    private FrameLayout createMainContainer() {
         return new FrameLayout(this);
     }
 
-    private void initDecodeService()
-    {
-        if (decodeService == null)
-        {
+    private void initDecodeService() {
+        if (decodeService == null) {
             decodeService = createDecodeService();
         }
     }
@@ -247,8 +228,7 @@ public abstract class BaseViewerActivity extends Activity implements DecodingPro
     protected abstract DecodeService createDecodeService();
 
     @Override
-    protected void onStop()
-    {
+    protected void onStop() {
         super.onStop();
     }
 
@@ -268,8 +248,7 @@ public abstract class BaseViewerActivity extends Activity implements DecodingPro
     }*/
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu)
-    {
+    public boolean onCreateOptionsMenu(Menu menu) {
         menu.add(0, MENU_EXIT, 0, "Exit");
         menu.add(1, MENU_GOTO, 0, getString(R.string.goto_page));
         menu.add(2, MENU_OUTLINE, 0, getString(R.string.table_of_contents));
@@ -279,16 +258,13 @@ public abstract class BaseViewerActivity extends Activity implements DecodingPro
         return true;
     }
 
-    private void setFullScreenMenuItemText(MenuItem menuItem)
-    {
+    private void setFullScreenMenuItemText(MenuItem menuItem) {
         menuItem.setTitle("Full screen " + (menuItem.isChecked() ? "on" : "off"));
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item)
-    {
-        switch (item.getItemId())
-        {
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
             case MENU_EXIT:
                 finish();
                 return true;
@@ -307,18 +283,29 @@ public abstract class BaseViewerActivity extends Activity implements DecodingPro
                 startActivity(getIntent());
                 return true;
             }
-            case MENU_OUTLINE:{
-                if (OutlineActivityData.get().items!=null) {
-                    Intent intent=new Intent(this, OutlineActivity.class);
-                    intent.putExtra("cp", documentView.getCurrentPage());
-                    startActivityForResult(intent, OUTLINE_REQUEST);
-                }
+            case MENU_OUTLINE: {
+                openOutline();
                 return true;
             }
             case MENU_OPTIONS:
                 startActivity(new Intent(this, Options.class));
         }
         return false;
+    }
+
+    public void openOutline() {
+    }
+
+    public DecodeService getDecodeService() {
+        return decodeService;
+    }
+
+    public DocumentView getDocumentView() {
+        return documentView;
+    }
+
+    public APageSeekBarControls getPageSeekBarControls() {
+        return mPageSeekBarControls;
     }
 
     //--------------------------------------
@@ -332,61 +319,60 @@ public abstract class BaseViewerActivity extends Activity implements DecodingPro
             Log.d(TAG, "setStartBookmark:"+bookmarkToRestore);
         }
         b.close();*/
-        Uri uri=getIntent().getData();
-        AKProgress progress=AKRecent.getInstance(getApplicationContext()).readRecentFromDb(Uri.decode(uri.getEncodedPath()));
-        if (null!=progress) {
-            BookmarkEntry entry=new BookmarkEntry(progress.bookmarkEntry);
-            bookmarkToRestore=entry;
+        Uri uri = getIntent().getData();
+        AKProgress progress = AKRecent.getInstance(getApplicationContext()).readRecentFromDb(Uri.decode(uri.getEncodedPath()));
+        if (null != progress) {
+            BookmarkEntry entry = new BookmarkEntry(progress.bookmarkEntry);
+            bookmarkToRestore = entry;
         }
     }
 
-    void restoreBookmark(){
+    void restoreBookmark() {
         if (bookmarkToRestore == null) {
             return;
         }
 
-        if (bookmarkToRestore.numberOfPages!=decodeService.getPageCount()&&decodeService.getPageCount()!=0) {
+        if (bookmarkToRestore.numberOfPages != decodeService.getPageCount() && decodeService.getPageCount() != 0) {
             bookmarkToRestore = null;
             return;
         }
 
-        if (0<bookmarkToRestore.page) {
+        if (0 < bookmarkToRestore.page) {
             int currentPage = bookmarkToRestore.page;
             documentView.goToPage(currentPage, bookmarkToRestore.offsetX, bookmarkToRestore.offsetY);
         }
     }
 
-    private void saveCurrentPage()
-    {
+    private void saveCurrentPage() {
         /*final SharedPreferences sharedPreferences = getSharedPreferences(DOCUMENT_VIEW_STATE_PREFERENCES, 0);
         final SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putInt(getIntent().getData().toString(), documentView.getCurrentPage());
         editor.commit();*/
-        Uri uri=getIntent().getData();
-        String filePath=Uri.decode(uri.getEncodedPath());
+        Uri uri = getIntent().getData();
+        String filePath = Uri.decode(uri.getEncodedPath());
         BookmarkEntry entry = toBookmarkEntry();
         Bookmark b = new Bookmark(getApplicationContext()).open();
         b.setLast(filePath, entry);
         b.close();
-        Log.i(TAG, "last page saved for "+filePath+" entry:"+entry);
+        Log.i(TAG, "last page saved for " + filePath + " entry:" + entry);
         AKRecent.getInstance(getApplicationContext()).addAsyncToDB(filePath, entry.page, entry.numberOfPages, entry.toString(),
-            new DataListener() {
-                @Override
-                public void onSuccess(Object... args) {
-                    //AKRecent.getInstance(getApplicationContext()).backup("mupdf_recent.jso");
-                }
+                new DataListener() {
+                    @Override
+                    public void onSuccess(Object... args) {
+                        //AKRecent.getInstance(getApplicationContext()).backup("mupdf_recent.jso");
+                    }
 
-                @Override
-                public void onFailed(Object... args) {
+                    @Override
+                    public void onFailed(Object... args) {
 
-                }
-            });
+                    }
+                });
     }
 
     public BookmarkEntry toBookmarkEntry() {
         return new BookmarkEntry(decodeService.getPageCount(),
-            documentView.getCurrentPage(), documentView.getZoomModel().getZoom()*1000, 0,
-            documentView.getScrollX(), documentView.getScrollY());
+                documentView.getCurrentPage(), documentView.getZoomModel().getZoom() * 1000, 0,
+                documentView.getScrollX(), documentView.getScrollY());
     }
 
     @Override
@@ -395,10 +381,10 @@ public abstract class BaseViewerActivity extends Activity implements DecodingPro
     }
 
     private SensorManager sensorManager;
-    private float[] gravity = { 0f, -9.81f, 0f};
+    private float[] gravity = {0f, -9.81f, 0f};
     private long gravityAge = 0;
 
-    private int prevOrientation=ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
+    private int prevOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
 
     protected void onResume() {
         super.onResume();
@@ -408,26 +394,24 @@ public abstract class BaseViewerActivity extends Activity implements DecodingPro
         SharedPreferences options = PreferenceManager.getDefaultSharedPreferences(this);
 
         if (Options.setOrientation(this)) {
-            sensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
+            sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
             if (sensorManager.getSensorList(Sensor.TYPE_ACCELEROMETER).size() > 0) {
                 gravity[0] = 0f;
                 gravity[1] = -9.81f;
                 gravity[2] = 0f;
                 gravityAge = 0;
                 sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
-                    SensorManager.SENSOR_DELAY_NORMAL);
+                        SensorManager.SENSOR_DELAY_NORMAL);
                 prevOrientation = options.getInt(Options.PREF_PREV_ORIENTATION, ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
                 setRequestedOrientation(prevOrientation);
-            }
-            else {
+            } else {
                 setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
             }
         }
 
         if (options.getBoolean(Options.PREF_KEEP_ON, false)) {
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        }
-        else {
+        } else {
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         }
 
@@ -455,16 +439,15 @@ public abstract class BaseViewerActivity extends Activity implements DecodingPro
         if (options.getBoolean(Options.PREF_FULLSCREEN, true)) {
             //getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
             getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        }
-        else {
+        } else {
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
         }
         mControls.hide();
-        int height=documentView.getHeight();
-        if (height<=0) {
-            height=new ViewConfiguration().getScaledTouchSlop()*2;
+        int height = documentView.getHeight();
+        if (height <= 0) {
+            height = new ViewConfiguration().getScaledTouchSlop() * 2;
         } else {
-            height=(int) (height*0.03);
+            height = (int) (height * 0.03);
         }
         documentView.setScrollMargin(height);
         documentView.setDecodePage(options.getBoolean(Options.PREF_RENDER_AHEAD, true) ? 1 : 0);
@@ -475,12 +458,12 @@ public abstract class BaseViewerActivity extends Activity implements DecodingPro
         super.onWindowFocusChanged(hasFocus);
         if (hasFocus) {
             getWindow().getDecorView().setSystemUiVisibility(
-                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                    |View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                    |View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                    |View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                    |View.SYSTEM_UI_FLAG_FULLSCREEN
-                    |View.SYSTEM_UI_FLAG_IMMERSIVE);
+                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                            | View.SYSTEM_UI_FLAG_FULLSCREEN
+                            | View.SYSTEM_UI_FLAG_IMMERSIVE);
         }
     }
 
@@ -520,9 +503,9 @@ public abstract class BaseViewerActivity extends Activity implements DecodingPro
         gravity[1] = 0.8f * gravity[1] + 0.2f * event.values[1];
         gravity[2] = 0.8f * gravity[2] + 0.2f * event.values[2];
 
-        float sq0 = gravity[0]*gravity[0];
-        float sq1 = gravity[1]*gravity[1];
-        float sq2 = gravity[2]*gravity[2];
+        float sq0 = gravity[0] * gravity[0];
+        float sq1 = gravity[1] * gravity[1];
+        float sq2 = gravity[2] * gravity[2];
 
         gravityAge++;
 
@@ -536,8 +519,7 @@ public abstract class BaseViewerActivity extends Activity implements DecodingPro
                 setOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
             else if (gravity[1] < -4 && Integer.parseInt(Build.VERSION.SDK) >= 9)
                 setOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT);
-        }
-        else if (sq0 > 3 * (sq1 + sq2)) {
+        } else if (sq0 > 3 * (sq1 + sq2)) {
             if (gravity[0] > 4)
                 setOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
             else if (gravity[0] < -4 && Integer.parseInt(Build.VERSION.SDK) >= 9)
@@ -547,7 +529,7 @@ public abstract class BaseViewerActivity extends Activity implements DecodingPro
 
     //--------------------------------
 
-    private final int OUTLINE_REQUEST=0;
+    protected final int OUTLINE_REQUEST = 0;
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {

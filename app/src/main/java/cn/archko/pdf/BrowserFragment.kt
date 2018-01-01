@@ -10,33 +10,20 @@ import android.support.v4.content.FileProvider
 import android.support.v4.view.MenuItemCompat
 import android.support.v4.widget.SwipeRefreshLayout
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemClickListener
 import android.widget.ListView
 import android.widget.PopupMenu
 import android.widget.TextView
-
-import com.artifex.mupdf.example.PDFDocViewActivity
-
-import org.vudroid.pdfdroid.PdfViewerActivity
-
-import java.io.File
-import java.io.FileFilter
-import java.util.ArrayList
-import java.util.Arrays
-import java.util.Comparator
-import java.util.HashMap
-
+import com.artifex.mupdf.viewer.DocumentActivity
 import cx.hell.android.pdfviewpro.APVApplication
 import cx.hell.android.pdfviewpro.FileListEntry
-import cx.hell.android.pdfviewpro.OpenFileActivity
 import cx.hell.android.pdfviewpro.Options
+import org.vudroid.pdfdroid.PdfViewerActivity
+import java.io.File
+import java.io.FileFilter
+import java.util.*
 
 /**
  * @version 1.00.00
@@ -368,8 +355,8 @@ open class BrowserFragment : RefreshableFragment(), OnItemClickListener, SwipeRe
         } else if (entry.type == FileListEntry.RECENT) {
             menuBuilder.menu.add(0, vudroidContextMenuItem, 0, getString(R.string.menu_vudroid))
             menuBuilder.menu.add(0, mupdfContextMenuItem, 0, getString(R.string.menu_mupdf))
-            menuBuilder.menu.add(0, EXAMPLEContextMenuItem, 0, "EXAMPLE")
-            menuBuilder.menu.add(0, apvContextMenuItem, 0, getString(R.string.menu_apv))
+            menuBuilder.menu.add(0, EXAMPLEContextMenuItem, 0, "Mupdf new Viewer")
+            //menuBuilder.menu.add(0, apvContextMenuItem, 0, getString(R.string.menu_apv))
             menuBuilder.menu.add(0, otherContextMenuItem, 0, getString(R.string.menu_other))
             menuBuilder.menu.add(0, infoContextMenuItem, 0, getString(R.string.menu_info))
             /*if (Build.VERSION_CODES.LOLLIPOP <= Build.VERSION.SDK_INT) {
@@ -380,8 +367,8 @@ open class BrowserFragment : RefreshableFragment(), OnItemClickListener, SwipeRe
         } else if (!entry.isDirectory && entry.type != FileListEntry.HOME) {
             menuBuilder.menu.add(0, vudroidContextMenuItem, 0, getString(R.string.menu_vudroid))
             menuBuilder.menu.add(0, mupdfContextMenuItem, 0, getString(R.string.menu_mupdf))
-            menuBuilder.menu.add(0, EXAMPLEContextMenuItem, 0, "EXAMPLE")
-            menuBuilder.menu.add(0, apvContextMenuItem, 0, getString(R.string.menu_apv))
+            menuBuilder.menu.add(0, EXAMPLEContextMenuItem, 0, "Mupdf new Viewer")
+            //menuBuilder.menu.add(0, apvContextMenuItem, 0, getString(R.string.menu_apv))
             menuBuilder.menu.add(0, otherContextMenuItem, 0, getString(R.string.menu_other))
             menuBuilder.menu.add(0, infoContextMenuItem, 0, getString(R.string.menu_info))
             /*if (Build.VERSION_CODES.LOLLIPOP <= Build.VERSION.SDK_INT) {
@@ -431,14 +418,9 @@ open class BrowserFragment : RefreshableFragment(), OnItemClickListener, SwipeRe
                     intent.setClass(activity, MuPDFRecyclerActivity::class.java)
                     startActivity(intent)
                     return true
-                } else if (item.itemId == apvContextMenuItem) {
-                    intent.setClass(activity, OpenFileActivity::class.java)
-                    intent.setDataAndType(Uri.fromFile(clickedFile), "application/pdf")
-                    startActivity(intent)
-                    return true
                 } else if (item.itemId == otherContextMenuItem) {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                        intent.setDataAndType(FileProvider.getUriForFile(getContext(), "cn.archko.mupdf.fileProvider", clickedFile), "application/pdf");
+                        intent.setDataAndType(FileProvider.getUriForFile(getContext(), "cn.archko.pdf.fileProvider", clickedFile), "application/pdf");
                         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                         intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -449,14 +431,11 @@ open class BrowserFragment : RefreshableFragment(), OnItemClickListener, SwipeRe
                     startActivity(intent)
                 } else if (infoContextMenuItem == item.itemId) {
                     showFileInfoDialog(entry)
-                } else if (LPDFContextMenuItem == item.itemId) {
-                    intent.setClass(activity, LOLLIPOPPDFActivity::class.java)
-                    intent.setDataAndType(Uri.fromFile(clickedFile), "application/pdf")
-                    startActivity(intent)
-                    return true
                 } else if (EXAMPLEContextMenuItem == item.itemId) {
-                    intent.setClass(activity, PDFDocViewActivity::class.java)
-                    intent.setDataAndType(Uri.fromFile(clickedFile), "application/pdf")
+                    intent.setClass(activity, DocumentActivity::class.java)
+                    // API>=21: intent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT); /* launch as a new document */
+                    intent.setAction(Intent.ACTION_VIEW)
+                    intent.setData(Uri.fromFile(clickedFile))
                     startActivity(intent)
                     return true
                 }
@@ -489,11 +468,11 @@ open class BrowserFragment : RefreshableFragment(), OnItemClickListener, SwipeRe
         protected val removeContextMenuItem = Menu.FIRST + 101
 
         protected val mupdfContextMenuItem = Menu.FIRST + 110
-        protected val apvContextMenuItem = Menu.FIRST + 111
+        //protected val apvContextMenuItem = Menu.FIRST + 111
         protected val vudroidContextMenuItem = Menu.FIRST + 112
         protected val otherContextMenuItem = Menu.FIRST + 113
         protected val infoContextMenuItem = Menu.FIRST + 114
-        protected val LPDFContextMenuItem = Menu.FIRST + 115
+        //protected val LPDFContextMenuItem = Menu.FIRST + 115
         protected val EXAMPLEContextMenuItem = Menu.FIRST + 116
     }
 }

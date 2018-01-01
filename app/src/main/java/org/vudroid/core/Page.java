@@ -107,11 +107,11 @@ class Page {
 
     @Override
     public String toString() {
-        return "Page{"+
-            "index="+index+
-            ", bounds="+bounds+
-            ", node="+node+
-            ", aspectRatio="+aspectRatio+
-            '}';
+        return "Page{" +
+                "index=" + index +
+                ", bounds=" + bounds +
+                ", node=" + node +
+                ", aspectRatio=" + aspectRatio +
+                '}';
     }
 }

@@ -4,8 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Mupdf.iml" filepath="$PROJECT_DIR$/Mupdf.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/example/example.iml" filepath="$PROJECT_DIR$/example/example.iml" />
-      <module fileurl="file://$PROJECT_DIR$/mupdf/mupdf.iml" filepath="$PROJECT_DIR$/mupdf/mupdf.iml" />
+      <module fileurl="file://$PROJECT_DIR$/viewer/viewer.iml" filepath="$PROJECT_DIR$/viewer/viewer.iml" />
     </modules>
   </component>
 </project>

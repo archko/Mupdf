@@ -9,14 +9,12 @@ import android.widget.Button
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
-
-import java.math.BigDecimal
-
 import cn.archko.pdf.utils.DateUtil
 import cn.archko.pdf.utils.FileUtils
 import cn.archko.pdf.utils.Util
 import cx.hell.android.pdfviewpro.APVApplication
 import cx.hell.android.pdfviewpro.FileListEntry
+import java.math.BigDecimal
 
 /**
  * @author: archko 2016/1/16 :14:34

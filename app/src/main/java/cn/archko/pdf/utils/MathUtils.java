@@ -2,7 +2,6 @@ package cn.archko.pdf.utils;
 
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.util.FloatMath;
 
 public class MathUtils {
 

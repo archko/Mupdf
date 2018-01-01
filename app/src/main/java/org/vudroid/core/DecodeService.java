@@ -6,8 +6,7 @@ import android.graphics.RectF;
 import android.net.Uri;
 import android.view.View;
 
-public interface DecodeService
-{
+public interface DecodeService {
     void setContentResolver(ContentResolver contentResolver);
 
     void setContainerView(View containerView);
@@ -30,8 +29,7 @@ public interface DecodeService
 
     void recycle();
 
-    public interface DecodeCallback
-    {
+    public interface DecodeCallback {
         void decodeComplete(Bitmap bitmap);
     }
 }

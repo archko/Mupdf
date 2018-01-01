@@ -20,4 +20,9 @@
 
 	<color name="text_reflow_color">#000000</color>
 	<color name="text_reflow_bg_color">#ffffdc</color>
+
+
+	<color name="white">#FFFFFFFF</color>
+	<color name="red">#FFFF0000</color>
+	<color name="black">#000000</color>
 </resources>
