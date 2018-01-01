@@ -438,7 +438,7 @@ open class BrowserFragment : RefreshableFragment(), OnItemClickListener, SwipeRe
                     return true
                 } else if (item.itemId == otherContextMenuItem) {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                        intent.setDataAndType(FileProvider.getUriForFile(getContext(), "cn.archko.pdf.fileProvider", clickedFile), "application/pdf");
+                        intent.setDataAndType(FileProvider.getUriForFile(getContext(), "cn.archko.mupdf.fileProvider", clickedFile), "application/pdf");
                         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                         intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
