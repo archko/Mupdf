@@ -3,6 +3,10 @@
 buildscript {
     repositories {
         jcenter()
+        maven {
+            url 'https://maven.google.com/'
+            name 'Google'
+        }
     }
     ext.support_version = '24.0.0'
     ext.kotlin_version = '1.2.0'
@@ -29,6 +33,10 @@ allprojects {
                 dirs.add(it.projectDir.absolutePath + "/libs")
             }
             dir dirs
+        }
+        maven {
+            url 'https://maven.google.com/'
+            name 'Google'
         }
     }
 }
