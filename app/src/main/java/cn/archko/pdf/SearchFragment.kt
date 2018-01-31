@@ -43,12 +43,12 @@ open class SearchFragment : DialogFragment(), AdapterView.OnItemClickListener, A
         setStyle(DialogFragment.STYLE_NORMAL, themeId)
     }
 
-    override fun setArguments(args: Bundle) {
+    override fun setArguments(args: Bundle?) {
         super.setArguments(args)
     }
 
 
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater!!.inflate(R.layout.filesearcher, container, false)
 
         dialog.setTitle(R.string.menu_search)
@@ -153,7 +153,7 @@ open class SearchFragment : DialogFragment(), AdapterView.OnItemClickListener, A
 
     private fun getHome(): String {
         val defaultHome = Environment.getExternalStorageDirectory().absolutePath
-        var path: String = activity.getSharedPreferences(ChooseFileFragmentActivity.PREF_TAG, 0).getString(ChooseFileFragmentActivity.PREF_HOME, defaultHome)
+        var path: String = activity?.getSharedPreferences(ChooseFileFragmentActivity.PREF_TAG, 0)!!.getString(ChooseFileFragmentActivity.PREF_HOME, defaultHome)
         if (path.length > 1 && path.endsWith("/")) {
             path = path.substring(0, path.length - 2)
         }
@@ -190,16 +190,16 @@ open class SearchFragment : DialogFragment(), AdapterView.OnItemClickListener, A
         //intent.setClass(getActivity(), OpenFileActivity.class);
         intent.setClass(activity, PdfViewerActivity::class.java)
         intent.action = "android.intent.action.VIEW"
-        activity.startActivity(intent)
+        activity?.startActivity(intent)
     }
 
     protected fun showFileInfoDialog(entry: FileListEntry) {
-        val ft = activity.supportFragmentManager.beginTransaction()
-        val prev = activity.supportFragmentManager.findFragmentByTag("dialog")
+        val ft = activity?.supportFragmentManager?.beginTransaction()
+        val prev = activity?.supportFragmentManager?.findFragmentByTag("dialog")
         if (prev != null) {
-            ft.remove(prev)
+            ft?.remove(prev)
         }
-        ft.addToBackStack(null)
+        ft?.addToBackStack(null)
 
         // Create and show the dialog.
         val fileInfoFragment = FileInfoFragment()

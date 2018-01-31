@@ -278,7 +278,7 @@ open class ChooseFileFragmentActivity : FragmentActivity() {
             return mFragment
         }
 
-        override fun destroyItem(container: ViewGroup?, position: Int, `object`: Any) {
+        override fun destroyItem(container: ViewGroup, position: Int, `object`: Any) {
             super.destroyItem(container, position, `object`)
             val mWeakFragment = mFragmentArray.get(position)
             mWeakFragment?.clear()

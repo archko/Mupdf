@@ -40,7 +40,7 @@ class HistoryFragment : BrowserFragment(), AbsListView.OnScrollListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mLocalBroadcastManager = LocalBroadcastManager.getInstance(activity)
+        mLocalBroadcastManager = LocalBroadcastManager.getInstance(activity!!)
 
         val filter = IntentFilter()
         filter.addAction(ACTION_STARTED)
@@ -58,12 +58,12 @@ class HistoryFragment : BrowserFragment(), AbsListView.OnScrollListener {
                 }
             }
         }
-        mLocalBroadcastManager!!.registerReceiver(mReceiver, filter)
+        mLocalBroadcastManager!!.registerReceiver(mReceiver!!, filter)
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        mLocalBroadcastManager!!.unregisterReceiver(mReceiver)
+        mLocalBroadcastManager!!.unregisterReceiver(mReceiver!!)
     }
 
     override fun onBackPressed(): Boolean {
@@ -187,7 +187,7 @@ class HistoryFragment : BrowserFragment(), AbsListView.OnScrollListener {
         }, null)
     }
 
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = super.onCreateView(inflater, container, savedInstanceState)
         filesListView!!.divider = null
         filesListView!!.dividerHeight = 0

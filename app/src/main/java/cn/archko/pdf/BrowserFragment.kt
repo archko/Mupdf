@@ -82,9 +82,9 @@ open class BrowserFragment : RefreshableFragment(), OnItemClickListener, SwipeRe
     }
 
     fun setAsHome() {
-        val edit = activity.getSharedPreferences(ChooseFileFragmentActivity.PREF_TAG, 0).edit()
-        edit.putString(ChooseFileFragmentActivity.PREF_HOME, currentPath)
-        edit.apply()
+        val edit = activity?.getSharedPreferences(ChooseFileFragmentActivity.PREF_TAG, 0)?.edit()
+        edit?.putString(ChooseFileFragmentActivity.PREF_HOME, currentPath)
+        edit?.apply()
     }
 
     open fun onBackPressed(): Boolean {
@@ -122,7 +122,7 @@ open class BrowserFragment : RefreshableFragment(), OnItemClickListener, SwipeRe
         Log.i(TAG, ".onDetach." + this)
     }
 
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater!!.inflate(R.layout.filechooser, container, false)
 
         this.pathTextView = view.findViewById<TextView>(R.id.path)
@@ -260,7 +260,7 @@ open class BrowserFragment : RefreshableFragment(), OnItemClickListener, SwipeRe
 
     private fun getHome(): String {
         val defaultHome = Environment.getExternalStorageDirectory().absolutePath
-        var path: String = activity.getSharedPreferences(ChooseFileFragmentActivity.PREF_TAG, 0).getString(ChooseFileFragmentActivity.PREF_HOME, defaultHome)
+        var path: String = activity?.getSharedPreferences(ChooseFileFragmentActivity.PREF_TAG, 0)!!.getString(ChooseFileFragmentActivity.PREF_HOME, defaultHome)
         if (path.length > 1 && path.endsWith("/")) {
             path = path.substring(0, path.length - 2)
         }
@@ -280,7 +280,7 @@ open class BrowserFragment : RefreshableFragment(), OnItemClickListener, SwipeRe
         //intent.setClass(getActivity(), OpenFileActivity.class);
         intent.setClass(activity, PdfViewerActivity::class.java)
         intent.action = "android.intent.action.VIEW"
-        activity.startActivity(intent)
+        activity?.startActivity(intent)
     }
 
     override fun onItemClick(parent: AdapterView<*>, v: View, position: Int, id: Long) {
@@ -394,7 +394,7 @@ open class BrowserFragment : RefreshableFragment(), OnItemClickListener, SwipeRe
             return true
         } else if (item.itemId == removeContextMenuItem) {
             if (entry.type == FileListEntry.RECENT) {
-                AKRecent.getInstance(activity.applicationContext).removeFromDb(entry.file.absolutePath)
+                AKRecent.getInstance(activity?.applicationContext).removeFromDb(entry.file.absolutePath)
                 update()
             }
         } else {
@@ -420,7 +420,7 @@ open class BrowserFragment : RefreshableFragment(), OnItemClickListener, SwipeRe
                     return true
                 } else if (item.itemId == otherContextMenuItem) {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                        intent.setDataAndType(FileProvider.getUriForFile(getContext(), "cn.archko.mupdf.fileProvider", clickedFile), "application/pdf");
+                        intent.setDataAndType(FileProvider.getUriForFile(getContext()!!, "cn.archko.mupdf.fileProvider", clickedFile), "application/pdf");
                         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                         intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -445,12 +445,12 @@ open class BrowserFragment : RefreshableFragment(), OnItemClickListener, SwipeRe
     }
 
     protected fun showFileInfoDialog(entry: FileListEntry) {
-        val ft = activity.supportFragmentManager.beginTransaction()
-        val prev = activity.supportFragmentManager.findFragmentByTag("dialog")
+        val ft = activity?.supportFragmentManager?.beginTransaction()
+        val prev = activity?.supportFragmentManager?.findFragmentByTag("dialog")
         if (prev != null) {
-            ft.remove(prev)
+            ft?.remove(prev)
         }
-        ft.addToBackStack(null)
+        ft?.addToBackStack(null)
 
         // Create and show the dialog.
         val fileInfoFragment = FileInfoFragment()

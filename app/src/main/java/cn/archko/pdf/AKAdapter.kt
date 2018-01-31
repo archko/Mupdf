@@ -15,7 +15,7 @@ import java.util.*
 /**
  * @author: archko 2014/4/17 :15:43
  */
-class AKAdapter(internal var mContext: Context) : BaseAdapter() {
+class AKAdapter(internal var mContext: Context?) : BaseAdapter() {
 
     internal var mData: ArrayList<FileListEntry>
     internal var mMode = TYPE_FILE

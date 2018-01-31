@@ -9,7 +9,7 @@ buildscript {
         }
     }
     ext.support_version = '24.0.0'
-    ext.kotlin_version = '1.2.0'
+    ext.kotlin_version = '1.2.20'
     ext.anko_version = '0.8.2'
     dependencies {
         classpath "com.android.tools.build:gradle:${GRADLE_PLUGIN_VERSION}"
