@@ -4,13 +4,23 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
+// Create a variable called keystorePropertiesFile, and initialize it to your
+// keystore.properties file, in the rootProject folder.
+def keystorePropertiesFile = rootProject.file("keystore.properties")
+
+// Initialize a new Properties() object called keystoreProperties.
+def keystoreProperties = new Properties()
+
+// Load your keystore.properties file into the keystoreProperties object.
+keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+
 android {
     signingConfigs {
         release {
-            keyAlias 'mupdf_release_key'
-            storeFile file('../mupdf_release_key.jks')
-            keyPassword 'Abc123456'
-            storePassword 'Abc123456'
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+            storeFile file(keystoreProperties['storeFile'])
+            storePassword keystoreProperties['storePassword']
         }
     }
     compileSdkVersion ANDROID_BUILD_SDK_VERSION as int
@@ -21,7 +31,7 @@ android {
         targetSdkVersion ANDROID_BUILD_TARGET_SDK_VERSION
         versionCode VERSION_CODE as int
         versionName VERSION_NAME
-        signingConfig signingConfigs.debug
+        signingConfig signingConfigs.release
         ndk.abiFilters 'armeabi-v7a'
     }
     compileOptions {
@@ -42,8 +52,6 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
-    }
-    productFlavors {
     }
     lintOptions { abortOnError false }
     sourceSets {
