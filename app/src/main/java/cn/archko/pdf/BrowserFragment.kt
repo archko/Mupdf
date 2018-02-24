@@ -35,7 +35,7 @@ import java.util.*
 open class BrowserFragment : RefreshableFragment(), OnItemClickListener, SwipeRefreshLayout.OnRefreshListener,
         PopupMenu.OnMenuItemClickListener, AdapterView.OnItemLongClickListener {
 
-    private var currentPath: String? = null
+    private var mCurrentPath: String? = null
 
     protected var mSwipeRefreshWidget: SwipeRefreshLayout? = null
     protected var pathTextView: TextView? = null
@@ -55,11 +55,12 @@ open class BrowserFragment : RefreshableFragment(), OnItemClickListener, SwipeRe
     protected var restoreMenuItem: MenuItem? = null
     internal var mPathMap: MutableMap<String, Int> = HashMap()
     protected var mSelectedPos = -1
+    internal var mScanner: AKProgressScaner? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        currentPath = getHome()
+        mCurrentPath = getHome()
         setHasOptionsMenu(true)
     }
 
@@ -83,16 +84,16 @@ open class BrowserFragment : RefreshableFragment(), OnItemClickListener, SwipeRe
 
     fun setAsHome() {
         val edit = activity?.getSharedPreferences(ChooseFileFragmentActivity.PREF_TAG, 0)?.edit()
-        edit?.putString(ChooseFileFragmentActivity.PREF_HOME, currentPath)
+        edit?.putString(ChooseFileFragmentActivity.PREF_HOME, mCurrentPath)
         edit?.apply()
     }
 
     open fun onBackPressed(): Boolean {
         val path = Environment.getExternalStorageDirectory().absolutePath
-        if (this.currentPath != path && this.currentPath != "/") {
-            val upFolder = File(this.currentPath!!).parentFile
+        if (this.mCurrentPath != path && this.mCurrentPath != "/") {
+            val upFolder = File(this.mCurrentPath!!).parentFile
             if (upFolder.isDirectory) {
-                this.currentPath = upFolder.absolutePath
+                this.mCurrentPath = upFolder.absolutePath
                 updateAdapter()
                 return true
             }
@@ -204,19 +205,19 @@ open class BrowserFragment : RefreshableFragment(), OnItemClickListener, SwipeRe
             this.fileList = ArrayList<FileListEntry>()
         }
         fileList!!.clear()
-        this.pathTextView!!.text = this.currentPath
+        this.pathTextView!!.text = this.mCurrentPath
         var entry: FileListEntry
 
         entry = FileListEntry(FileListEntry.HOME, resources.getString(R.string.go_home))
         fileList!!.add(entry)
 
-        if (this.currentPath != "/") {
-            val upFolder = File(this.currentPath!!).parentFile
+        if (this.mCurrentPath != "/") {
+            val upFolder = File(this.mCurrentPath!!).parentFile
             entry = FileListEntry(FileListEntry.NORMAL, -1, upFolder, "..")
             fileList!!.add(entry)
         }
 
-        val files = File(this.currentPath!!).listFiles(this.fileFilter)
+        val files = File(this.mCurrentPath!!).listFiles(this.fileFilter)
 
         if (files != null) {
             try {
@@ -236,7 +237,7 @@ open class BrowserFragment : RefreshableFragment(), OnItemClickListener, SwipeRe
                     }
                 })
             } catch (e: NullPointerException) {
-                throw RuntimeException("failed to sort file list " + files + " for path " + this.currentPath, e)
+                throw RuntimeException("failed to sort file list " + files + " for path " + this.mCurrentPath, e)
             }
 
             for (file in files) {
@@ -246,9 +247,9 @@ open class BrowserFragment : RefreshableFragment(), OnItemClickListener, SwipeRe
         }
 
         fileListAdapter!!.setData(fileList!!)
-        //System.out.println("mPathMap.get(currentPath):"+mPathMap.get(currentPath)+ " size:"+fileList.size());
-        if (null != mPathMap[currentPath!!]) {
-            val pos = mPathMap[currentPath!!]
+        //System.out.println("mPathMap.get(mCurrentPath):"+mPathMap.get(mCurrentPath)+ " size:"+fileList.size());
+        if (null != mPathMap[mCurrentPath!!]) {
+            val pos = mPathMap[mCurrentPath!!]
             if (pos!! < fileList!!.size) {
                 filesListView!!.setSelection(pos!!)
             }
@@ -256,6 +257,29 @@ open class BrowserFragment : RefreshableFragment(), OnItemClickListener, SwipeRe
         fileListAdapter!!.notifyDataSetChanged()
         //this.filesListView.setSelection(0);
         mSwipeRefreshWidget!!.isRefreshing = false
+
+        startGetProgress(fileList!!, mCurrentPath)
+    }
+
+    private fun startGetProgress(fileList: ArrayList<FileListEntry>, currentPath: String?) {
+        if (null == mScanner) {
+            mScanner = AKProgressScaner()
+        }
+        mScanner!!.startScan(fileList, activity!!, currentPath, object : DataListener {
+            override fun onSuccess(vararg args: Any?) {
+                var path = args[0] as String
+                if (!mCurrentPath.equals(path)) {
+                    return
+                }
+                fileList!!.clear()
+                fileList!!.addAll(args[1] as ArrayList<FileListEntry>)
+                fileListAdapter!!.setData(fileList)
+                fileListAdapter!!.notifyDataSetChanged()
+            }
+
+            override fun onFailed(vararg args: Any?) {
+            }
+        })
     }
 
     private fun getHome(): String {
@@ -297,8 +321,8 @@ open class BrowserFragment : RefreshableFragment(), OnItemClickListener, SwipeRe
             return
 
         if (clickedFile.isDirectory) {
-            mPathMap.put(currentPath!!, position)
-            this.currentPath = clickedFile.absolutePath
+            mPathMap.put(mCurrentPath!!, position)
+            this.mCurrentPath = clickedFile.absolutePath
             updateAdapter()
         } else {
             pdfView(clickedFile)

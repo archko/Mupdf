@@ -5,7 +5,7 @@ import java.io.Serializable;
 
 import cn.archko.pdf.AKProgress;
 
-public class FileListEntry implements Serializable {
+public class FileListEntry implements Serializable, Cloneable {
     private String label = null;
     private File file = null;
     private boolean isDirectory = false;
@@ -14,7 +14,7 @@ public class FileListEntry implements Serializable {
     public static final int NORMAL = 0;
     public static final int HOME = 1;
     public static final int RECENT = 2;
-    AKProgress mAkProgress;
+    private AKProgress mAkProgress;
 
     public AKProgress getAkProgress() {
         return mAkProgress;
@@ -83,5 +83,15 @@ public class FileListEntry implements Serializable {
 
     public boolean isUpFolder() {
         return this.isDirectory && this.label.equals("..");
+    }
+
+    @Override
+    public FileListEntry clone() {
+        try {
+            return (FileListEntry) super.clone();
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

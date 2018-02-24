@@ -1,17 +1,18 @@
 package cn.archko.pdf
 
+import android.os.Build
 import android.os.Bundle
 import android.support.v4.app.DialogFragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.ProgressBar
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import cn.archko.pdf.utils.DateUtil
 import cn.archko.pdf.utils.FileUtils
 import cn.archko.pdf.utils.Util
+import com.artifex.mupdf.fitz.Document
+import com.artifex.mupdf.fitz.Matrix
+import com.artifex.mupdf.fitz.android.AndroidDrawDevice
 import cx.hell.android.pdfviewpro.APVApplication
 import cx.hell.android.pdfviewpro.FileListEntry
 import java.math.BigDecimal
@@ -29,13 +30,14 @@ class FileInfoFragment : DialogFragment() {
     lateinit var mLastReadLayout: View
     lateinit var mLastRead: TextView
     lateinit var mProgressBar: ProgressBar
+    lateinit var mIcon: ImageView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val themeId = android.R.style.Theme_Holo_Light_Dialog
-        /*if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+        var themeId = android.R.style.Theme_Holo_Light_Dialog
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             themeId = android.R.style.Theme_Material_Light_Dialog;
-        }*/
+        }
         setStyle(DialogFragment.STYLE_NORMAL, themeId)
     }
 
@@ -55,6 +57,7 @@ class FileInfoFragment : DialogFragment() {
         mLastRead = view.findViewById<TextView>(R.id.lastRead)
         mProgressBar = view.findViewById<ProgressBar>(R.id.progressbar)
         mLastModified = view.findViewById<TextView>(R.id.lastModified)
+        mIcon = view.findViewById<ImageView>(R.id.icon)
         val button = view.findViewById<Button>(R.id.btn_ok)
         button.setOnClickListener { this@FileInfoFragment.dismiss() }
 
@@ -97,6 +100,20 @@ class FileInfoFragment : DialogFragment() {
             showProgress(progress)
         }
         mLastModified.text = DateUtil.formatTime(file.lastModified(), DateUtil.TIME_FORMAT_TWO)
+
+        showIcon(file.path)
+    }
+
+    private fun showIcon(path: String) {
+        try {
+            var core: Document? = Document.openDocument(path)
+            val page = core!!.loadPage(0)
+            val ctm: Matrix = AndroidDrawDevice.fitPageWidth(page, activity!!.windowManager.defaultDisplay.width * 2 / 5)
+            val bitmap = AndroidDrawDevice.drawPage(page, ctm)
+            mIcon.setImageBitmap(bitmap)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     private fun showProgress(progress: AKProgress) {

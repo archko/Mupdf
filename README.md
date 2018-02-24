@@ -3,4 +3,4 @@ I add the pagesview of apv,to improve mupdf viewer.
 changed ReaderView to Vertical Scrolling
 
 
-´ÓmupdfµÄÔ´ÂëÖÐÈ¡µÃ,Ìí¼ÓapvµÄä¯ÀÀ·½Ê½,ÖÆ×÷Ò»¸ö¿ÉÓÃµÄÔÄ¶ÁÆ÷,¿ÉÒÔ´ò¿ªapvµÈ´ò²»¿ªµÄpdfÎÄ¼þ.¿ÉÒÔÍ¨¹ýTextFlow²é¿´·ÇÉ¨Ãè°æµÄpdf,¿ÉËõ·Å×ÖÌå´óÐ¡.
+ä»Žmupdfçš„æºç ä¸­å–å¾—,æ·»åŠ apvçš„æµè§ˆæ–¹å¼,åˆ¶ä½œä¸€ä¸ªå¯ç”¨çš„é˜…è¯»å™¨,å¯ä»¥æ‰“å¼€apvç­‰æ‰“ä¸å¼€çš„pdfæ–‡ä»¶.å¯ä»¥é€šè¿‡TextFlowæŸ¥çœ‹éžæ‰«æç‰ˆçš„pdf,å¯ç¼©æ”¾å­—ä½“å¤§å°.

@@ -307,7 +307,7 @@ public class AKRecent implements Serializable {
         return arraylist;
     }
 
-    //------------------- opertion of db -------------------
+    //------------------- operation of db -------------------
     public void addAsyncToDB(final String path, final int page, final int numberOfPage, final String bookmarkEntry, final DataListener dataListener) {
         Util.execute(true, new AsyncTask<Void, Void, Void>() {
             @Override

@@ -56,7 +56,10 @@ class AKAdapter(internal var mContext: Context?) : BaseAdapter() {
         if (convertView == null) {
             viewHolder = ViewHolder()
             when (type) {
-                TYPE_FILE -> convertView = View.inflate(mContext, R.layout.picker_entry, null)
+                TYPE_FILE -> {
+                    convertView = View.inflate(mContext, R.layout.picker_entry_history, null)
+                    viewHolder.mProgressBar = convertView!!.findViewById<ProgressBar>(R.id.progressbar)
+                }
                 TYPE_RENCENT -> {
                     convertView = View.inflate(mContext, R.layout.picker_entry_history, null)
                     viewHolder.mProgressBar = convertView!!.findViewById<ProgressBar>(R.id.progressbar)
@@ -78,14 +81,14 @@ class AKAdapter(internal var mContext: Context?) : BaseAdapter() {
         val entry = mData[position]
 
 
-        if (type == TYPE_RENCENT) {
+        if (type == TYPE_RENCENT || TYPE_FILE == type) {
             val progress = entry.akProgress
             if (null != progress) {
                 viewHolder.mProgressBar!!.visibility = View.VISIBLE
                 viewHolder.mProgressBar!!.max = progress.numberOfPages
                 viewHolder.mProgressBar!!.progress = progress.page
             } else {
-                viewHolder.mProgressBar!!.visibility = View.GONE
+                viewHolder.mProgressBar!!.visibility = View.INVISIBLE
             }
         } else if (type == TYPE_SEARCH) {
             viewHolder.mPath!!.text = entry.file.absolutePath
