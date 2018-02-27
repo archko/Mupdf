@@ -67,6 +67,48 @@
             android:text="fileSize" />
     </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="2dp">
+
+        <TextView
+            android:layout_width="68dp"
+            android:layout_height="wrap_content"
+            android:text="@string/label_lastmodified"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/lastModified"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="lastModified"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/pageLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="2dp"
+        android:visibility="visible">
+
+        <TextView
+            android:layout_width="68dp"
+            android:layout_height="wrap_content"
+            android:text="@string/label_pagecount"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/pageCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="1"
+            android:textSize="14sp" />
+    </LinearLayout>
+
     <RelativeLayout
         android:id="@+id/lay_last_read"
         android:layout_width="match_parent"
@@ -102,26 +144,6 @@
             android:minHeight="4dp"
             android:textSize="14sp" />
     </RelativeLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="2dp">
-
-        <TextView
-            android:layout_width="68dp"
-            android:layout_height="wrap_content"
-            android:text="@string/label_lastmodified"
-            android:textSize="14sp" />
-
-        <TextView
-            android:id="@+id/lastModified"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="lastModified"
-            android:textSize="14sp" />
-    </LinearLayout>
 
     <Button
         android:id="@+id/btn_ok"

@@ -17,6 +17,7 @@
 	<string name="label_filesize">FileSize:</string>
 	<string name="label_read">LastRead:</string>
 	<string name="label_lastmodified">LastModified:</string>
+	<string name="label_pagecount">pageCount:</string>
 	<string name="label_location">Location:</string>
 
 	<string name="about">About</string>

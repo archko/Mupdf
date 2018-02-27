@@ -17,6 +17,7 @@
 	<string name="label_filesize">大小:</string>
 	<string name="label_read">上次阅读:</string>
 	<string name="label_lastmodified">上次更新:</string>
+	<string name="label_pagecount">页数:</string>
 	<string name="label_location">位置:</string>
 
 	<string name="about">关于</string>
