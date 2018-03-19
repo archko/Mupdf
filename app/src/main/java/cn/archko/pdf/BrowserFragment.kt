@@ -124,7 +124,7 @@ open class BrowserFragment : RefreshableFragment(), OnItemClickListener, SwipeRe
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater!!.inflate(R.layout.filechooser, container, false)
+        val view = inflater?.inflate(R.layout.filechooser, container, false)
 
         this.pathTextView = view.findViewById<TextView>(R.id.path)
         this.filesListView = view.findViewById<ListView>(R.id.files)
@@ -182,8 +182,8 @@ open class BrowserFragment : RefreshableFragment(), OnItemClickListener, SwipeRe
         updateAdapter()
 
         //registerForContextMenu(this.filesListView);
-        filesListView!!.onItemClickListener = this
-        filesListView!!.onItemLongClickListener = this
+        filesListView?.onItemClickListener = this
+        filesListView?.onItemLongClickListener = this
     }
 
     fun updateAdapter() {
@@ -191,8 +191,8 @@ open class BrowserFragment : RefreshableFragment(), OnItemClickListener, SwipeRe
         if (null == fileListAdapter) {
             fileListAdapter = AKAdapter(activity)
         }
-        this.filesListView!!.adapter = this.fileListAdapter
-        this.filesListView!!.onItemClickListener = this
+        this.filesListView?.adapter = this.fileListAdapter
+        this.filesListView?.onItemClickListener = this
 
         update()
     }
@@ -258,10 +258,10 @@ open class BrowserFragment : RefreshableFragment(), OnItemClickListener, SwipeRe
         //this.filesListView.setSelection(0);
         mSwipeRefreshWidget!!.isRefreshing = false
 
-        startGetProgress(fileList!!, mCurrentPath)
+        startGetProgress(fileList, mCurrentPath)
     }
 
-    private fun startGetProgress(fileList: ArrayList<FileListEntry>, currentPath: String?) {
+    private fun startGetProgress(fileList: ArrayList<FileListEntry> ?, currentPath: String?) {
         if (null == mScanner) {
             mScanner = AKProgressScaner()
         }
@@ -271,9 +271,9 @@ open class BrowserFragment : RefreshableFragment(), OnItemClickListener, SwipeRe
                 if (!mCurrentPath.equals(path)) {
                     return
                 }
-                fileList!!.clear()
-                fileList!!.addAll(args[1] as ArrayList<FileListEntry>)
-                fileListAdapter!!.setData(fileList)
+                fileList?.clear()
+                fileList?.addAll(args[1] as ArrayList<FileListEntry>)
+                fileListAdapter!!.setData(fileList!!)
                 fileListAdapter!!.notifyDataSetChanged()
             }
 

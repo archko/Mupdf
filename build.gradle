@@ -2,29 +2,26 @@
 
 buildscript {
     repositories {
+        google()
         jcenter()
-        maven {
-            url 'https://maven.google.com/'
-            name 'Google'
-        }
+        mavenCentral()
     }
-    ext.support_version = '24.0.0'
-    ext.kotlin_version = '1.2.20'
-    ext.anko_version = '0.8.2'
+    ext.support_version = '25.0.0'
+    ext.kotlin_version = '1.2.30'
+    ext.anko_version = '0.10.1'
     dependencies {
         classpath "com.android.tools.build:gradle:${GRADLE_PLUGIN_VERSION}"
-        //classpath "com.antfortune.freeline:gradle:${FREELINE_VERSION}"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "org.jetbrains.kotlin:kotlin-android-extensions:$kotlin_version"
-
-        // NOTE: Do not place your application dependencies here; they belong
-        // in the individual module build.gradle files
+        //classpath "com.antfortune.freeline:gradle:${FREELINE_VERSION}"
     }
 }
 
 allprojects {
     repositories {
+        google()
         jcenter()
+        mavenCentral()
         // 引入AAR
         flatDir {
             List<String> dirs = new ArrayList<>()
@@ -33,10 +30,6 @@ allprojects {
                 dirs.add(it.projectDir.absolutePath + "/libs")
             }
             dir dirs
-        }
-        maven {
-            url 'https://maven.google.com/'
-            name 'Google'
         }
     }
 }

@@ -13,7 +13,7 @@ public class BitmapPool {
     private Pools.SimplePool<Bitmap> simplePool;
 
     private BitmapPool() {
-        simplePool = new Pools.SimplePool<>(32);
+        simplePool = new Pools.SimplePool<>(48);
     }
 
     public static BitmapPool getInstance() {
@@ -25,7 +25,11 @@ public class BitmapPool {
         if (null == b) {
             b = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         } else {
-            b.eraseColor(0);
+            if (b.getHeight() == height && b.getWidth() == width) {
+                b.eraseColor(0);
+            } else {
+                b = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+            }
         }
         return b;
     }
@@ -42,6 +46,6 @@ public class BitmapPool {
         while ((bitmap = simplePool.acquire()) != null) {
             bitmap.recycle();
         }
-        simplePool = null;
+        //simplePool = null;
     }
 }

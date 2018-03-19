@@ -319,6 +319,7 @@ public class AKDecodeService implements DecodeService {
                 }
                 document.recycle();
                 codecContext.recycle();
+                BitmapPool.getInstance().clear();
             }
         });
         executorService.shutdown();

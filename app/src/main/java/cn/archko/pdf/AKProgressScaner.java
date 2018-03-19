@@ -6,9 +6,6 @@ import android.os.AsyncTask;
 import java.util.ArrayList;
 import java.util.List;
 
-import cn.archko.pdf.AKProgress;
-import cn.archko.pdf.AKRecent;
-import cn.archko.pdf.DataListener;
 import cn.archko.pdf.utils.Util;
 import cx.hell.android.pdfviewpro.FileListEntry;
 

@@ -10,6 +10,7 @@ import com.artifex.mupdf.fitz.Document;
 import com.artifex.mupdf.fitz.Page;
 import com.artifex.mupdf.fitz.android.AndroidDrawDevice;
 
+import org.vudroid.core.BitmapPool;
 import org.vudroid.core.codec.CodecPage;
 
 public class PdfPage implements CodecPage {
@@ -83,7 +84,8 @@ public class PdfPage implements CodecPage {
 
         patchX = (int) (pageSliceBounds.left * pageW);
         patchY = (int) (pageSliceBounds.top * pageH);
-        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        //Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        Bitmap bitmap = BitmapPool.getInstance().acquire(width, height);
 
         com.artifex.mupdf.fitz.Matrix ctm = new com.artifex.mupdf.fitz.Matrix(scale);
         AndroidDrawDevice dev = new AndroidDrawDevice(bitmap, patchX, patchY, 0, 0, width, height);

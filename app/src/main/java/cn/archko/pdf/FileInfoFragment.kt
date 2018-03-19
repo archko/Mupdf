@@ -10,12 +10,13 @@ import android.widget.*
 import cn.archko.pdf.utils.DateUtil
 import cn.archko.pdf.utils.FileUtils
 import cn.archko.pdf.utils.Util
-import com.artifex.mupdf.fitz.Document
-import com.artifex.mupdf.fitz.Matrix
-import com.artifex.mupdf.fitz.android.AndroidDrawDevice
 import cx.hell.android.pdfviewpro.APVApplication
 import cx.hell.android.pdfviewpro.FileListEntry
 import java.math.BigDecimal
+
+import com.artifex.mupdf.fitz.Document
+import com.artifex.mupdf.fitz.Matrix
+import com.artifex.mupdf.fitz.android.AndroidDrawDevice
 
 /**
  * @author: archko 2016/1/16 :14:34
@@ -126,7 +127,7 @@ class FileInfoFragment : DialogFragment() {
         val percent = progress.page * 100f / progress.numberOfPages
         val b = BigDecimal(percent.toDouble())
         text += "       " + b.setScale(2, BigDecimal.ROUND_HALF_UP).toFloat() + "%"
-        mLastRead.text = text
+        mLastRead.text = text + " /" + progress.page
         mProgressBar.max = progress.numberOfPages
         mProgressBar.progress = progress.page
     }

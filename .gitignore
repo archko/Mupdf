@@ -7,8 +7,12 @@
 /*.iml
 /app/build
 /viewer/build
+/mupdf/build
+/example/build
 
 /app/app.iml
 /viewer/viewer.iml
+/mupdf/viewer.iml
+/example/viewer.iml
 /freeline*.zip
 
