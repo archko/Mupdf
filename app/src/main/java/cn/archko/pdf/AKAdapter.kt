@@ -57,11 +57,11 @@ class AKAdapter(internal var mContext: Context?) : BaseAdapter() {
             viewHolder = ViewHolder()
             when (type) {
                 TYPE_FILE -> {
-                    convertView = View.inflate(mContext, R.layout.picker_entry_history, null)
+                    convertView = View.inflate(mContext, R.layout.picker_entry, null)
                     viewHolder.mProgressBar = convertView!!.findViewById<ProgressBar>(R.id.progressbar)
                 }
                 TYPE_RENCENT -> {
-                    convertView = View.inflate(mContext, R.layout.picker_entry_history, null)
+                    convertView = View.inflate(mContext, R.layout.picker_entry, null)
                     viewHolder.mProgressBar = convertView!!.findViewById<ProgressBar>(R.id.progressbar)
                 }
                 TYPE_SEARCH -> {

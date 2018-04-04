@@ -271,9 +271,8 @@ open class BrowserFragment : RefreshableFragment(), OnItemClickListener, SwipeRe
                 if (!mCurrentPath.equals(path)) {
                     return
                 }
-                fileList?.clear()
-                fileList?.addAll(args[1] as ArrayList<FileListEntry>)
-                fileListAdapter!!.setData(fileList!!)
+
+                fileListAdapter!!.setData(args[1] as ArrayList<FileListEntry>)
                 fileListAdapter!!.notifyDataSetChanged()
             }
 

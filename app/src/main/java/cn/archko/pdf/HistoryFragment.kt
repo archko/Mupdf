@@ -189,8 +189,8 @@ class HistoryFragment : BrowserFragment(), AbsListView.OnScrollListener {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = super.onCreateView(inflater, container, savedInstanceState)
-        filesListView!!.divider = null
-        filesListView!!.dividerHeight = 0
+        //filesListView!!.divider = null
+        //filesListView!!.dividerHeight = 0
 
         this.pathTextView!!.visibility = View.GONE
         filesListView!!.setOnScrollListener(this)
