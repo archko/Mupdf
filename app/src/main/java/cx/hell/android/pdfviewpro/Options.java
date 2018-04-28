@@ -18,65 +18,65 @@ public class Options extends PreferenceActivity implements OnSharedPreferenceCha
     private final static String TAG = "cx.hell.android.pdfviewpro";
 
     public final static String PREF_TAG = "Options";
-    public final static String PREF_ZOOM_ANIMATION = "zoomAnimation";
+    //public final static String PREF_ZOOM_ANIMATION = "zoomAnimation";
     public final static String PREF_DIRS_FIRST = "dirsFirst";
     public final static String PREF_SHOW_EXTENSION = "showExtension";
     public final static String PREF_ORIENTATION = "orientation";
     public final static String PREF_FULLSCREEN = "fullscreen";
-    public final static String PREF_PAGE_ANIMATION = "pageAnimation";
-    public final static String PREF_FADE_SPEED = "fadeSpeed";
+    //public final static String PREF_PAGE_ANIMATION = "pageAnimation";
+    //public final static String PREF_FADE_SPEED = "fadeSpeed";
     public final static String PREF_RENDER_AHEAD = "renderAhead";
-    public final static String PREF_COLOR_MODE = "colorMode";
-    public final static String PREF_OMIT_IMAGES = "omitImages";
+    //public final static String PREF_COLOR_MODE = "colorMode";
+    //public final static String PREF_OMIT_IMAGES = "omitImages";
     public final static String PREF_VERTICAL_SCROLL_LOCK = "verticalScrollLock";
-    public final static String PREF_BOX = "boxType";
+    //public final static String PREF_BOX = "boxType";
     public final static String PREF_SIDE_MARGINS = "sideMargins2"; // sideMargins was boolean
     public final static String PREF_TOP_MARGIN = "topMargin";
-    public final static String PREF_EXTRA_CACHE = "extraCache";
-    public final static String PREF_DOUBLE_TAP = "doubleTap";
-    public final static String PREF_VOLUME_PAIR = "volumePair";
-    public final static String PREF_ZOOM_PAIR = "zoomPair";
-    public final static String PREF_LONG_ZOOM_PAIR = "longZoomPair";
-    public final static String PREF_UP_DOWN_PAIR = "upDownPair";
-    public final static String PREF_LEFT_RIGHT_PAIR = "leftRightPair";
-    public final static String PREF_RIGHT_UP_DOWN_PAIR = "rightUpDownPair";
-    public final static String PREF_EINK = "eink";
-    public final static String PREF_NOOK2 = "nook2";
+    //public final static String PREF_EXTRA_CACHE = "extraCache";
+    //public final static String PREF_DOUBLE_TAP = "doubleTap";
+    //public final static String PREF_VOLUME_PAIR = "volumePair";
+    //public final static String PREF_ZOOM_PAIR = "zoomPair";
+    //public final static String PREF_LONG_ZOOM_PAIR = "longZoomPair";
+    //public final static String PREF_UP_DOWN_PAIR = "upDownPair";
+    //public final static String PREF_LEFT_RIGHT_PAIR = "leftRightPair";
+    //public final static String PREF_RIGHT_UP_DOWN_PAIR = "rightUpDownPair";
+    //public final static String PREF_EINK = "eink";
+    //public final static String PREF_NOOK2 = "nook2";
     public final static String PREF_KEEP_ON = "keepOn";
-    public final static String PREF_SHOW_ZOOM_ON_SCROLL = "showZoomOnScroll";
-    public final static String PREF_HISTORY = "history";
-    public final static String PREF_TOP_BOTTOM_TAP_PAIR = "topBottomTapPair";
+    //public final static String PREF_SHOW_ZOOM_ON_SCROLL = "showZoomOnScroll";
+    //public final static String PREF_HISTORY = "history";
+    //public final static String PREF_TOP_BOTTOM_TAP_PAIR = "topBottomTapPair";
     public final static String PREF_PREV_ORIENTATION = "prevOrientation";
 
-    public final static int PAGE_NUMBER_DISABLED = 100;
-    public final static int ZOOM_BUTTONS_DISABLED = 100;
+    //public final static int PAGE_NUMBER_DISABLED = 100;
+    //public final static int ZOOM_BUTTONS_DISABLED = 100;
 
-    public final static int DOUBLE_TAP_NONE = 0;
-    public final static int DOUBLE_TAP_ZOOM = 1;
-    public final static int DOUBLE_TAP_ZOOM_IN_OUT = 2;
+    //public final static int DOUBLE_TAP_NONE = 0;
+    //public final static int DOUBLE_TAP_ZOOM = 1;
+    //public final static int DOUBLE_TAP_ZOOM_IN_OUT = 2;
 
-    public final static int PAIR_NONE = 0;
-    public final static int PAIR_SCREEN = 1;
-    public final static int PAIR_PAGE = 2;
-    public final static int PAIR_ZOOM_1020 = 3;
-    public final static int PAIR_ZOOM_1050 = 4;
-    public final static int PAIR_ZOOM_1100 = 5;
-    public final static int PAIR_ZOOM_1200 = 6;
-    public final static int PAIR_ZOOM_1414 = 7;
-    public final static int PAIR_ZOOM_2000 = 8;
-    public final static int PAIR_PAGE_TOP = 9;
-    public final static int PAIR_SCREEN_REV = 10;
-    public final static int PAIR_PAGE_REV = 11;
-    public final static int PAIR_PAGE_TOP_REV = 12;
+    //public final static int PAIR_NONE = 0;
+    //public final static int PAIR_SCREEN = 1;
+    //public final static int PAIR_PAGE = 2;
+    //public final static int PAIR_ZOOM_1020 = 3;
+    //public final static int PAIR_ZOOM_1050 = 4;
+    //public final static int PAIR_ZOOM_1100 = 5;
+    //public final static int PAIR_ZOOM_1200 = 6;
+    //public final static int PAIR_ZOOM_1414 = 7;
+    //public final static int PAIR_ZOOM_2000 = 8;
+    //public final static int PAIR_PAGE_TOP = 9;
+    //public final static int PAIR_SCREEN_REV = 10;
+    //public final static int PAIR_PAGE_REV = 11;
+    //public final static int PAIR_PAGE_TOP_REV = 12;
 
-    public final static int COLOR_MODE_NORMAL = 0;
-    public final static int COLOR_MODE_INVERT = 1;
-    public final static int COLOR_MODE_GRAY = 2;
-    public final static int COLOR_MODE_INVERT_GRAY = 3;
-    public final static int COLOR_MODE_BLACK_ON_YELLOWISH = 4;
-    public final static int COLOR_MODE_GREEN_ON_BLACK = 5;
-    public final static int COLOR_MODE_RED_ON_BLACK = 6;
-    public final static int COLOR_MODE_APPLE_RED_ON_BLACK = 7;
+    //public final static int COLOR_MODE_NORMAL = 0;
+    //public final static int COLOR_MODE_INVERT = 1;
+    //public final static int COLOR_MODE_GRAY = 2;
+    //public final static int COLOR_MODE_INVERT_GRAY = 3;
+    //public final static int COLOR_MODE_BLACK_ON_YELLOWISH = 4;
+    //public final static int COLOR_MODE_GREEN_ON_BLACK = 5;
+    //public final static int COLOR_MODE_RED_ON_BLACK = 6;
+    //public final static int COLOR_MODE_APPLE_RED_ON_BLACK = 7;
     private final static int[] foreColors = {
             Color.BLACK, Color.WHITE, Color.BLACK, Color.WHITE,
             Color.BLACK, Color.GREEN, Color.RED, Color.BLACK};
@@ -126,23 +126,23 @@ public class Options extends PreferenceActivity implements OnSharedPreferenceCha
 
     private Resources resources;
 
-    private static final String[] summaryKeys = {PREF_ZOOM_ANIMATION, PREF_ORIENTATION, PREF_PAGE_ANIMATION,
-            PREF_FADE_SPEED, PREF_COLOR_MODE, PREF_BOX, PREF_SIDE_MARGINS, PREF_TOP_MARGIN,
+    private static final String[] summaryKeys = { PREF_ORIENTATION, /*PREF_ZOOM_ANIMATION,PREF_PAGE_ANIMATION,
+            PREF_FADE_SPEED, PREF_COLOR_MODE, PREF_BOX,*/ PREF_SIDE_MARGINS, PREF_TOP_MARGIN/*,
             PREF_EXTRA_CACHE, PREF_DOUBLE_TAP, PREF_VOLUME_PAIR, PREF_ZOOM_PAIR,
             PREF_LONG_ZOOM_PAIR, PREF_UP_DOWN_PAIR, PREF_LEFT_RIGHT_PAIR, PREF_RIGHT_UP_DOWN_PAIR,
-            PREF_TOP_BOTTOM_TAP_PAIR};
-    private static final int[] summaryEntryValues = {R.array.zoom_animations, R.array.orientations, R.array.page_animations,
-            R.array.fade_speeds, R.array.color_modes, R.array.boxes, R.array.margins, R.array.margins,
+            PREF_TOP_BOTTOM_TAP_PAIR*/};
+    private static final int[] summaryEntryValues = {R.array.orientations, /*R.array.zoom_animations, R.array.page_animations,
+            R.array.fade_speeds, R.array.color_modes, R.array.boxes, */R.array.margins, R.array.margins/*,
             R.array.extra_caches, R.array.double_tap_actions, R.array.action_pairs, R.array.action_pairs,
-            R.array.action_pairs, R.array.action_pairs, R.array.action_pairs, R.array.action_pairs, R.array.action_pairs};
-    private static final int[] summaryEntries = {R.array.zoom_animation_labels, R.array.orientation_labels, R.array.page_animation_labels,
-            R.array.fade_speed_labels, R.array.color_mode_labels, R.array.box_labels, R.array.margin_labels, R.array.margin_labels,
+            R.array.action_pairs, R.array.action_pairs, R.array.action_pairs, R.array.action_pairs, R.array.action_pairs*/};
+    private static final int[] summaryEntries = {R.array.orientation_labels, /*R.array.zoom_animation_labels, R.array.page_animation_labels,
+            R.array.fade_speed_labels, R.array.color_mode_labels, R.array.box_labels, */R.array.margin_labels, R.array.margin_labels/*,
             R.array.extra_cache_labels, R.array.double_tap_action_labels, R.array.action_pair_labels, R.array.action_pair_labels,
-            R.array.action_pair_labels, R.array.action_pair_labels, R.array.action_pair_labels, R.array.action_pair_labels, R.array.action_pair_labels};
-    private static final int[] summaryDefaults = {R.string.default_zoom_animation, R.string.default_orientation, R.string.default_page_animation,
-            R.string.default_fade_speed, R.string.default_color_mode, R.string.default_box, R.string.default_side_margin, R.string.default_top_margin,
+            R.array.action_pair_labels, R.array.action_pair_labels, R.array.action_pair_labels, R.array.action_pair_labels, R.array.action_pair_labels*/};
+    private static final int[] summaryDefaults = {R.string.default_orientation, /*R.string.default_zoom_animation, R.string.default_page_animation,
+            R.string.default_fade_speed, R.string.default_color_mode, R.string.default_box, */R.string.default_side_margin, R.string.default_top_margin/*,
             R.string.default_extra_cache, R.string.default_double_tap_action, R.string.default_volume_pair, R.string.default_zoom_pair,
-            R.string.default_long_zoom_pair, R.string.default_up_down_pair, R.string.default_left_right_pair, R.string.default_right_up_down_pair, R.string.default_top_bottom_tap_pair};
+            R.string.default_long_zoom_pair, R.string.default_up_down_pair, R.string.default_left_right_pair, R.string.default_right_up_down_pair, R.string.default_top_bottom_tap_pair*/};
 
     public String getString(SharedPreferences options, String key) {
         return getString(this.resources, options, key);
@@ -202,9 +202,9 @@ public class Options extends PreferenceActivity implements OnSharedPreferenceCha
         return backColors[colorMode];
     }
 
-    public static int getColorMode(SharedPreferences pref) {
+    /*public static int getColorMode(SharedPreferences pref) {
         return getIntFromString(pref, PREF_COLOR_MODE, 0);
-    }
+    }*/
 
     @Override
     public void onCreate(Bundle icicle) {

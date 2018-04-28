@@ -46,7 +46,7 @@ open class BrowserFragment : RefreshableFragment(), OnItemClickListener, SwipeRe
 
     private val dirsFirst = true
     private var showExtension: Boolean? = false
-    private val history = true
+    //private val history = true
 
     private var setAsHomeMenuItem: MenuItem? = null
     protected var optionsMenuItem: MenuItem? = null
@@ -105,7 +105,7 @@ open class BrowserFragment : RefreshableFragment(), OnItemClickListener, SwipeRe
         super.onResume()
         Log.i(TAG, ".onResume." + this)
         val options = PreferenceManager.getDefaultSharedPreferences(APVApplication.getInstance())
-        showExtension = options.getBoolean(Options.PREF_SHOW_EXTENSION, false)
+        showExtension = options.getBoolean(Options.PREF_SHOW_EXTENSION, true)
     }
 
     override fun onPause() {
@@ -261,7 +261,7 @@ open class BrowserFragment : RefreshableFragment(), OnItemClickListener, SwipeRe
         startGetProgress(fileList, mCurrentPath)
     }
 
-    private fun startGetProgress(fileList: ArrayList<FileListEntry> ?, currentPath: String?) {
+    private fun startGetProgress(fileList: ArrayList<FileListEntry>?, currentPath: String?) {
         if (null == mScanner) {
             mScanner = AKProgressScaner()
         }
