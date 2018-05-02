@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">MuPDF</string>
-    <string name="version">2.2 (fit 1.12.0)</string>
+    <string name="version">2.4</string>
     <string name="cancel">Cancel</string>
     <string name="search_backwards">Search backwards</string>
     <string name="search_forwards">Search forwards</string>
