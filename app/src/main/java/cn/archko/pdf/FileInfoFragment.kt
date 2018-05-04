@@ -10,13 +10,12 @@ import android.widget.*
 import cn.archko.pdf.utils.DateUtil
 import cn.archko.pdf.utils.FileUtils
 import cn.archko.pdf.utils.Util
-import cx.hell.android.pdfviewpro.APVApplication
-import cx.hell.android.pdfviewpro.FileListEntry
-import java.math.BigDecimal
-
 import com.artifex.mupdf.fitz.Document
 import com.artifex.mupdf.fitz.Matrix
 import com.artifex.mupdf.fitz.android.AndroidDrawDevice
+import cx.hell.android.pdfviewpro.APVApplication
+import cx.hell.android.pdfviewpro.FileListEntry
+import java.math.BigDecimal
 
 /**
  * @author: archko 2016/1/16 :14:34
@@ -33,6 +32,8 @@ class FileInfoFragment : DialogFragment() {
     lateinit var mPageCount: TextView
     lateinit var mProgressBar: ProgressBar
     lateinit var mIcon: ImageView
+    var progress: AKProgress? = null
+    var pageCount = 0;
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,12 +48,12 @@ class FileInfoFragment : DialogFragment() {
         super.setArguments(args)
         if (null != args) {
             mEntry = args.getSerializable(FILE_LIST_ENTRY) as FileListEntry
+            progress = mEntry!!.akProgress
         }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater!!.inflate(R.layout.file_info
-                , container, false)
+        val view = inflater.inflate(R.layout.file_info, container, false)
         mLocation = view.findViewById<TextView>(R.id.location)
         mFileName = view.findViewById<TextView>(R.id.fileName)
         mFileSize = view.findViewById<TextView>(R.id.fileSize)
@@ -83,7 +84,6 @@ class FileInfoFragment : DialogFragment() {
         mFileName.text = file.name
         mFileSize.text = Util.getFileSize(mEntry!!.fileSize)
 
-        var progress: AKProgress? = mEntry!!.akProgress
         if (null == progress) {
             val recentManager = RecentManager(APVApplication.getInstance())
             try {
@@ -94,14 +94,12 @@ class FileInfoFragment : DialogFragment() {
             } finally {
                 recentManager.close()
             }
-            if (null != progress) {
-                showProgress(progress)
-            } else {
-                mLastReadLayout.visibility = View.GONE
-            }
-        } else {
+        }
+        if (null != progress) {
             mLastReadLayout.visibility = View.VISIBLE
-            showProgress(progress)
+            showProgress(progress!!)
+        } else {
+            mLastReadLayout.visibility = View.GONE
         }
         mLastModified.text = DateUtil.formatTime(file.lastModified(), DateUtil.TIME_FORMAT_TWO)
 
@@ -110,10 +108,11 @@ class FileInfoFragment : DialogFragment() {
 
     private fun showIcon(path: String) {
         try {
-            var core: Document? = Document.openDocument(path)
-            mPageCount.setText(core!!.countPages().toString())
+            val core: Document? = Document.openDocument(path)
+            pageCount = core!!.countPages()
+            setPage()
 
-            val page = core!!.loadPage(0)
+            val page = core.loadPage(0)
             val ctm: Matrix = AndroidDrawDevice.fitPageWidth(page, activity!!.windowManager.defaultDisplay.width * 2 / 5)
             val bitmap = AndroidDrawDevice.drawPage(page, ctm)
             mIcon.setImageBitmap(bitmap)
@@ -122,14 +121,23 @@ class FileInfoFragment : DialogFragment() {
         }
     }
 
+    private fun setPage() {
+        if (null != progress) {
+            mPageCount.setText(progress!!.page.toString() + "/" + pageCount.toString())
+        } else {
+            mPageCount.setText(pageCount.toString())
+        }
+    }
+
     private fun showProgress(progress: AKProgress) {
         var text = DateUtil.formatTime(progress.timestampe, DateUtil.TIME_FORMAT_TWO)
         val percent = progress.page * 100f / progress.numberOfPages
         val b = BigDecimal(percent.toDouble())
         text += "       " + b.setScale(2, BigDecimal.ROUND_HALF_UP).toFloat() + "%"
-        mLastRead.text = text + " /" + progress.page
+        mLastRead.text = text
         mProgressBar.max = progress.numberOfPages
         mProgressBar.progress = progress.page
+        setPage()
     }
 
     companion object {
