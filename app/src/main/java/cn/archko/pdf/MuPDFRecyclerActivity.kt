@@ -576,7 +576,7 @@ class MuPDFRecyclerActivity : FragmentActivity(), SensorEventListener {
             pdfHolder.imageView.adjustViewBounds = true
         }
 
-        override fun onViewRecycled(holder: RecyclerView.ViewHolder?) {
+        override fun onViewRecycled(holder: RecyclerView.ViewHolder) {
             super.onViewRecycled(holder)
             val pdfHolder = holder as PdfHolder?
             pdfHolder!!.imageView.setImageBitmap(null)

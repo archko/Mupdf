@@ -3,6 +3,8 @@ package com.artifex.mupdfdemo;
 import android.content.Context;
 import android.graphics.Paint;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
+import android.text.Spanned;
 import android.view.MotionEvent;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -19,6 +21,8 @@ import cn.archko.pdf.utils.Util;
 public class MuPDFReflowRecyclerViewAdapter extends RecyclerView.Adapter {
     private final Context mContext;
     private final PdfDocument mCore;
+
+    private String TXT_PATTERN = "</?(html|head|body|span|div|p)[^>]*>|(<style>[^<]*</style>)";
 
     public MuPDFReflowRecyclerViewAdapter(Context c, PdfDocument core) {
         mContext = c;
@@ -48,11 +52,12 @@ public class MuPDFReflowRecyclerViewAdapter extends RecyclerView.Adapter {
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int pos) {
         final int position = pos;
         PDFTextView reflowView = (PDFTextView) holder.itemView;
-        byte[] result =((PdfPage) mCore.getPage(position)).asHtml(position);
+        byte[] result = ((PdfPage) mCore.getPage(position)).asHtml(position);
 
         String text = new String(result);
-        //Spanned spanned = Html.fromHtml(text);
-        reflowView.setText(text);
+        text = text.replaceAll("(<style>[^<]*</style>)|(<![^>*])", "").trim();
+        Spanned spanned = Html.fromHtml(text);
+        reflowView.setText(spanned);
     }
 
     class ItemViewHolder extends RecyclerView.ViewHolder {
