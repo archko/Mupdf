@@ -66,7 +66,8 @@ public class PDFBookmarkManager {
         if (null!=bookmarkToRestore) {
             bookmarkToRestore.page=currentPage;
             bookmarkToRestore.numberOfPages=pageCount;
-            if (zoom!=1) {
+            bookmarkToRestore.absoluteZoomLevel=zoom;
+            if (zoom!=1000f) {
                 bookmarkToRestore.absoluteZoomLevel=zoom;
             }
             if (scrollX!=0) {
@@ -77,6 +78,6 @@ public class PDFBookmarkManager {
             }
             return bookmarkToRestore;
         }
-        return new BookmarkEntry(pageCount, currentPage, zoom*1000f, 0, scrollX, scrollY);
+        return new BookmarkEntry(pageCount, currentPage, zoom, 0, scrollX, scrollY);
     }
 }

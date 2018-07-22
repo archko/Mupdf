@@ -372,7 +372,7 @@ public abstract class BaseViewerActivity extends Activity implements DecodingPro
         Uri uri = getIntent().getData();
         String filePath = Uri.decode(uri.getEncodedPath());
         pdfBookmarkManager.saveCurrentPage(filePath,decodeService.getPageCount(),documentView.getCurrentPage(),
-            documentView.getZoomModel().getZoom(), documentView.getScrollX(), documentView.getScrollY());
+            documentView.getZoomModel().getZoom()*1000f, documentView.getScrollX(), documentView.getScrollY());
 
         sensorHelper.onPause();
     }

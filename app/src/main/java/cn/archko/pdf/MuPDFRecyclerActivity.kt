@@ -373,7 +373,7 @@ class MuPDFRecyclerActivity : FragmentActivity() {
     override fun onPause() {
         super.onPause()
 
-        pdfBookmarkManager?.saveCurrentPage(mPath, core!!.pageCount, pos, 1f, 0, 0)
+        pdfBookmarkManager?.saveCurrentPage(mPath, core!!.pageCount, pos, 1000f, 0, 0)
 
         sensorHelper?.onPause()
     }
