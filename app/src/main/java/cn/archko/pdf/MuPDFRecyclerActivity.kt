@@ -1,17 +1,11 @@
 package cn.archko.pdf
 
 import android.annotation.TargetApi
-import android.content.Context
 import android.content.Intent
-import android.content.pm.ActivityInfo
 import android.content.res.Configuration
 import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.Color
-import android.hardware.Sensor
-import android.hardware.SensorEvent
-import android.hardware.SensorEventListener
-import android.hardware.SensorManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -28,8 +22,6 @@ import com.artifex.mini.OutlineActivity
 import com.artifex.mupdf.fitz.Matrix
 import com.artifex.mupdf.fitz.android.AndroidDrawDevice
 import com.artifex.mupdfdemo.MuPDFReflowRecyclerViewAdapter
-import cx.hell.android.pdfviewpro.Bookmark
-import cx.hell.android.pdfviewpro.BookmarkEntry
 import cx.hell.android.pdfviewpro.Options
 import org.vudroid.core.events.CurrentPageListener
 import org.vudroid.core.models.CurrentPageModel
@@ -39,14 +31,13 @@ import org.vudroid.pdfdroid.codec.PdfDocument
 /**
  * @author: archko 2016/5/9 :12:43
  */
-class MuPDFRecyclerActivity : FragmentActivity(), SensorEventListener {
+class MuPDFRecyclerActivity : FragmentActivity() {
     private var mPath: String? = null
     private var pos = 0
 
     internal var width = 720
     lateinit var mRecyclerView: RecyclerView
     private var gestureDetector: GestureDetector? = null
-    private var bookmarkToRestore: BookmarkEntry? = null
     private var pageNumberToast: Toast? = null
 
     private var core: PdfDocument? = null
@@ -58,6 +49,8 @@ class MuPDFRecyclerActivity : FragmentActivity(), SensorEventListener {
     private var mTitle: TextView? = null
     private var mReflow = false
     private val OUTLINE_REQUEST = 0
+    private var pdfBookmarkManager: PDFBookmarkManager? = null
+    private var sensorHelper: SensorHelper? = null
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -74,12 +67,14 @@ class MuPDFRecyclerActivity : FragmentActivity(), SensorEventListener {
 
         println("path:" + mPath!!)
 
-        setStartBookmark()
+        pdfBookmarkManager = PDFBookmarkManager()
+        pdfBookmarkManager?.setStartBookmark(mPath)
+        sensorHelper = SensorHelper(this)
 
         try {
             core = PdfDocument.openDocument(mPath, null)
 
-            restoreBookmark()
+            pos = pdfBookmarkManager?.restoreBookmark(core!!.pageCount)!!
 
             if (pos > 0) {
                 mRecyclerView.scrollToPosition(pos)
@@ -94,6 +89,7 @@ class MuPDFRecyclerActivity : FragmentActivity(), SensorEventListener {
             }
         } catch (e: Exception) {
             e.printStackTrace()
+            finish()
         }
 
     }
@@ -347,97 +343,15 @@ class MuPDFRecyclerActivity : FragmentActivity(), SensorEventListener {
     }
     //--------------------------------------
 
-    fun setStartBookmark() {
-        val progress = AKRecent.getInstance(applicationContext).readRecentFromDb(mPath)
-        if (null != progress) {
-            val entry = BookmarkEntry(progress.bookmarkEntry)
-            bookmarkToRestore = entry
-        }
-    }
-
-    internal fun restoreBookmark() {
-        if (bookmarkToRestore == null || core == null || core!!.pageCount <= 0) {
-            return
-        }
-
-        if (bookmarkToRestore!!.numberOfPages != core!!.pageCount || bookmarkToRestore!!.page > core!!.pageCount) {
-            bookmarkToRestore = null
-            return
-        }
-
-        if (0 < bookmarkToRestore!!.page) {
-            pos = bookmarkToRestore!!.page
-        }
-    }
-
-    private fun saveCurrentPage() {
-        val filePath = Uri.decode(mPath)
-        val entry = toBookmarkEntry()
-        val b = Bookmark(applicationContext).open()
-        b.setLast(filePath, entry)
-        b.close()
-        Log.i(TAG, "last page saved for $filePath entry:$entry")
-        AKRecent.getInstance(applicationContext).addAsyncToDB(filePath, entry.page, entry.numberOfPages, entry.toString(),
-                object : DataListener {
-                    override fun onSuccess(vararg args: Any) {
-                        //AKRecent.getInstance(getApplicationContext()).backup("mupdf_recent.jso");
-                    }
-
-                    override fun onFailed(vararg args: Any) {
-
-                    }
-                })
-    }
-
-    fun toBookmarkEntry(): BookmarkEntry {
-        if (null != bookmarkToRestore) {
-            bookmarkToRestore!!.page = pos
-            bookmarkToRestore!!.numberOfPages = core!!.pageCount
-            return bookmarkToRestore!!
-        }
-        return BookmarkEntry(core!!.pageCount,
-                pos, (1 * 1000).toFloat(), 0,
-                0, 0)
-    }
-
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
     }
 
-    private var sensorManager: SensorManager? = null
-    private val gravity = floatArrayOf(0f, -9.81f, 0f)
-    private var gravityAge: Long = 0
-
-    private var prevOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-
     override fun onResume() {
         super.onResume()
 
-        sensorManager = null
-
+        sensorHelper?.onResume()
         val options = PreferenceManager.getDefaultSharedPreferences(this)
-
-        if (Options.setOrientation(this)) {
-            sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
-            if (sensorManager!!.getSensorList(Sensor.TYPE_ACCELEROMETER).size > 0) {
-                gravity[0] = 0f
-                gravity[1] = -9.81f
-                gravity[2] = 0f
-                gravityAge = 0
-                sensorManager!!.registerListener(this, sensorManager!!.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
-                        SensorManager.SENSOR_DELAY_NORMAL)
-                prevOrientation = options.getInt(Options.PREF_PREV_ORIENTATION, ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
-                requestedOrientation = prevOrientation
-            } else {
-                requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-            }
-        }
-
-        if (options.getBoolean(Options.PREF_KEEP_ON, false)) {
-            window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        } else {
-            window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        }
 
         //documentView.setVerticalScrollLock(options.getBoolean(Options.PREF_VERTICAL_SCROLL_LOCK, true));
         if (options.getBoolean(Options.PREF_FULLSCREEN, true)) {
@@ -459,59 +373,9 @@ class MuPDFRecyclerActivity : FragmentActivity(), SensorEventListener {
     override fun onPause() {
         super.onPause()
 
-        saveCurrentPage()
+        pdfBookmarkManager?.saveCurrentPage(mPath, core!!.pageCount, pos, 1f, 0, 0)
 
-        if (sensorManager != null) {
-            sensorManager!!.unregisterListener(this)
-            sensorManager = null
-            val edit = PreferenceManager.getDefaultSharedPreferences(this).edit()
-            edit.putInt(Options.PREF_PREV_ORIENTATION, prevOrientation)
-            //Log.v(TAG, "prevOrientation saved: "+prevOrientation);
-            edit.apply()
-        }
-    }
-
-    private fun setOrientation(orientation: Int) {
-        if (orientation != prevOrientation) {
-            //Log.v(TAG, "setOrientation: "+orientation);
-            requestedOrientation = orientation
-            prevOrientation = orientation
-        }
-    }
-
-    /**
-     * Called when accuracy changes.
-     * This method is empty, but it's required by relevant interface.
-     */
-    override fun onAccuracyChanged(sensor: Sensor, accuracy: Int) {}
-
-    override fun onSensorChanged(event: SensorEvent) {
-        gravity[0] = 0.8f * gravity[0] + 0.2f * event.values[0]
-        gravity[1] = 0.8f * gravity[1] + 0.2f * event.values[1]
-        gravity[2] = 0.8f * gravity[2] + 0.2f * event.values[2]
-
-        val sq0 = gravity[0] * gravity[0]
-        val sq1 = gravity[1] * gravity[1]
-        val sq2 = gravity[2] * gravity[2]
-
-        gravityAge++
-
-        if (gravityAge < 4) {
-            // ignore initial hiccups
-            return
-        }
-
-        if (sq1 > 3 * (sq0 + sq2)) {
-            if (gravity[1] > 4)
-                setOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
-            else if (gravity[1] < -4 && Integer.parseInt(Build.VERSION.SDK) >= 9)
-                setOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT)
-        } else if (sq0 > 3 * (sq1 + sq2)) {
-            if (gravity[0] > 4)
-                setOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)
-            else if (gravity[0] < -4 && Integer.parseInt(Build.VERSION.SDK) >= 9)
-                setOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE)
-        }
+        sensorHelper?.onPause()
     }
 
     //===========================================

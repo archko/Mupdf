@@ -3,17 +3,10 @@ package org.vudroid.core;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -25,6 +18,8 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
+import cn.archko.pdf.PDFBookmarkManager;
+import cn.archko.pdf.SensorHelper;
 import org.vudroid.core.events.CurrentPageListener;
 import org.vudroid.core.events.DecodingProgressListener;
 import org.vudroid.core.events.PageViewPresenter;
@@ -34,15 +29,10 @@ import org.vudroid.core.models.ZoomModel;
 import org.vudroid.core.views.APageSeekBarControls;
 import org.vudroid.core.views.PageViewZoomControls;
 
-import cn.archko.pdf.AKProgress;
-import cn.archko.pdf.AKRecent;
-import cn.archko.pdf.DataListener;
 import cn.archko.pdf.R;
-import cx.hell.android.pdfviewpro.Bookmark;
-import cx.hell.android.pdfviewpro.BookmarkEntry;
 import cx.hell.android.pdfviewpro.Options;
 
-public abstract class BaseViewerActivity extends Activity implements DecodingProgressListener, CurrentPageListener, SensorEventListener {
+public abstract class BaseViewerActivity extends Activity implements DecodingProgressListener, CurrentPageListener {
     private static final int MENU_EXIT = 0;
     private static final int MENU_GOTO = 1;
     private static final int MENU_FULL_SCREEN = 2;
@@ -60,10 +50,8 @@ public abstract class BaseViewerActivity extends Activity implements DecodingPro
     //private CurrentPageModel mPageModel;
     APageSeekBarControls mPageSeekBarControls;
 
-    /**
-     * Bookmarked page to go to.
-     */
-    private BookmarkEntry bookmarkToRestore = null;
+    PDFBookmarkManager pdfBookmarkManager;
+    SensorHelper sensorHelper;
 
     /**
      * Called when the activity is first created.
@@ -73,9 +61,13 @@ public abstract class BaseViewerActivity extends Activity implements DecodingPro
         super.onCreate(savedInstanceState);
         initDecodeService();
         final ZoomModel zoomModel = new ZoomModel();
-        setStartBookmark();
-        if (null != bookmarkToRestore) {
-            zoomModel.setZoom(bookmarkToRestore.absoluteZoomLevel / 1000);
+        pdfBookmarkManager=new PDFBookmarkManager();
+        sensorHelper=new SensorHelper(this);
+
+        Uri uri = getIntent().getData();
+        pdfBookmarkManager.setStartBookmark(Uri.decode(uri.getEncodedPath()));
+        if (null != pdfBookmarkManager.getBookmarkToRestore()) {
+            zoomModel.setZoom(pdfBookmarkManager.getBookmarkToRestore().absoluteZoomLevel / 1000);
         }
         final DecodingProgressModel progressModel = new DecodingProgressModel();
         progressModel.addEventListener(this);
@@ -102,7 +94,10 @@ public abstract class BaseViewerActivity extends Activity implements DecodingPro
 
         /*final SharedPreferences sharedPreferences = getSharedPreferences(DOCUMENT_VIEW_STATE_PREFERENCES, 0);
         documentView.goToPage(sharedPreferences.getInt(getIntent().getData().toString(), 0));*/
-        restoreBookmark();
+        int currentPage=pdfBookmarkManager.restoreBookmark(decodeService.getPageCount());
+        if (0 < currentPage) {
+            documentView.goToPage(currentPage, pdfBookmarkManager.getBookmarkToRestore().offsetX, pdfBookmarkManager.getBookmarkToRestore().offsetY);
+        }
         documentView.showDocument();
 
         //viewerPreferences.addRecent(getIntent().getData());
@@ -170,7 +165,7 @@ public abstract class BaseViewerActivity extends Activity implements DecodingPro
         if (pageNumberToast != null) {
             pageNumberToast.setText(pageText);
         } else {
-            pageNumberToast = Toast.makeText(this, pageText, 80);
+            pageNumberToast = Toast.makeText(this, pageText, Toast.LENGTH_SHORT);
         }
         pageNumberToast.setGravity(Gravity.BOTTOM | Gravity.LEFT, 0, 0);
         pageNumberToast.show();
@@ -239,14 +234,6 @@ public abstract class BaseViewerActivity extends Activity implements DecodingPro
         super.onDestroy();
     }
 
-    /*private void saveCurrentPage()
-    {
-        final SharedPreferences sharedPreferences = getSharedPreferences(DOCUMENT_VIEW_STATE_PREFERENCES, 0);
-        final SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putInt(getIntent().getData().toString(), documentView.getCurrentPage());
-        editor.commit();
-    }*/
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         menu.add(0, MENU_EXIT, 0, "Exit");
@@ -310,104 +297,16 @@ public abstract class BaseViewerActivity extends Activity implements DecodingPro
 
     //--------------------------------------
 
-    public void setStartBookmark() {
-        /*Bookmark b = new Bookmark(getApplicationContext()).open();
-        Uri uri=getIntent().getData();
-        String bookmarkName=Uri.decode(uri.getEncodedPath());
-        if (b != null) {
-            bookmarkToRestore = b.getLast(bookmarkName);
-            Log.d(TAG, "setStartBookmark:"+bookmarkToRestore);
-        }
-        b.close();*/
-        Uri uri = getIntent().getData();
-        AKProgress progress = AKRecent.getInstance(getApplicationContext()).readRecentFromDb(Uri.decode(uri.getEncodedPath()));
-        if (null != progress) {
-            BookmarkEntry entry = new BookmarkEntry(progress.bookmarkEntry);
-            bookmarkToRestore = entry;
-        }
-    }
-
-    void restoreBookmark() {
-        if (bookmarkToRestore == null) {
-            return;
-        }
-
-        if (bookmarkToRestore.numberOfPages != decodeService.getPageCount() && decodeService.getPageCount() != 0) {
-            bookmarkToRestore = null;
-            return;
-        }
-
-        if (0 < bookmarkToRestore.page) {
-            int currentPage = bookmarkToRestore.page;
-            documentView.goToPage(currentPage, bookmarkToRestore.offsetX, bookmarkToRestore.offsetY);
-        }
-    }
-
-    private void saveCurrentPage() {
-        /*final SharedPreferences sharedPreferences = getSharedPreferences(DOCUMENT_VIEW_STATE_PREFERENCES, 0);
-        final SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putInt(getIntent().getData().toString(), documentView.getCurrentPage());
-        editor.commit();*/
-        Uri uri = getIntent().getData();
-        String filePath = Uri.decode(uri.getEncodedPath());
-        BookmarkEntry entry = toBookmarkEntry();
-        Bookmark b = new Bookmark(getApplicationContext()).open();
-        b.setLast(filePath, entry);
-        b.close();
-        Log.i(TAG, "last page saved for " + filePath + " entry:" + entry);
-        AKRecent.getInstance(getApplicationContext()).addAsyncToDB(filePath, entry.page, entry.numberOfPages, entry.toString(),
-                new DataListener() {
-                    @Override
-                    public void onSuccess(Object... args) {
-                        //AKRecent.getInstance(getApplicationContext()).backup("mupdf_recent.jso");
-                    }
-
-                    @Override
-                    public void onFailed(Object... args) {
-
-                    }
-                });
-    }
-
-    public BookmarkEntry toBookmarkEntry() {
-        return new BookmarkEntry(decodeService.getPageCount(),
-                documentView.getCurrentPage(), documentView.getZoomModel().getZoom() * 1000, 0,
-                documentView.getScrollX(), documentView.getScrollY());
-    }
-
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
     }
 
-    private SensorManager sensorManager;
-    private float[] gravity = {0f, -9.81f, 0f};
-    private long gravityAge = 0;
-
-    private int prevOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
-
     protected void onResume() {
         super.onResume();
 
-        sensorManager = null;
-
+        sensorHelper.onResume();
         SharedPreferences options = PreferenceManager.getDefaultSharedPreferences(this);
-
-        if (Options.setOrientation(this)) {
-            sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-            if (sensorManager.getSensorList(Sensor.TYPE_ACCELEROMETER).size() > 0) {
-                gravity[0] = 0f;
-                gravity[1] = -9.81f;
-                gravity[2] = 0f;
-                gravityAge = 0;
-                sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
-                        SensorManager.SENSOR_DELAY_NORMAL);
-                prevOrientation = options.getInt(Options.PREF_PREV_ORIENTATION, ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-                setRequestedOrientation(prevOrientation);
-            } else {
-                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-            }
-        }
 
         if (options.getBoolean(Options.PREF_KEEP_ON, false)) {
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -470,61 +369,12 @@ public abstract class BaseViewerActivity extends Activity implements DecodingPro
     @Override
     protected void onPause() {
         super.onPause();
+        Uri uri = getIntent().getData();
+        String filePath = Uri.decode(uri.getEncodedPath());
+        pdfBookmarkManager.saveCurrentPage(filePath,decodeService.getPageCount(),documentView.getCurrentPage(),
+            documentView.getZoomModel().getZoom(), documentView.getScrollX(), documentView.getScrollY());
 
-        saveCurrentPage();
-
-        if (sensorManager != null) {
-            sensorManager.unregisterListener(this);
-            sensorManager = null;
-            SharedPreferences.Editor edit = PreferenceManager.getDefaultSharedPreferences(this).edit();
-            edit.putInt(Options.PREF_PREV_ORIENTATION, prevOrientation);
-            //Log.v(TAG, "prevOrientation saved: "+prevOrientation);
-            edit.apply();
-        }
-    }
-
-    private void setOrientation(int orientation) {
-        if (orientation != prevOrientation) {
-            //Log.v(TAG, "setOrientation: "+orientation);
-            setRequestedOrientation(orientation);
-            prevOrientation = orientation;
-        }
-    }
-
-    /**
-     * Called when accuracy changes.
-     * This method is empty, but it's required by relevant interface.
-     */
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
-    }
-
-    public void onSensorChanged(SensorEvent event) {
-        gravity[0] = 0.8f * gravity[0] + 0.2f * event.values[0];
-        gravity[1] = 0.8f * gravity[1] + 0.2f * event.values[1];
-        gravity[2] = 0.8f * gravity[2] + 0.2f * event.values[2];
-
-        float sq0 = gravity[0] * gravity[0];
-        float sq1 = gravity[1] * gravity[1];
-        float sq2 = gravity[2] * gravity[2];
-
-        gravityAge++;
-
-        if (gravityAge < 4) {
-            // ignore initial hiccups
-            return;
-        }
-
-        if (sq1 > 3 * (sq0 + sq2)) {
-            if (gravity[1] > 4)
-                setOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-            else if (gravity[1] < -4 && Integer.parseInt(Build.VERSION.SDK) >= 9)
-                setOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT);
-        } else if (sq0 > 3 * (sq1 + sq2)) {
-            if (gravity[0] > 4)
-                setOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-            else if (gravity[0] < -4 && Integer.parseInt(Build.VERSION.SDK) >= 9)
-                setOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
-        }
+        sensorHelper.onPause();
     }
 
     //--------------------------------

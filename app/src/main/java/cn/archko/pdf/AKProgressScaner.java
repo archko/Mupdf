@@ -16,7 +16,7 @@ public class AKProgressScaner {
 
     private AsyncTask<Void, Void, List<FileListEntry>> mAsyncTask;
 
-    public void startScan(List<FileListEntry> fileListEntries, Context activity, String currentPath, DataListener dataListener) {
+    public void startScan(final List<FileListEntry> fileListEntries, final Context activity, final String currentPath, final DataListener dataListener) {
         if (null != mAsyncTask) {
             mAsyncTask.cancel(true);
         }
