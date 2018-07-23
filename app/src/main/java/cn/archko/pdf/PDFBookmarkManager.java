@@ -28,6 +28,9 @@ public class PDFBookmarkManager {
     }
 
     public int restoreBookmark(int pageCount) {
+        if (bookmarkToRestore == null) {
+            return 0;
+        }
         int currentPage=0;
 
         if (bookmarkToRestore.numberOfPages!=pageCount||bookmarkToRestore.page>pageCount) {
