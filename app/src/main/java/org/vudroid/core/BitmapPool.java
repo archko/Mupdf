@@ -13,7 +13,7 @@ public class BitmapPool {
     private Pools.SimplePool<Bitmap> simplePool;
 
     private BitmapPool() {
-        simplePool = new Pools.SimplePool<>(48);
+        simplePool = new Pools.SimplePool<>(16);
     }
 
     public static BitmapPool getInstance() {
@@ -35,7 +35,10 @@ public class BitmapPool {
     }
 
     public void release(Bitmap bitmap) {
-        simplePool.release(bitmap);
+        boolean isRelease = simplePool.release(bitmap);
+        if (!isRelease) {
+            bitmap.recycle();
+        }
     }
 
     public synchronized void clear() {
