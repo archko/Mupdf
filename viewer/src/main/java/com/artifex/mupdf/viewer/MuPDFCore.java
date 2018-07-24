@@ -3,6 +3,7 @@ package com.artifex.mupdf.viewer;
 import android.graphics.Bitmap;
 import android.graphics.PointF;
 import android.graphics.RectF;
+
 import com.artifex.mupdf.fitz.Cookie;
 import com.artifex.mupdf.fitz.DisplayList;
 import com.artifex.mupdf.fitz.Document;
@@ -76,6 +77,24 @@ public class MuPDFCore
 		return new PointF(pageWidth, pageHeight);
 	}
 
+	public synchronized PointF getPageSize2(int pageNum) {
+		Page p = doc.loadPage(pageNum);
+		Rect b = p.getBounds();
+		float w = b.x1 - b.x0;
+		float h = b.y1 - b.y0;
+		return new PointF(w, h);
+	}
+
+    public Page loadPage(int pageNum) {
+        if (pageNum > pageCount - 1) {
+            pageNum = pageCount - 1;
+        } else if (pageNum < 0) {
+            pageNum = 0;
+        }
+        Page loadPage = doc.loadPage(pageNum);
+        return loadPage;
+    }
+
 	public synchronized void onDestroy() {
 		if (displayList != null)
 			displayList.destroy();
@@ -88,6 +107,18 @@ public class MuPDFCore
 		doc = null;
 	}
 
+	/**
+	 * 渲染页面,传入一个Bitmap对象.使用硬件加速,虽然速度影响不大.
+	 *
+	 * @param bm     需要渲染的位图,配置为ARGB8888
+	 * @param page   当前渲染页面页码
+	 * @param pageW  页面的宽,由缩放级别计算得到的最后宽,由于这个宽诸页面的裁剪大小,如果不正确,得到的Tile页面是不正确的
+	 * @param pageH  页面的宽,由缩放级别计算得到的最后宽,由于这个宽诸页面的裁剪大小,如果不正确,得到的Tile页面是不正确的
+	 * @param patchX 裁剪的页面的左顶点
+	 * @param patchY 裁剪的页面的上顶点
+	 * @param patchW 页面的宽,具体渲染的页面实际大小.显示出来的大小.
+	 * @param patchH 页面的高,具体渲染的页面实际大小.显示出来的大小.
+	 */
 	public synchronized void drawPage(Bitmap bm, int pageNum,
 			int pageW, int pageH,
 			int patchX, int patchY,
@@ -117,29 +148,6 @@ public class MuPDFCore
 			Cookie cookie) {
 		drawPage(bm, pageNum, pageW, pageH, patchX, patchY, patchW, patchH, cookie);
 	}
-
-    /**
-     * 渲染页面,传入一个Bitmap对象.使用硬件加速,虽然速度影响不大.
-     *
-     * @param bm     需要渲染的位图,配置为ARGB8888
-     * @param page   当前渲染页面页码
-     * @param pageW  页面的宽,由缩放级别计算得到的最后宽,由于这个宽诸页面的裁剪大小,如果不正确,得到的Tile页面是不正确的
-     * @param pageH  页面的宽,由缩放级别计算得到的最后宽,由于这个宽诸页面的裁剪大小,如果不正确,得到的Tile页面是不正确的
-     * @param patchX 裁剪的页面的左顶点
-     * @param patchY 裁剪的页面的上顶点
-     * @param patchW 页面的宽,具体渲染的页面实际大小.显示出来的大小.
-     * @param patchH 页面的高,具体渲染的页面实际大小.显示出来的大小.
-     */
-    public void renderPage(Bitmap bm, int page,
-        int pageW, int pageH,
-        int patchX, int patchY,
-        int patchW, int patchH,
-        Cookie cookie) {
-        gotoPage(page);
-        /*System.out.println(String.format("renderPage pageW-:%d, pageH-:%d, patchX:%d, patchY:%d, patchW:%d, patchH:%d",
-            pageW, pageH, patchX, patchY, patchW, patchH));*/
-        //drawPage4Apv(bm, pageW, pageH, patchX, patchY, patchW, patchH, cookie.cookiePtr);
-    }
 
 	public synchronized Link[] getPageLinks(int pageNum) {
 		gotoPage(pageNum);
@@ -185,15 +193,12 @@ public class MuPDFCore
 	}
 
     //==========================================================================
-    public float getPDFPageWidth() {
-        return pageWidth;
-    }
-
-    public float getPDFPageHeight() {
-        return pageHeight;
-    }
 
 	public byte[] asHtml(int position) {
 		return page.textAsHtml();
+	}
+
+	public Page getPage() {
+		return page;
 	}
 }
