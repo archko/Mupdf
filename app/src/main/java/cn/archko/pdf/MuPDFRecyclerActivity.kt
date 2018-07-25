@@ -21,7 +21,10 @@ import android.text.TextUtils
 import android.util.Log
 import android.util.SparseArray
 import android.view.*
-import android.widget.*
+import android.widget.ImageButton
+import android.widget.RelativeLayout
+import android.widget.TextView
+import android.widget.Toast
 import cn.archko.pdf.utils.Util
 import com.artifex.mini.OutlineActivity
 import com.artifex.mupdf.fitz.Matrix
@@ -88,7 +91,7 @@ class MuPDFRecyclerActivity : FragmentActivity() {
         try {
             pos = pdfBookmarkManager?.restoreBookmark(mCore!!.countPages())!!
 
-            mRecyclerView.adapter = PDFRecyclerAdapter()
+            mRecyclerView.adapter = BaseRecyclerAdapter()
             if (pos > 0) {
                 mRecyclerView.scrollToPosition(pos)
             }
@@ -186,19 +189,6 @@ class MuPDFRecyclerActivity : FragmentActivity() {
 
         mRecyclerView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST))
 
-        mRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrollStateChanged(recyclerView: RecyclerView?, newState: Int) {
-                super.onScrollStateChanged(recyclerView, newState)
-                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-                    mRecyclerView.adapter!!.notifyDataSetChanged()
-                }
-            }
-
-            override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
-            }
-        })
-
         val layout = RelativeLayout(this)
         layout.addView(mRecyclerView)
 
@@ -245,7 +235,7 @@ class MuPDFRecyclerActivity : FragmentActivity() {
 
     private fun reflowModeSet(reflow: Boolean) {
         mReflow = reflow
-        mRecyclerView.adapter = if (mReflow) MuPDFReflowRecyclerViewAdapter(this, mCore) else PDFRecyclerAdapter()
+        mRecyclerView.adapter = if (mReflow) MuPDFReflowRecyclerViewAdapter(this, mCore) else BaseRecyclerAdapter()
         mReflowButton!!.setColorFilter(if (mReflow) Color.argb(0xFF, 172, 114, 37) else Color.argb(0xFF, 255, 255, 255))
         if (pos > 0) {
             mRecyclerView.scrollToPosition(pos)
@@ -396,11 +386,26 @@ class MuPDFRecyclerActivity : FragmentActivity() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
             var holder: PdfHolder? = null
-            val view = ImageView(baseContext)
+            val view = APDFView(parent.context, mCore, Point(parent.width, parent.height))
             var lp: ViewGroup.LayoutParams? = view.layoutParams
+            var size: PointF? = null
+            var width: Int = ViewGroup.LayoutParams.MATCH_PARENT
+            var height: Int = ViewGroup.LayoutParams.MATCH_PARENT
+            if (mPageSizes.size() > 0) {
+                size = mPageSizes.get(0)
+                val xr = parent.width / size.x
+                val yr = parent.height / size.y
+                var mSourceScale = Math.max(xr, yr)
+                val newSize = Point((size.x * mSourceScale).toInt(), (size.y * mSourceScale).toInt())
+                width = newSize.x
+                height = newSize.y
+            }
             if (null == lp) {
-                lp = RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+                lp = RecyclerView.LayoutParams(width, height)
                 view.layoutParams = lp
+            } else {
+                lp.width = width;
+                lp.height = height;
             }
             holder = PdfHolder(view)
             return holder
@@ -410,25 +415,7 @@ class MuPDFRecyclerActivity : FragmentActivity() {
             pos = viewHolder.adapterPosition
             val pdfHolder = viewHolder as PdfHolder
 
-            if (pdfHolder.mBitmap != null && !pdfHolder.mBitmap!!.isRecycled) {
-                updateBitmap(pdfHolder, pdfHolder.mBitmap!!)
-                return
-            } else {
-                if (pdfHolder.mThumbnail != null && !pdfHolder.mThumbnail!!.isRecycled) {
-                    updateBitmap(pdfHolder, pdfHolder.mThumbnail!!)
-                }
-            }
-
-            if (mRecyclerView.scrollState == RecyclerView.SCROLL_STATE_IDLE) {
-                val bm = renderBitmap(position, 1)
-                pdfHolder.mBitmap = bm
-                updateBitmap(pdfHolder, pdfHolder.mBitmap!!)
-            } else {
-                val bm = renderBitmap(position, 8)
-                pdfHolder.mThumbnail = bm
-                updateBitmap(pdfHolder, pdfHolder.mThumbnail!!)
-            }
-            Log.d(TAG, "onBindViewHolder:" + pos)
+            pdfHolder.onBind(position)
         }
 
         private fun renderBitmap(position: Int, scale: Int): Bitmap {
@@ -446,30 +433,24 @@ class MuPDFRecyclerActivity : FragmentActivity() {
             return bitmap
         }
 
-        private fun updateBitmap(pdfHolder: PdfHolder, bitmap: Bitmap) {
-            pdfHolder.imageView.setImageBitmap(bitmap)
-            pdfHolder.imageView.adjustViewBounds = true
-        }
-
         override fun onViewRecycled(holder: RecyclerView.ViewHolder) {
             super.onViewRecycled(holder)
             val pdfHolder = holder as PdfHolder?
-            pdfHolder!!.imageView.setImageBitmap(null)
-            if (null != pdfHolder && null != pdfHolder.mThumbnail && !pdfHolder.mThumbnail!!.isRecycled) {
-                pdfHolder.mThumbnail!!.recycle()
-            }
-            if (null != pdfHolder && null != pdfHolder.mBitmap && !pdfHolder.mBitmap!!.isRecycled) {
-                pdfHolder.mBitmap!!.recycle()
-            }
+
+            pdfHolder?.view?.releaseResources()
         }
 
         override fun getItemCount(): Int {
             return mCore!!.countPages()
         }
 
-        inner class PdfHolder(internal var imageView: ImageView) : RecyclerView.ViewHolder(imageView) {
-            internal var mThumbnail: Bitmap? = null
-            internal var mBitmap: Bitmap? = null
+        inner class PdfHolder(internal var view: APDFView) : RecyclerView.ViewHolder(view) {
+            fun onBind(position: Int) {
+                val pageSize = mPageSizes.get(position)
+                view.setPage(position, pageSize)
+
+                println("onBindViewHolder:$pos, view:${view}")
+            }
         }
 
     }
@@ -520,7 +501,7 @@ class MuPDFRecyclerActivity : FragmentActivity() {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
             var holder: PdfHolder?
 
-            println("width:${parent.width},height:${parent.height}")
+            println("view:width:${parent.width},height:${parent.height}")
             val pdfView = PDFView(parent.context, mCore, Point(parent.width, parent.height))
 
             holder = PdfHolder(pdfView)
@@ -530,11 +511,7 @@ class MuPDFRecyclerActivity : FragmentActivity() {
         override fun onBindViewHolder(viewHolder: RecyclerView.ViewHolder, position: Int) {
             pos = viewHolder.adapterPosition
             val pdfHolder = viewHolder as PdfHolder
-
-            val pageSize = mPageSizes.get(position)
-            pdfHolder.view.setPage(position, pageSize)
-
-            println("onBindViewHolder:$pos, view:${pdfHolder.view}")
+            pdfHolder.onBind(position)
         }
 
         override fun onViewRecycled(holder: RecyclerView.ViewHolder) {
@@ -548,8 +525,12 @@ class MuPDFRecyclerActivity : FragmentActivity() {
         }
 
         inner class PdfHolder(internal var view: PDFView) : RecyclerView.ViewHolder(view) {
+            fun onBind(position: Int) {
+                val pageSize = mPageSizes.get(position)
+                view.setPage(position, pageSize)
 
+                println("onBindViewHolder:$pos, view:${view}")
+            }
         }
-
     }
 }

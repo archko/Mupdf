@@ -2,20 +2,16 @@ package cn.archko.pdf;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Bitmap.Config;
-import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.PointF;
 import android.graphics.RectF;
-import android.os.Build;
 import android.os.Handler;
-import android.view.View;
+import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 
 import com.artifex.mupdf.fitz.Cookie;
 import com.artifex.mupdf.fitz.Link;
@@ -23,6 +19,8 @@ import com.artifex.mupdf.viewer.CancellableAsyncTask;
 import com.artifex.mupdf.viewer.CancellableTaskDefinition;
 import com.artifex.mupdf.viewer.MuPDFCancellableTaskDefinition;
 import com.artifex.mupdf.viewer.MuPDFCore;
+
+import org.vudroid.core.BitmapPool;
 
 // Make our ImageViews opaque to optimize redraw
 class OpaqueImageView extends ImageView {
@@ -43,7 +41,7 @@ public class PDFView extends ViewGroup {
 	private static final int HIGHLIGHT_COLOR = 0x80cc6600;
 	private static final int LINK_COLOR = 0x800066cc;
 	private static final int BOX_COLOR = 0xFF4444FF;
-	private static final int BACKGROUND_COLOR = 0xFFFFFFFF;
+	//private static final int BACKGROUND_COLOR = 0xFFFFFFFF;
 	private static final int PROGRESS_DIALOG_DELAY = 200;
 
 	protected final Context mContext;
@@ -57,15 +55,15 @@ public class PDFView extends ViewGroup {
 	private       Bitmap    mEntireBm;
 	private       Matrix    mEntireMat;
 	//private       AsyncTask<Void,Void,Link[]> mGetLinkInfo;
-	private       CancellableAsyncTask<Void, Void> mDrawEntire;
+	private       CancellableAsyncTask<Void, Bitmap> mDrawEntire;
 
 	private       RectF     mSearchBoxes[];
 	protected     Link      mLinks[];
-	private       View      mSearchView;
+	//private       View      mSearchView;
 	private       boolean   mIsBlank;
 	private       boolean   mHighlightLinks;
 
-	private       ProgressBar mBusyIndicator;
+	//private       ProgressBar mBusyIndicator;
 	private final Handler   mHandler = new Handler();
 	private int currentPage;
 	private Paint mSearchPaint;
@@ -75,13 +73,21 @@ public class PDFView extends ViewGroup {
 		mContext = c;
 		mCore = core;
 		mParentSize = parentSize;
-		setBackgroundColor(BACKGROUND_COLOR);
+		//setBackgroundColor(BACKGROUND_COLOR);
 		//mEntireBm = Bitmap.createBitmap(parentSize.x, parentSize.y, Config.ARGB_8888);
 		mEntireMat = new Matrix();
 		mSearchPaint = new Paint();
+		mEntire = new OpaqueImageView(mContext);
+		mEntire.setScaleType(ImageView.ScaleType.MATRIX);
+		addView(mEntire);
 	}
 
 	private void reinit() {
+		Log.d("view", "reinit oldmEntireBm:" + mEntireBm+" cp:"+currentPage);
+		if (null != mEntireBm) {
+			BitmapPool.getInstance().release(mEntireBm);
+			mEntireBm = null;
+		}
 		// Cancel pending render task
 		if (mDrawEntire != null) {
 			mDrawEntire.cancel();
@@ -96,12 +102,12 @@ public class PDFView extends ViewGroup {
 		mIsBlank = true;
 		mPageNumber = 0;
 
-		if (mSize == null)
+		if (mSize == null) {
 			mSize = mParentSize;
+		}
 
 		if (mEntire != null) {
 			mEntire.setImageBitmap(null);
-			mEntire.invalidate();
 		}
 
 		mSearchBoxes = null;
@@ -111,53 +117,20 @@ public class PDFView extends ViewGroup {
 	public void releaseResources() {
 		reinit();
 
-		if (mBusyIndicator != null) {
+		/*if (mBusyIndicator != null) {
 			removeView(mBusyIndicator);
 			mBusyIndicator = null;
-		}
-	}
-
-	public void releaseBitmaps() {
-		reinit();
-
-		// recycle bitmaps before releasing them.
-
-		if (mEntireBm!=null)
-			mEntireBm.recycle();
-		mEntireBm = null;
-	}
-
-	public void blank(int page) {
-		reinit();
-		mPageNumber = page;
-
-		if (mBusyIndicator == null) {
-			mBusyIndicator = new ProgressBar(mContext);
-			mBusyIndicator.setIndeterminate(true);
-			addView(mBusyIndicator);
-		}
-
-		setBackgroundColor(BACKGROUND_COLOR);
+		}*/
 	}
 
 	public void setPage(int page, PointF size) {
-		// Cancel pending render task
-		if (mDrawEntire != null) {
-			mDrawEntire.cancel();
-			mDrawEntire = null;
-		}
-
 		mIsBlank = false;
 		// Highlights may be missing because mIsBlank was true on last draw
-		if (mSearchView != null)
-			mSearchView.invalidate();
+		//if (mSearchView != null) {
+		//    mSearchView.invalidate();
+        //}
 
 		mPageNumber = page;
-		if (mEntire == null) {
-			mEntire = new OpaqueImageView(mContext);
-			mEntire.setScaleType(ImageView.ScaleType.MATRIX);
-			addView(mEntire);
-		}
 
 		// Calculate scaled size that fits within the screen limits
 		// This is the size at minimum zoom
@@ -167,14 +140,7 @@ public class PDFView extends ViewGroup {
 		Point newSize = new Point((int)(size.x*mSourceScale), (int)(size.y*mSourceScale));
 		mSize = newSize;
 		//Log.d("view", "mParentSize:" + mParentSize + " xr:" + xr + " yr:" + yr + " mss:" + mSourceScale + " mSize:" + mSize);
-		if (null == mEntireBm || mSize.y != mParentSize.y || mSize.x != mParentSize.x) {
-			mEntireBm = Bitmap.createBitmap(mSize.x, mSize.y, Config.ARGB_8888);
-		}
 
-		if (currentPage != page) {
-			mEntire.setImageBitmap(null);
-			mEntire.invalidate();
-		}
 		currentPage = page;
 
 		// Get the link info in the background
@@ -192,16 +158,26 @@ public class PDFView extends ViewGroup {
 
 		mGetLinkInfo.execute();*/
 
+		if (null != mEntireBm) {
+			Log.d("view", "mEntireBm:" + mEntireBm+" cp:"+currentPage);
+			return;
+		}
+
+		// Cancel pending render task
+		if (mDrawEntire != null) {
+			mDrawEntire.cancel();
+			mDrawEntire = null;
+		}
+
 		// Render the page in the background
-		mDrawEntire = new CancellableAsyncTask<Void, Void>(getDrawPageTask(mEntireBm, mSize.x, mSize.y, 0, 0, mSize.x, mSize.y)) {
+		mDrawEntire = new CancellableAsyncTask<Void, Bitmap>(getDrawPageTask(mSize.x, mSize.y, 0, 0, mSize.x, mSize.y)) {
 
 			@Override
 			public void onPreExecute() {
-				setBackgroundColor(BACKGROUND_COLOR);
+				//setBackgroundColor(BACKGROUND_COLOR);
 				mEntire.setImageBitmap(null);
-				mEntire.invalidate();
 
-				if (mBusyIndicator == null) {
+				/*if (mBusyIndicator == null) {
 					mBusyIndicator = new ProgressBar(mContext);
 					mBusyIndicator.setIndeterminate(true);
 					addView(mBusyIndicator);
@@ -212,23 +188,22 @@ public class PDFView extends ViewGroup {
 								mBusyIndicator.setVisibility(VISIBLE);
 						}
 					}, PROGRESS_DIALOG_DELAY);
-				}
+				}*/
 			}
 
-			@Override
-			public void onPostExecute(Void result) {
-				removeView(mBusyIndicator);
-				mBusyIndicator = null;
-				mEntire.setImageBitmap(mEntireBm);
-				mEntire.invalidate();
-				setBackgroundColor(Color.TRANSPARENT);
-
-			}
-		};
+            @Override
+            public void onPostExecute(Bitmap bitmap) {
+                //removeView(mBusyIndicator);
+                //mBusyIndicator = null;
+                //setBackgroundColor(Color.TRANSPARENT);
+                mEntireBm = bitmap;
+                mEntire.setImageBitmap(mEntireBm);
+            }
+        };
 
 		mDrawEntire.execute();
 
-		if (mSearchView == null) {
+		/*if (mSearchView == null) {
 			mSearchView = new View(mContext) {
 				@Override
 				protected void onDraw(final Canvas canvas) {
@@ -256,20 +231,22 @@ public class PDFView extends ViewGroup {
 			};
 
 			addView(mSearchView);
-		}
-		requestLayout();
+		}*/
+		//requestLayout();
 	}
 
 	public void setSearchBoxes(RectF searchBoxes[]) {
 		mSearchBoxes = searchBoxes;
-		if (mSearchView != null)
-			mSearchView.invalidate();
+		/*if (mSearchView != null) {
+		    mSearchView.invalidate();
+        }*/
 	}
 
 	public void setLinkHighlighting(boolean f) {
 		mHighlightLinks = f;
-		if (mSearchView != null)
-			mSearchView.invalidate();
+		/*if (mSearchView != null) {
+		    mSearchView.invalidate();
+        }*/
 	}
 
 	@Override
@@ -292,10 +269,10 @@ public class PDFView extends ViewGroup {
 
 		setMeasuredDimension(x, y);
 
-		if (mBusyIndicator != null) {
+		/*if (mBusyIndicator != null) {
 			int limit = Math.min(mParentSize.x, mParentSize.y)/2;
 			mBusyIndicator.measure(MeasureSpec.AT_MOST | limit, MeasureSpec.AT_MOST | limit);
-		}
+		}*/
 	}
 
 	@Override
@@ -312,16 +289,16 @@ public class PDFView extends ViewGroup {
 			mEntire.layout(0, 0, w, h);
 		}
 
-		if (mSearchView != null) {
-			mSearchView.layout(0, 0, w, h);
-		}
+		//if (mSearchView != null) {
+		//	mSearchView.layout(0, 0, w, h);
+		//}
 
-		if (mBusyIndicator != null) {
+		/*if (mBusyIndicator != null && mBusyIndicator.getVisibility() == VISIBLE) {
 			int bw = mBusyIndicator.getMeasuredWidth();
 			int bh = mBusyIndicator.getMeasuredHeight();
 
 			mBusyIndicator.layout((w-bw)/2, (h-bh)/2, (w+bw)/2, (h+bh)/2);
-		}
+		}*/
 	}
 
 	public int getPage() {
@@ -349,20 +326,14 @@ public class PDFView extends ViewGroup {
 		return null;
 	}
 
-	protected CancellableTaskDefinition<Void, Void> getDrawPageTask(final Bitmap bm, final int sizeX, final int sizeY,
+	protected CancellableTaskDefinition<Void, Bitmap> getDrawPageTask(final int sizeX, final int sizeY,
 			final int patchX, final int patchY, final int patchWidth, final int patchHeight) {
-		return new MuPDFCancellableTaskDefinition<Void, Void>() {
+		return new MuPDFCancellableTaskDefinition<Void, Bitmap>() {
 			@Override
-			public Void doInBackground(Cookie cookie, Void ... params) {
-				// Workaround bug in Android Honeycomb 3.x, where the bitmap generation count
-				// is not incremented when drawing.
-				if (null!=bm) {
-					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB &&
-							Build.VERSION.SDK_INT < Build.VERSION_CODES.ICE_CREAM_SANDWICH)
-						bm.eraseColor(0);
-					mCore.drawPage(bm, mPageNumber, sizeX, sizeY, patchX, patchY, patchWidth, patchHeight, cookie);
-				}
-				return null;
+			public Bitmap doInBackground(Cookie cookie, Void ... params) {
+                Bitmap bitmap = BitmapPool.getInstance().acquire(sizeX, sizeY);
+                mCore.drawPage(bitmap, mPageNumber, sizeX, sizeY, patchX, patchY, patchWidth, patchHeight, cookie);
+                return bitmap;
 			}
 		};
 
