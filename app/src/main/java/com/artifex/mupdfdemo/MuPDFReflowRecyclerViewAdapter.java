@@ -9,10 +9,8 @@ import android.view.MotionEvent;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.artifex.mupdf.fitz.Document;
 import com.artifex.mupdf.viewer.MuPDFCore;
-
-import org.vudroid.pdfdroid.codec.PdfDocument;
-import org.vudroid.pdfdroid.codec.PdfPage;
 
 import cn.archko.pdf.R;
 import cn.archko.pdf.utils.Util;
@@ -22,11 +20,11 @@ import cn.archko.pdf.utils.Util;
  */
 public class MuPDFReflowRecyclerViewAdapter extends RecyclerView.Adapter {
     private final Context mContext;
-    private final MuPDFCore mCore;
+    private final Document mCore;
 
     private String TXT_PATTERN = "</?(html|head|body|span|div|p)[^>]*>|(<style>[^<]*</style>)";
 
-    public MuPDFReflowRecyclerViewAdapter(Context c, MuPDFCore core) {
+    public MuPDFReflowRecyclerViewAdapter(Context c, Document core) {
         mContext = c;
         mCore = core;
     }
@@ -54,7 +52,7 @@ public class MuPDFReflowRecyclerViewAdapter extends RecyclerView.Adapter {
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int pos) {
         final int position = pos;
         PDFTextView reflowView = (PDFTextView) holder.itemView;
-        byte[] result = mCore.asHtml(position);
+        byte[] result = mCore.loadPage(position).textAsHtml();
 
         String text = new String(result);
         text = text.replaceAll("(<style>[^<]*</style>)|(<![^>*])", "").trim();

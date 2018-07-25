@@ -77,24 +77,6 @@ public class MuPDFCore
 		return new PointF(pageWidth, pageHeight);
 	}
 
-	public synchronized PointF getPageSize2(int pageNum) {
-		Page p = doc.loadPage(pageNum);
-		Rect b = p.getBounds();
-		float w = b.x1 - b.x0;
-		float h = b.y1 - b.y0;
-		return new PointF(w, h);
-	}
-
-    public Page loadPage(int pageNum) {
-        if (pageNum > pageCount - 1) {
-            pageNum = pageCount - 1;
-        } else if (pageNum < 0) {
-            pageNum = 0;
-        }
-        Page loadPage = doc.loadPage(pageNum);
-        return loadPage;
-    }
-
 	public synchronized void onDestroy() {
 		if (displayList != null)
 			displayList.destroy();
@@ -190,15 +172,5 @@ public class MuPDFCore
 
 	public synchronized boolean authenticatePassword(String password) {
 		return doc.authenticatePassword(password);
-	}
-
-    //==========================================================================
-
-	public byte[] asHtml(int position) {
-		return page.textAsHtml();
-	}
-
-	public Page getPage() {
-		return page;
 	}
 }
