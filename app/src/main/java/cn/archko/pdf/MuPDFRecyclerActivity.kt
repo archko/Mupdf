@@ -4,7 +4,6 @@ import android.annotation.TargetApi
 import android.content.Intent
 import android.content.res.Configuration
 import android.database.Cursor
-import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.Point
 import android.graphics.PointF
@@ -26,17 +25,15 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import android.widget.Toast
 import cn.archko.pdf.utils.Util
-import com.artifex.mini.OutlineActivity
 import com.artifex.mupdf.fitz.Document
-import com.artifex.mupdf.fitz.Matrix
 import com.artifex.mupdf.fitz.Outline
-import com.artifex.mupdf.fitz.android.AndroidDrawDevice
 import com.artifex.mupdfdemo.MuPDFReflowRecyclerViewAdapter
 import cx.hell.android.pdfviewpro.Options
 import org.jetbrains.anko.toast
 import org.vudroid.core.events.CurrentPageListener
 import org.vudroid.core.models.CurrentPageModel
 import org.vudroid.core.views.PageSeekBarControls
+import java.util.*
 
 /**
  * @author: archko 2016/5/9 :12:43
@@ -45,7 +42,6 @@ class MuPDFRecyclerActivity : FragmentActivity() {
     private var mPath: String? = null
     private var pos = 0
 
-    internal var width = 720
     lateinit var mRecyclerView: RecyclerView
     private var gestureDetector: GestureDetector? = null
     private var pageNumberToast: Toast? = null
@@ -62,12 +58,12 @@ class MuPDFRecyclerActivity : FragmentActivity() {
     private var sensorHelper: SensorHelper? = null
     private var mCore: Document? = null
     private var outline: Array<Outline>? = null
+    private var items: ArrayList<com.artifex.mupdf.viewer.OutlineActivity.Item>? = null
     private val mPageSizes = SparseArray<PointF>()
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        width = windowManager.defaultDisplay.width
         initView()
 
         if (null != savedInstanceState) {
@@ -115,11 +111,32 @@ class MuPDFRecyclerActivity : FragmentActivity() {
 
     fun openOutline(pos: Int) {
         if (hasOutline() && null != outline) {
-            val intent = Intent(this, OutlineActivity::class.java)
+            val intent = Intent(this, com.artifex.mini.OutlineActivity::class.java)
             intent.putExtra("cp", pos)
             intent.putExtra("POSITION", pos);
-            intent.putExtra("OUTLINE", outline);
+            intent.putExtra("OUTLINE", getOutline());
             startActivityForResult(intent, OUTLINE_REQUEST)
+        }
+    }
+
+    fun getOutline(): ArrayList<com.artifex.mupdf.viewer.OutlineActivity.Item> {
+        if (null != items) {
+            return items!!
+        } else {
+            items = ArrayList<com.artifex.mupdf.viewer.OutlineActivity.Item>()
+            flattenOutlineNodes(items!!, outline, "")
+        }
+        return items!!
+    }
+
+    private fun flattenOutlineNodes(result: ArrayList<com.artifex.mupdf.viewer.OutlineActivity.Item>, list: Array<Outline>?, indent: String) {
+        for (node in list!!) {
+            if (node.title != null) {
+                result.add(com.artifex.mupdf.viewer.OutlineActivity.Item(indent + node.title, node.page))
+            }
+            if (node.down != null) {
+                flattenOutlineNodes(result, node.down, "$indent    ")
+            }
         }
     }
 
@@ -342,7 +359,7 @@ class MuPDFRecyclerActivity : FragmentActivity() {
         return controls
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when (requestCode) {
             OUTLINE_REQUEST -> {
                 if (resultCode >= 0) {
@@ -427,21 +444,6 @@ class MuPDFRecyclerActivity : FragmentActivity() {
             val pdfHolder = viewHolder as PdfHolder
 
             pdfHolder.onBind(position)
-        }
-
-        private fun renderBitmap(position: Int, scale: Int): Bitmap {
-            //val result = core!!.getPage(position) as PdfPage
-            //val width = result.width / scale
-            //val height = result.height / scale
-            //val bm = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-            //result.renderBitmap(bm, position, width, height, 0, 0, width, height, null)
-            //return result.renderBitmap(width, height, RectF(0f, 0f, width.toFloat(), height.toFloat()), 1.0f);
-            //return bm
-            val page = mCore!!.loadPage(position)
-            //Log.i(APP, "draw page " + pageNumber)
-            val ctm: Matrix = AndroidDrawDevice.fitPageWidth(page, width)
-            val bitmap = AndroidDrawDevice.drawPage(page, ctm)
-            return bitmap
         }
 
         override fun onViewRecycled(holder: RecyclerView.ViewHolder) {

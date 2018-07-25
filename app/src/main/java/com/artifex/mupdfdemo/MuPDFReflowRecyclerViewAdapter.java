@@ -10,10 +10,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.artifex.mupdf.fitz.Document;
-import com.artifex.mupdf.viewer.MuPDFCore;
 
 import cn.archko.pdf.R;
-import cn.archko.pdf.utils.Util;
 
 /**
  * @author: archko 2016/5/13 :11:03
@@ -40,10 +38,15 @@ public class MuPDFReflowRecyclerViewAdapter extends RecyclerView.Adapter {
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        final PDFTextView pageView;
+        final PDFTextView pdfView;
 
-        pageView = new PDFTextView(mContext, this);
-        ItemViewHolder holder = new ItemViewHolder(pageView);
+        pdfView = new PDFTextView(mContext);
+        ItemViewHolder holder = new ItemViewHolder(pdfView);
+        RecyclerView.LayoutParams lp = (RecyclerView.LayoutParams) pdfView.getLayoutParams();
+        if (null == lp) {
+            lp = new RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            pdfView.setLayoutParams(lp);
+        }
 
         return holder;
     }
@@ -75,11 +78,9 @@ public class MuPDFReflowRecyclerViewAdapter extends RecyclerView.Adapter {
         Paint mPaint;
         float mTextSize = 15;
         float mScale = 1.0f;
-        MuPDFReflowRecyclerViewAdapter mAdapter;
 
-        public PDFTextView(Context context, MuPDFReflowRecyclerViewAdapter adapter) {
+        public PDFTextView(Context context) {
             super(context);
-            mAdapter = adapter;
             mPaint = getPaint();
             mTextSize = mPaint.getTextSize();
             mPaint.setTextSize(mTextSize * 1.2f);
@@ -88,7 +89,6 @@ public class MuPDFReflowRecyclerViewAdapter extends RecyclerView.Adapter {
             setLineSpacing(0, 1.2f);
             setTextColor(context.getResources().getColor(R.color.text_reflow_color));
             setBackgroundColor(context.getResources().getColor(R.color.text_reflow_bg_color));
-            setWidth(Util.getScreenWidthPixelWithOrientation(context));
             setTextIsSelectable(true);
         }
 
