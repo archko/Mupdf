@@ -31,14 +31,18 @@ import com.artifex.mupdfdemo.MuPDFReflowRecyclerViewAdapter
 import cx.hell.android.pdfviewpro.Options
 import org.jetbrains.anko.toast
 import org.vudroid.core.events.CurrentPageListener
+import org.vudroid.core.events.ZoomListener
 import org.vudroid.core.models.CurrentPageModel
+import org.vudroid.core.models.ZoomModel
 import org.vudroid.core.views.PageSeekBarControls
+import org.vudroid.core.views.PageViewZoomControls
 import java.util.*
 
 /**
  * @author: archko 2016/5/9 :12:43
  */
-class MuPDFRecyclerActivity : FragmentActivity() {
+class MuPDFRecyclerActivity : FragmentActivity(), ZoomListener {
+
     private var mPath: String? = null
     private var pos = 0
 
@@ -47,7 +51,7 @@ class MuPDFRecyclerActivity : FragmentActivity() {
     private var pageNumberToast: Toast? = null
 
     private var mPageModel: CurrentPageModel? = null
-    lateinit var mPageSeekBarControls: PageSeekBarControls
+    private var mPageSeekBarControls: PageSeekBarControls? = null
     private var mButtonsView: View? = null
     private var mReflowButton: ImageButton? = null
     private var mOutlineButton: ImageButton? = null
@@ -60,6 +64,8 @@ class MuPDFRecyclerActivity : FragmentActivity() {
     private var outline: Array<Outline>? = null
     private var items: ArrayList<com.artifex.mupdf.viewer.OutlineActivity.Item>? = null
     private val mPageSizes = SparseArray<PointF>()
+    private var mControls: PageViewZoomControls? = null
+    private var zoomModel: ZoomModel? = null
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -209,6 +215,7 @@ class MuPDFRecyclerActivity : FragmentActivity() {
     }
 
     private fun initView() {
+        window.requestFeature(Window.FEATURE_NO_TITLE)
         mRecyclerView = RecyclerView(this)
         mRecyclerView.layoutManager = LinearLayoutManager(this)
         mRecyclerView.setHasFixedSize(true)
@@ -223,7 +230,10 @@ class MuPDFRecyclerActivity : FragmentActivity() {
         setContentView(layout)
 
         initTouchParams()
-        mRecyclerView.setOnTouchListener { v, event -> gestureDetector!!.onTouchEvent(event) }
+        mRecyclerView.setOnTouchListener { v, event ->
+            //mScaleGestureDetector?.onTouchEvent(event)
+            gestureDetector!!.onTouchEvent(event)
+        }
 
         mPageModel = CurrentPageModel()
         mPageModel!!.addEventListener(CurrentPageListener { pageIndex ->
@@ -234,17 +244,22 @@ class MuPDFRecyclerActivity : FragmentActivity() {
         })
         mPageSeekBarControls = createSeekControls(mPageModel!!)
 
-        var lp = RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-        lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM)
-
-        layout.addView(mPageSeekBarControls, lp)
-        mPageSeekBarControls.hide()
-
         makeButtonsView()
-        lp = RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        var lp = RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
         lp.addRule(RelativeLayout.ALIGN_PARENT_TOP)
         layout.addView(mButtonsView, lp)
         mButtonsView!!.visibility = View.GONE
+
+        lp = RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        lp.addRule(RelativeLayout.BELOW, R.id.switcher)
+        layout.addView(mPageSeekBarControls, lp)
+
+        zoomModel = ZoomModel()
+        mControls = createZoomControls(zoomModel!!)
+        zoomModel?.addEventListener(this)
+        lp = RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM)
+        layout.addView(mControls, lp)
     }
 
     private fun makeButtonsView() {
@@ -268,6 +283,13 @@ class MuPDFRecyclerActivity : FragmentActivity() {
         if (pos > 0) {
             mRecyclerView.scrollToPosition(pos)
         }
+    }
+
+    private fun createZoomControls(zoomModel: ZoomModel): PageViewZoomControls {
+        val controls = PageViewZoomControls(this, zoomModel)
+        controls.gravity = Gravity.RIGHT or Gravity.BOTTOM
+        zoomModel.addEventListener(controls)
+        return controls
     }
 
     internal fun initTouchParams() {
@@ -335,9 +357,10 @@ class MuPDFRecyclerActivity : FragmentActivity() {
             }
 
             override fun onDoubleTap(e: MotionEvent): Boolean {
-                mPageModel!!.setCurrentPage(pos)
-                mPageModel!!.pageCount = mCore!!.countPages()
-                mPageModel!!.toggleSeekControls()
+                mPageModel?.setCurrentPage(pos)
+                mPageModel?.pageCount = mCore!!.countPages()
+                mPageModel?.toggleSeekControls()
+                zoomModel?.toggleZoomControls()
                 if (mButtonsView!!.visibility == View.GONE) {
                     mButtonsView!!.visibility = View.VISIBLE
                 } else {
@@ -350,6 +373,14 @@ class MuPDFRecyclerActivity : FragmentActivity() {
                 return false
             }
         })
+        //mScaleGestureDetector = ScaleGestureDetector(this, this)
+    }
+
+    override fun zoomChanged(newZoom: Float, oldZoom: Float) {
+        mRecyclerView.adapter.notifyDataSetChanged()
+    }
+
+    override fun commitZoom() {
     }
 
     private fun createSeekControls(pageModel: CurrentPageModel): PageSeekBarControls {
@@ -390,6 +421,8 @@ class MuPDFRecyclerActivity : FragmentActivity() {
         } else {
             window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
         }
+        mPageSeekBarControls?.hide()
+        mControls?.hide()
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
@@ -413,18 +446,14 @@ class MuPDFRecyclerActivity : FragmentActivity() {
     private inner class BaseRecyclerAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-            var holder: PdfHolder? = null
             val view = APDFView(parent.context, mCore, Point(parent.width, parent.height))
-            var lp: ViewGroup.LayoutParams? = view.layoutParams
-            var size: PointF? = null
+            var lp: RecyclerView.LayoutParams? = view.layoutParams as RecyclerView.LayoutParams?
             var width: Int = ViewGroup.LayoutParams.MATCH_PARENT
             var height: Int = ViewGroup.LayoutParams.MATCH_PARENT
+            var pageSize: PointF? = null
             if (mPageSizes.size() > 0) {
-                size = mPageSizes.get(0)
-                val xr = parent.width / size.x
-                val yr = parent.height / size.y
-                var mSourceScale = Math.max(xr, yr)
-                val newSize = Point((size.x * mSourceScale).toInt(), (size.y * mSourceScale).toInt())
+                pageSize = mPageSizes.get(0)
+                val newSize: Point = view.caculateSize(pageSize, zoomModel!!.zoom)
                 width = newSize.x
                 height = newSize.y
             }
@@ -435,7 +464,7 @@ class MuPDFRecyclerActivity : FragmentActivity() {
                 lp.width = width;
                 lp.height = height;
             }
-            holder = PdfHolder(view)
+            val holder = PdfHolder(view)
             return holder
         }
 
@@ -460,9 +489,9 @@ class MuPDFRecyclerActivity : FragmentActivity() {
         inner class PdfHolder(internal var view: APDFView) : RecyclerView.ViewHolder(view) {
             fun onBind(position: Int) {
                 val pageSize = mPageSizes.get(position)
-                view.setPage(position, pageSize)
+                view.setPage(position, pageSize, zoomModel!!.zoom)
 
-                println("onBindViewHolder:$pos, view:${view}")
+                //println("onBindViewHolder:$pos, view:${view}")
             }
         }
 

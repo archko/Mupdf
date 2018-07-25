@@ -7,6 +7,7 @@ import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.PointF;
 import android.text.TextPaint;
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -30,7 +31,7 @@ public class APDFView extends RelativeLayout {
     private final Document mCore;
 
     private int mPageNumber;
-    private Point mParentSize;
+    private Point mViewSize;    //size of visible view
     private Point mSize;   // Size of page at minimum zoom
     private float mSourceScale = 1f;
 
@@ -49,11 +50,11 @@ public class APDFView extends RelativeLayout {
         return paint;
     }
 
-    public APDFView(Context c, Document core, Point parentSize) {
+    public APDFView(Context c, Document core, Point viewSize) {
         super(c);
         mContext = c;
         mCore = core;
-        mParentSize = parentSize;
+        mViewSize = viewSize;
         updateView();
     }
 
@@ -96,19 +97,25 @@ public class APDFView extends RelativeLayout {
         mBusyIndicator.setVisibility(GONE);
     }
 
-    public void setPage(int page, PointF size) {
+    public Point caculateSize(PointF pageSize, float zoom) {
+        float xr = mViewSize.x * zoom / pageSize.x;
+        float yr = mViewSize.y * zoom / pageSize.y;
+        mSourceScale = Math.max(xr, yr);
+        Point newSize = new Point((int) (pageSize.x * mSourceScale), (int) (pageSize.y * mSourceScale));
+        mSize = newSize;
+        return mSize;
+    }
+
+    public void setPage(int page, PointF pageSize, float zoom) {
         mPageNumber = page;
 
         // Calculate scaled size that fits within the screen limits
         // This is the size at minimum zoom
-        if (mSize == null || mSize.x != size.x || mSize.y != size.y) {
-            float xr = mParentSize.x / size.x;
-            float yr = mParentSize.y / size.y;
-            mSourceScale = Math.max(xr, yr);
-            Point newSize = new Point((int) (size.x * mSourceScale), (int) (size.y * mSourceScale));
-            mSize = newSize;
+        if (mSize == null || mSize.x != pageSize.x || mSize.y != pageSize.y) {
+            caculateSize(pageSize, zoom);
         }
-        //Log.d("view", "mParentSize:" + mParentSize + " xr:" + xr + " yr:" + yr + " mss:" + mSourceScale + " mSize:" + mSize);
+        int xOrigin = (int) (mSize.x * (zoom - 1f) / 2);
+        Log.d("view", "view:" + mViewSize + " patchX:" + xOrigin + " mss:" + mSourceScale + " mSize:" + mSize + " zoom:" + zoom);
 
         if (null != mBitmap) {
             //Log.d("view", "mBitmap:" + mBitmap + " cp:" + mPageNumber);
@@ -122,7 +129,7 @@ public class APDFView extends RelativeLayout {
         }
 
         // Render the page in the background
-        mDrawTask = new CancellableAsyncTask<Void, Bitmap>(getDrawPageTask(mSize.x, mSize.y, 0, 0, mSize.x, mSize.y)) {
+        mDrawTask = new CancellableAsyncTask<Void, Bitmap>(getDrawPageTask(mSize.x, mSize.y, xOrigin, 0)) {
 
             @Override
             public void onPreExecute() {
@@ -143,8 +150,7 @@ public class APDFView extends RelativeLayout {
     }
 
     protected CancellableTaskDefinition<Void, Bitmap> getDrawPageTask(final int sizeX, final int sizeY,
-                                                                      final int patchX, final int patchY,
-                                                                      final int patchWidth, final int patchHeight) {
+                                                                      final int xOrigin, final int yOrigin) {
         return new MuPDFCancellableTaskDefinition<Void, Bitmap>() {
             @Override
             public Bitmap doInBackground(Cookie cookie, Void... params) {
@@ -153,7 +159,7 @@ public class APDFView extends RelativeLayout {
 
                 Page page = mCore.loadPage(mPageNumber);
                 com.artifex.mupdf.fitz.Matrix ctm = new com.artifex.mupdf.fitz.Matrix(mSourceScale);
-                AndroidDrawDevice dev = new AndroidDrawDevice(bitmap, 0, 0, patchX, patchY, sizeX, sizeY);
+                AndroidDrawDevice dev = new AndroidDrawDevice(bitmap, xOrigin, yOrigin, 0, 0, sizeX, sizeY);
                 page.run(dev, ctm, (Cookie) null);
                 dev.close();
                 dev.destroy();
