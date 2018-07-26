@@ -2,11 +2,9 @@ package cn.archko.pdf;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.PointF;
-import android.text.TextPaint;
+import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -14,13 +12,11 @@ import android.widget.RelativeLayout;
 
 import com.artifex.mupdf.fitz.Cookie;
 import com.artifex.mupdf.fitz.Document;
+import com.artifex.mupdf.fitz.Matrix;
 import com.artifex.mupdf.fitz.Page;
 import com.artifex.mupdf.fitz.android.AndroidDrawDevice;
-import com.artifex.mupdf.viewer.CancellableAsyncTask;
-import com.artifex.mupdf.viewer.CancellableTaskDefinition;
-import com.artifex.mupdf.viewer.MuPDFCancellableTaskDefinition;
 
-import org.vudroid.core.BitmapPool;
+import cn.archko.pdf.utils.Util;
 
 /**
  * @author: archko 2018/7/25 :12:43
@@ -37,25 +33,17 @@ public class APDFView extends RelativeLayout {
 
     private ImageView mEntireView; // Image rendered at minimum zoom
     private Bitmap mBitmap;
-    private CancellableAsyncTask<Void, Bitmap> mDrawTask;
+    private AsyncTask<Void, Void, Bitmap> mDrawTask;
     private ProgressBar mBusyIndicator;
-    private final TextPaint textPaint = textPaint();
+    private AKBitmapManager mBitmapManager;
 
-    private TextPaint textPaint() {
-        final TextPaint paint = new TextPaint();
-        paint.setColor(Color.BLACK);
-        paint.setAntiAlias(true);
-        paint.setTextSize(32);
-        paint.setTextAlign(Paint.Align.CENTER);
-        return paint;
-    }
-
-    public APDFView(Context c, Document core, Point viewSize) {
+    public APDFView(Context c, Document core, Point viewSize, AKBitmapManager bitmapManager) {
         super(c);
         mContext = c;
         mCore = core;
         mViewSize = viewSize;
         updateView();
+        mBitmapManager = bitmapManager;
     }
 
     public void updateView() {
@@ -75,21 +63,13 @@ public class APDFView extends RelativeLayout {
         return mPageNumber;
     }
 
-    /*@Override
-    protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
-
-        canvas.drawText("Page " + (mPageNumber + 1), getMeasuredWidth() / 2, getHeight() / 2, textPaint);
-    }*/
-
     public void releaseResources() {
         if (null != mBitmap) {
-            BitmapPool.getInstance().release(mBitmap);
             mBitmap = null;
         }
-        // Cancel pending render task
+
         if (mDrawTask != null) {
-            mDrawTask.cancel();
+            mDrawTask.cancel(true);
             mDrawTask = null;
         }
 
@@ -108,6 +88,7 @@ public class APDFView extends RelativeLayout {
 
     public void setPage(int page, PointF pageSize, float zoom) {
         mPageNumber = page;
+        zoom = 1f;
 
         // Calculate scaled size that fits within the screen limits
         // This is the size at minimum zoom
@@ -117,56 +98,59 @@ public class APDFView extends RelativeLayout {
         int xOrigin = (int) (mSize.x * (zoom - 1f) / 2);
         Log.d("view", "view:" + mViewSize + " patchX:" + xOrigin + " mss:" + mSourceScale + " mSize:" + mSize + " zoom:" + zoom);
 
+        if (null == mBitmap) {
+            mBitmap = mBitmapManager.getBitmap(mPageNumber);
+        }
         if (null != mBitmap) {
-            //Log.d("view", "mBitmap:" + mBitmap + " cp:" + mPageNumber);
+            mEntireView.setImageBitmap(mBitmap);
+            android.graphics.Matrix matrix = new android.graphics.Matrix();
+            matrix.setTranslate(-xOrigin / 2, 0);
+            matrix.postScale(((float) mSize.x) / mBitmap.getWidth(), ((float) mSize.y) / mBitmap.getHeight());
+            mEntireView.setImageMatrix(matrix);
             return;
         }
 
-        // Cancel pending render task
         if (mDrawTask != null) {
-            mDrawTask.cancel();
+            mDrawTask.cancel(true);
             mDrawTask = null;
         }
 
-        // Render the page in the background
-        mDrawTask = new CancellableAsyncTask<Void, Bitmap>(getDrawPageTask(mSize.x, mSize.y, xOrigin, 0)) {
+        mDrawTask = getDrawPageTask(mSize.x, mSize.y, xOrigin, 0);
+        //mDrawTask.execute();
+        Util.execute(false, mDrawTask);
+    }
+
+    protected AsyncTask<Void, Void, Bitmap> getDrawPageTask(final int sizeX, final int sizeY,
+                                                            final int xOrigin, final int yOrigin) {
+        return new AsyncTask<Void, Void, Bitmap>() {
 
             @Override
             public void onPreExecute() {
                 mBusyIndicator.setVisibility(VISIBLE);
-                //setBackgroundColor(BACKGROUND_COLOR);
-                //mEntireView.setImageBitmap(null);
             }
 
             @Override
-            public void onPostExecute(Bitmap bitmap) {
-                mBusyIndicator.setVisibility(GONE);
-                mBitmap = bitmap;
-                mEntireView.setImageBitmap(mBitmap);
-            }
-        };
-
-        mDrawTask.execute();
-    }
-
-    protected CancellableTaskDefinition<Void, Bitmap> getDrawPageTask(final int sizeX, final int sizeY,
-                                                                      final int xOrigin, final int yOrigin) {
-        return new MuPDFCancellableTaskDefinition<Void, Bitmap>() {
-            @Override
-            public Bitmap doInBackground(Cookie cookie, Void... params) {
-                Bitmap bitmap = BitmapPool.getInstance().acquire(sizeX, sizeY);
-                //mCore.drawPage(bitmap, mPageNumber, sizeX, sizeY, patchX, patchY, patchWidth, patchHeight, cookie);
+            protected Bitmap doInBackground(Void... params) {
+                Bitmap bitmap = Bitmap.createBitmap(sizeX, sizeY, Bitmap.Config.ARGB_8888);
 
                 Page page = mCore.loadPage(mPageNumber);
-                com.artifex.mupdf.fitz.Matrix ctm = new com.artifex.mupdf.fitz.Matrix(mSourceScale);
+                Matrix ctm = new Matrix(mSourceScale);
                 AndroidDrawDevice dev = new AndroidDrawDevice(bitmap, xOrigin, yOrigin, 0, 0, sizeX, sizeY);
                 page.run(dev, ctm, (Cookie) null);
                 dev.close();
                 dev.destroy();
                 return bitmap;
             }
-        };
 
+            @Override
+            protected void onPostExecute(Bitmap bitmap) {
+                mBusyIndicator.setVisibility(GONE);
+                mBitmap = bitmap;
+                mBitmapManager.setBitmap(mPageNumber, bitmap);
+                mEntireView.setImageBitmap(mBitmap);
+            }
+
+        };
     }
 
 }
