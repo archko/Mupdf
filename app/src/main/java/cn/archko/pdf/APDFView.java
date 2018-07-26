@@ -1,5 +1,6 @@
 package cn.archko.pdf;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Point;
@@ -15,6 +16,8 @@ import com.artifex.mupdf.fitz.Document;
 import com.artifex.mupdf.fitz.Matrix;
 import com.artifex.mupdf.fitz.Page;
 import com.artifex.mupdf.fitz.android.AndroidDrawDevice;
+
+import org.vudroid.core.BitmapPool;
 
 import cn.archko.pdf.utils.Util;
 
@@ -35,15 +38,15 @@ public class APDFView extends RelativeLayout {
     private Bitmap mBitmap;
     private AsyncTask<Void, Void, Bitmap> mDrawTask;
     private ProgressBar mBusyIndicator;
-    private AKBitmapManager mBitmapManager;
+    //private AKBitmapManager mBitmapManager;
 
-    public APDFView(Context c, Document core, Point viewSize, AKBitmapManager bitmapManager) {
+    public APDFView(Context c, Document core, Point viewSize/*, AKBitmapManager bitmapManager*/) {
         super(c);
         mContext = c;
         mCore = core;
         mViewSize = viewSize;
         updateView();
-        mBitmapManager = bitmapManager;
+        //mBitmapManager = bitmapManager;
     }
 
     public void updateView() {
@@ -65,6 +68,7 @@ public class APDFView extends RelativeLayout {
 
     public void releaseResources() {
         if (null != mBitmap) {
+            BitmapPool.getInstance().release(mBitmap);
             mBitmap = null;
         }
 
@@ -98,15 +102,15 @@ public class APDFView extends RelativeLayout {
         int xOrigin = (int) (mSize.x * (zoom - 1f) / 2);
         Log.d("view", "view:" + mViewSize + " patchX:" + xOrigin + " mss:" + mSourceScale + " mSize:" + mSize + " zoom:" + zoom);
 
-        if (null == mBitmap) {
+        /*if (null == mBitmap) {
             mBitmap = mBitmapManager.getBitmap(mPageNumber);
-        }
+        }*/
         if (null != mBitmap) {
             mEntireView.setImageBitmap(mBitmap);
-            android.graphics.Matrix matrix = new android.graphics.Matrix();
-            matrix.setTranslate(-xOrigin / 2, 0);
-            matrix.postScale(((float) mSize.x) / mBitmap.getWidth(), ((float) mSize.y) / mBitmap.getHeight());
-            mEntireView.setImageMatrix(matrix);
+            //android.graphics.Matrix matrix = new android.graphics.Matrix();
+            //matrix.setTranslate(-xOrigin / 2, 0);
+            //matrix.postScale(((float) mSize.x) / mBitmap.getWidth(), ((float) mSize.y) / mBitmap.getHeight());
+            //mEntireView.setImageMatrix(matrix);
             return;
         }
 
@@ -120,6 +124,7 @@ public class APDFView extends RelativeLayout {
         Util.execute(false, mDrawTask);
     }
 
+    @SuppressLint("StaticFieldLeak")
     protected AsyncTask<Void, Void, Bitmap> getDrawPageTask(final int sizeX, final int sizeY,
                                                             final int xOrigin, final int yOrigin) {
         return new AsyncTask<Void, Void, Bitmap>() {
@@ -131,7 +136,7 @@ public class APDFView extends RelativeLayout {
 
             @Override
             protected Bitmap doInBackground(Void... params) {
-                Bitmap bitmap = Bitmap.createBitmap(sizeX, sizeY, Bitmap.Config.ARGB_8888);
+                Bitmap bitmap = BitmapPool.getInstance().acquire(sizeX,sizeY);//Bitmap.createBitmap(sizeX, sizeY, Bitmap.Config.ARGB_8888);
 
                 Page page = mCore.loadPage(mPageNumber);
                 Matrix ctm = new Matrix(mSourceScale);
@@ -146,7 +151,7 @@ public class APDFView extends RelativeLayout {
             protected void onPostExecute(Bitmap bitmap) {
                 mBusyIndicator.setVisibility(GONE);
                 mBitmap = bitmap;
-                mBitmapManager.setBitmap(mPageNumber, bitmap);
+                //mBitmapManager.setBitmap(mPageNumber, bitmap);
                 mEntireView.setImageBitmap(mBitmap);
             }
 
