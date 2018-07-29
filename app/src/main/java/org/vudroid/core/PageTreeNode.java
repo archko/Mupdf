@@ -11,7 +11,7 @@ import java.lang.ref.SoftReference;
 import java.util.Arrays;
 
 class PageTreeNode {
-    private static final int SLICE_SIZE = 65535 * 4;
+    private static final int SLICE_SIZE =256*256*8;
     private Bitmap bitmap;
     private SoftReference<Bitmap> bitmapWeakReference;
     private boolean decodingNow;

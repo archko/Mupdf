@@ -38,15 +38,15 @@ public class APDFView extends RelativeLayout {
     private Bitmap mBitmap;
     private AsyncTask<Void, Void, Bitmap> mDrawTask;
     private ProgressBar mBusyIndicator;
-    //private AKBitmapManager mBitmapManager;
+    private AKBitmapManager mBitmapManager;
 
-    public APDFView(Context c, Document core, Point viewSize/*, AKBitmapManager bitmapManager*/) {
+    public APDFView(Context c, Document core, Point viewSize, AKBitmapManager bitmapManager) {
         super(c);
         mContext = c;
         mCore = core;
         mViewSize = viewSize;
         updateView();
-        //mBitmapManager = bitmapManager;
+        mBitmapManager = bitmapManager;
     }
 
     public void updateView() {
@@ -68,7 +68,7 @@ public class APDFView extends RelativeLayout {
 
     public void releaseResources() {
         if (null != mBitmap) {
-            BitmapPool.getInstance().release(mBitmap);
+            //BitmapPool.getInstance().release(mBitmap);
             mBitmap = null;
         }
 
@@ -82,9 +82,9 @@ public class APDFView extends RelativeLayout {
     }
 
     public Point caculateSize(PointF pageSize, float zoom) {
-        float xr = mViewSize.x * zoom / pageSize.x;
-        float yr = mViewSize.y * zoom / pageSize.y;
-        mSourceScale = Math.max(xr, yr);
+        float xr = mViewSize.x / pageSize.x;
+        float yr = mViewSize.y / pageSize.y;
+        mSourceScale = Math.max(xr, yr) * zoom;
         Point newSize = new Point((int) (pageSize.x * mSourceScale), (int) (pageSize.y * mSourceScale));
         mSize = newSize;
         return mSize;
@@ -92,7 +92,7 @@ public class APDFView extends RelativeLayout {
 
     public void setPage(int page, PointF pageSize, float zoom) {
         mPageNumber = page;
-        zoom = 1f;
+        //zoom = 1f;
 
         // Calculate scaled size that fits within the screen limits
         // This is the size at minimum zoom
@@ -102,15 +102,15 @@ public class APDFView extends RelativeLayout {
         int xOrigin = (int) (mSize.x * (zoom - 1f) / 2);
         Log.d("view", "view:" + mViewSize + " patchX:" + xOrigin + " mss:" + mSourceScale + " mSize:" + mSize + " zoom:" + zoom);
 
-        /*if (null == mBitmap) {
+        if (null == mBitmap) {
             mBitmap = mBitmapManager.getBitmap(mPageNumber);
-        }*/
+        }
         if (null != mBitmap) {
             mEntireView.setImageBitmap(mBitmap);
-            //android.graphics.Matrix matrix = new android.graphics.Matrix();
-            //matrix.setTranslate(-xOrigin / 2, 0);
-            //matrix.postScale(((float) mSize.x) / mBitmap.getWidth(), ((float) mSize.y) / mBitmap.getHeight());
-            //mEntireView.setImageMatrix(matrix);
+            android.graphics.Matrix matrix = new android.graphics.Matrix();
+            matrix.setTranslate(-xOrigin / 2, 0);
+            matrix.postScale(((float) mSize.x) / mBitmap.getWidth(), ((float) mSize.y) / mBitmap.getHeight());
+            mEntireView.setImageMatrix(matrix);
             return;
         }
 
@@ -151,7 +151,7 @@ public class APDFView extends RelativeLayout {
             protected void onPostExecute(Bitmap bitmap) {
                 mBusyIndicator.setVisibility(GONE);
                 mBitmap = bitmap;
-                //mBitmapManager.setBitmap(mPageNumber, bitmap);
+                mBitmapManager.setBitmap(mPageNumber, bitmap);
                 mEntireView.setImageBitmap(mBitmap);
             }
 

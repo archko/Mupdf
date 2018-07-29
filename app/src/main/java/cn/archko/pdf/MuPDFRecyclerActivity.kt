@@ -66,7 +66,7 @@ class MuPDFRecyclerActivity : FragmentActivity(), ZoomListener {
     private val mPageSizes = SparseArray<PointF>()
     private var mControls: PageViewZoomControls? = null
     private var zoomModel: ZoomModel? = null
-    //private var bitmapManager: AKBitmapManager? = null
+    private var bitmapManager: AKBitmapManager? = null
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -96,7 +96,7 @@ class MuPDFRecyclerActivity : FragmentActivity(), ZoomListener {
 
     private fun doLoadDoc() {
         try {
-            //bitmapManager = AKBitmapManager()
+            bitmapManager = AKBitmapManager()
             pos = pdfBookmarkManager?.restoreBookmark(mCore!!.countPages())!!
 
             mRecyclerView.adapter = BaseRecyclerAdapter()
@@ -448,7 +448,7 @@ class MuPDFRecyclerActivity : FragmentActivity(), ZoomListener {
     private inner class BaseRecyclerAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-            val view = APDFView(parent.context, mCore, Point(parent.width, parent.height)/*, bitmapManager*/)
+            val view = APDFView(parent.context, mCore, Point(parent.width, parent.height), bitmapManager)
             var lp: RecyclerView.LayoutParams? = view.layoutParams as RecyclerView.LayoutParams?
             var width: Int = ViewGroup.LayoutParams.MATCH_PARENT
             var height: Int = ViewGroup.LayoutParams.MATCH_PARENT
