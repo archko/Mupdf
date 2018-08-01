@@ -16,4 +16,6 @@ public interface PageViewPresenter {
     void back();
 
     String getTitle();
+
+    void reflow();
 }

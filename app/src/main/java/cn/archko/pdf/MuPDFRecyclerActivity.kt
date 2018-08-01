@@ -20,9 +20,7 @@ import android.text.TextUtils
 import android.util.Log
 import android.util.SparseArray
 import android.view.*
-import android.widget.ImageButton
 import android.widget.RelativeLayout
-import android.widget.TextView
 import android.widget.Toast
 import cn.archko.pdf.utils.Util
 import com.artifex.mupdf.fitz.Document
@@ -31,10 +29,11 @@ import com.artifex.mupdfdemo.MuPDFReflowRecyclerViewAdapter
 import cx.hell.android.pdfviewpro.Options
 import org.jetbrains.anko.toast
 import org.vudroid.core.events.CurrentPageListener
+import org.vudroid.core.events.PageViewPresenter
 import org.vudroid.core.events.ZoomListener
 import org.vudroid.core.models.CurrentPageModel
 import org.vudroid.core.models.ZoomModel
-import org.vudroid.core.views.PageSeekBarControls
+import org.vudroid.core.views.APageSeekBarControls
 import org.vudroid.core.views.PageViewZoomControls
 import java.util.*
 
@@ -51,11 +50,7 @@ class MuPDFRecyclerActivity : FragmentActivity(), ZoomListener {
     private var pageNumberToast: Toast? = null
 
     private var mPageModel: CurrentPageModel? = null
-    private var mPageSeekBarControls: PageSeekBarControls? = null
-    private var mButtonsView: View? = null
-    private var mReflowButton: ImageButton? = null
-    private var mOutlineButton: ImageButton? = null
-    private var mTitle: TextView? = null
+    private var mPageSeekBarControls: APageSeekBarControls? = null
     private var mReflow = false
     private val OUTLINE_REQUEST = 0
     private var pdfBookmarkManager: PDFBookmarkManager? = null
@@ -75,7 +70,6 @@ class MuPDFRecyclerActivity : FragmentActivity(), ZoomListener {
 
         if (null != savedInstanceState) {
             mPath = savedInstanceState.getString("path", null)
-            pos = savedInstanceState.getInt("pos", 0)
         }
 
         parseIntent()
@@ -103,14 +97,7 @@ class MuPDFRecyclerActivity : FragmentActivity(), ZoomListener {
             if (pos > 0) {
                 mRecyclerView.scrollToPosition(pos)
             }
-            mTitle!!.text = mPath
-            if (hasOutline()) {
-                mOutlineButton!!.setOnClickListener {
-                    openOutline(pos)
-                }
-            } else {
-                mOutlineButton!!.visibility = View.GONE
-            }
+            mPageSeekBarControls?.setReflow(hasOutline())
         } catch (e: Exception) {
             e.printStackTrace()
             finish()
@@ -200,11 +187,11 @@ class MuPDFRecyclerActivity : FragmentActivity(), ZoomListener {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putString("path", mPath)
-        outState.putInt("pos", pos)
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
+        mPath = savedInstanceState.getString("path", null)
     }
 
     override fun onDestroy() {
@@ -246,15 +233,10 @@ class MuPDFRecyclerActivity : FragmentActivity(), ZoomListener {
         })
         mPageSeekBarControls = createSeekControls(mPageModel!!)
 
-        makeButtonsView()
         var lp = RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
         lp.addRule(RelativeLayout.ALIGN_PARENT_TOP)
-        layout.addView(mButtonsView, lp)
-        mButtonsView!!.visibility = View.GONE
-
-        lp = RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-        lp.addRule(RelativeLayout.BELOW, R.id.switcher)
         layout.addView(mPageSeekBarControls, lp)
+        mPageSeekBarControls?.hide()
 
         zoomModel = ZoomModel()
         mControls = createZoomControls(zoomModel!!)
@@ -262,15 +244,6 @@ class MuPDFRecyclerActivity : FragmentActivity(), ZoomListener {
         lp = RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
         lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM)
         layout.addView(mControls, lp)
-    }
-
-    private fun makeButtonsView() {
-        mButtonsView = layoutInflater.inflate(R.layout.view_buttons, null)
-        mReflowButton = mButtonsView!!.findViewById<ImageButton>(R.id.reflowButton) as ImageButton
-        mOutlineButton = mButtonsView!!.findViewById<ImageButton>(R.id.outlineButton) as ImageButton
-        mTitle = mButtonsView!!.findViewById<TextView>(R.id.title) as TextView
-
-        mReflowButton!!.setOnClickListener { toggleReflow() }
     }
 
     private fun toggleReflow() {
@@ -281,7 +254,7 @@ class MuPDFRecyclerActivity : FragmentActivity(), ZoomListener {
     private fun reflowModeSet(reflow: Boolean) {
         mReflow = reflow
         mRecyclerView.adapter = if (mReflow) MuPDFReflowRecyclerViewAdapter(this, mCore) else BaseRecyclerAdapter()
-        mReflowButton!!.setColorFilter(if (mReflow) Color.argb(0xFF, 172, 114, 37) else Color.argb(0xFF, 255, 255, 255))
+        mPageSeekBarControls?.reflowButton!!.setColorFilter(if (mReflow) Color.argb(0xFF, 172, 114, 37) else Color.argb(0xFF, 255, 255, 255))
         if (pos > 0) {
             mRecyclerView.scrollToPosition(pos)
         }
@@ -361,13 +334,8 @@ class MuPDFRecyclerActivity : FragmentActivity(), ZoomListener {
             override fun onDoubleTap(e: MotionEvent): Boolean {
                 mPageModel?.setCurrentPage(pos)
                 mPageModel?.pageCount = mCore!!.countPages()
-                mPageModel?.toggleSeekControls()
+                mPageSeekBarControls?.toggleSeekControls()
                 zoomModel?.toggleZoomControls()
-                if (mButtonsView!!.visibility == View.GONE) {
-                    mButtonsView!!.visibility = View.VISIBLE
-                } else {
-                    mButtonsView!!.visibility = View.GONE
-                }
                 return true
             }
 
@@ -385,11 +353,38 @@ class MuPDFRecyclerActivity : FragmentActivity(), ZoomListener {
     override fun commitZoom() {
     }
 
-    private fun createSeekControls(pageModel: CurrentPageModel): PageSeekBarControls {
-        val controls = PageSeekBarControls(this, pageModel)
-        controls.gravity = Gravity.CENTER_HORIZONTAL or Gravity.TOP
-        pageModel.addEventListener(controls)
-        return controls
+    private fun createSeekControls(pageModel: CurrentPageModel): APageSeekBarControls {
+        mPageSeekBarControls = APageSeekBarControls(this, object : PageViewPresenter {
+            override fun reflow() {
+                toggleReflow()
+            }
+
+            override fun getPageCount(): Int {
+                return pageModel.getPageCount()
+            }
+
+            override fun getCurrentPageIndex(): Int {
+                return pageModel.currentPageIndex
+            }
+
+            override fun goToPageIndex(page: Int) {
+                mRecyclerView.layoutManager.scrollToPosition(page)
+            }
+
+            override fun showOutline() {
+                openOutline(pos)
+            }
+
+            override fun back() {
+                this@MuPDFRecyclerActivity.finish()
+            }
+
+            override fun getTitle(): String {
+                return mPath!!
+            }
+        })
+        pageModel.addEventListener(mPageSeekBarControls)
+        return mPageSeekBarControls!!
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -397,6 +392,7 @@ class MuPDFRecyclerActivity : FragmentActivity(), ZoomListener {
             OUTLINE_REQUEST -> {
                 if (resultCode >= 0) {
                     pos = resultCode - RESULT_FIRST_USER
+                    mPageSeekBarControls?.hide()
                 }
                 mRecyclerView.layoutManager.scrollToPosition(resultCode)
             }

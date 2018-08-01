@@ -35,13 +35,14 @@
             android:textSize="16sp"
             android:textColor="@android:color/white"/>
 
-        <!--<ImageButton
+        <ImageButton
             android:id="@+id/reflowButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:contentDescription="@string/toggle_reflow_mode"
             android:background="@drawable/button"
-            android:src="@drawable/ic_reflow"/>-->
+            android:visibility="gone"
+            android:src="@drawable/ic_reflow"/>
 
         <ImageButton
             android:id="@+id/outlineButton"

@@ -146,6 +146,11 @@ public abstract class BaseViewerActivity extends Activity implements DecodingPro
                 String filePath = Uri.decode(uri.getEncodedPath());
                 return filePath;
             }
+
+            @Override
+            public void reflow() {
+
+            }
         });
         documentView.setAPageSeekBarControls(mPageSeekBarControls);
         frameLayout.addView(mPageSeekBarControls);

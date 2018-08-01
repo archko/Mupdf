@@ -28,6 +28,7 @@ public class APageSeekBarControls extends LinearLayout implements View.OnClickLi
     protected TextView mPageNumberView;
     protected Runnable gotoPageRunnable = null;
 
+    private ImageButton mReflowButton;
     private ImageButton mOutlineButton;
     private TextView mTitle;
     private ImageButton mBackButton;
@@ -42,14 +43,16 @@ public class APageSeekBarControls extends LinearLayout implements View.OnClickLi
         setOrientation(LinearLayout.VERTICAL);
         LayoutInflater.from(context).inflate(R.layout.seek_bar_controls, this);
 
-        mPageSlider = (SeekBar) findViewById(R.id.seek_bar);
+        mPageSlider = findViewById(R.id.seek_bar);
         //mPageSlider.setId(10000);
-        mPageNumberView = (TextView) findViewById(R.id.page_num);
-        mOutlineButton = (ImageButton) findViewById(R.id.outlineButton);
-        mTitle = (TextView) findViewById(R.id.title);
-        mBackButton = (ImageButton) findViewById(R.id.back_button);
+        mPageNumberView = findViewById(R.id.page_num);
+        mReflowButton = findViewById(R.id.reflowButton);
+        mOutlineButton = findViewById(R.id.outlineButton);
+        mTitle = findViewById(R.id.title);
+        mBackButton = findViewById(R.id.back_button);
         mBackButton.setColorFilter(Color.argb(0xFF, 255, 255, 255));
 
+        mReflowButton.setOnClickListener(this);
         mOutlineButton.setOnClickListener(this);
         mBackButton.setOnClickListener(this);
 
@@ -64,7 +67,7 @@ public class APageSeekBarControls extends LinearLayout implements View.OnClickLi
 
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 int index = (progress + mPageSliderRes / 2) / mPageSliderRes;
-                mPageNumberView.setText(String.format("%d / %d", index + 1, mPageViewPresenter.getPageCount()));
+                mPageNumberView.setText(String.format("%s / %s", index + 1, mPageViewPresenter.getPageCount()));
                 showPageSlider(false);
             }
         });
@@ -137,12 +140,22 @@ public class APageSeekBarControls extends LinearLayout implements View.OnClickLi
         }, 3000);
     }
 
+    public void setReflow(boolean reflow) {
+        this.mReflowButton.setVisibility(reflow ? VISIBLE : GONE);
+    }
+
+    public ImageButton getReflowButton() {
+        return mReflowButton;
+    }
+
     @Override
     public void onClick(View v) {
         if (R.id.outlineButton == v.getId()) {
             mPageViewPresenter.showOutline();
         } else if (R.id.back_button == v.getId()) {
             mPageViewPresenter.back();
+        } else if (R.id.reflowButton == v.getId()) {
+            mPageViewPresenter.reflow();
         }
     }
 }

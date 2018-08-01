@@ -136,7 +136,7 @@ public class APDFView extends RelativeLayout {
 
             @Override
             protected Bitmap doInBackground(Void... params) {
-                Bitmap bitmap = BitmapPool.getInstance().acquire(sizeX,sizeY);//Bitmap.createBitmap(sizeX, sizeY, Bitmap.Config.ARGB_8888);
+                Bitmap bitmap = BitmapPool.getInstance().acquire(sizeX, sizeY);//Bitmap.createBitmap(sizeX, sizeY, Bitmap.Config.ARGB_8888);
 
                 Page page = mCore.loadPage(mPageNumber);
                 Matrix ctm = new Matrix(mSourceScale);
