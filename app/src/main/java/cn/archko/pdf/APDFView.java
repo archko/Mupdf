@@ -92,11 +92,10 @@ public class APDFView extends RelativeLayout {
 
     public void setPage(int page, PointF pageSize, float zoom) {
         mPageNumber = page;
-        //zoom = 1f;
 
-        // Calculate scaled size that fits within the screen limits
-        // This is the size at minimum zoom
+        boolean refresh = false;
         if (mSize == null || mSize.x != pageSize.x || mSize.y != pageSize.y) {
+            refresh = true;
             caculateSize(pageSize, zoom);
         }
         int xOrigin = (int) (mSize.x * (zoom - 1f) / 2);
@@ -111,7 +110,9 @@ public class APDFView extends RelativeLayout {
             matrix.setTranslate(-xOrigin / 2, 0);
             matrix.postScale(((float) mSize.x) / mBitmap.getWidth(), ((float) mSize.y) / mBitmap.getHeight());
             mEntireView.setImageMatrix(matrix);
-            return;
+            if (!refresh) {
+                return;
+            }
         }
 
         if (mDrawTask != null) {
@@ -144,6 +145,7 @@ public class APDFView extends RelativeLayout {
                 page.run(dev, ctm, (Cookie) null);
                 dev.close();
                 dev.destroy();
+                page.destroy();
                 return bitmap;
             }
 
