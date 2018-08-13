@@ -49,7 +49,6 @@ class MuPDFRecyclerActivity : FragmentActivity(), ZoomListener {
     private var gestureDetector: GestureDetector? = null
     private var pageNumberToast: Toast? = null
 
-    private var mPageModel: CurrentPageModel? = null
     private var mPageSeekBarControls: APageSeekBarControls? = null
     private var mReflow = false
     private val OUTLINE_REQUEST = 0
@@ -97,7 +96,7 @@ class MuPDFRecyclerActivity : FragmentActivity(), ZoomListener {
             if (pos > 0) {
                 mRecyclerView.scrollToPosition(pos)
             }
-            mPageSeekBarControls?.setReflow(hasOutline())
+            mPageSeekBarControls?.setReflow(true)
         } catch (e: Exception) {
             e.printStackTrace()
             finish()
@@ -224,14 +223,7 @@ class MuPDFRecyclerActivity : FragmentActivity(), ZoomListener {
             gestureDetector!!.onTouchEvent(event)
         }
 
-        mPageModel = CurrentPageModel()
-        mPageModel!!.addEventListener(CurrentPageListener { pageIndex ->
-            Log.d(TAG, "currentPageChanged:" + pageIndex)
-            if (pos != pageIndex) {
-                mRecyclerView.scrollToPosition(pageIndex)
-            }
-        })
-        mPageSeekBarControls = createSeekControls(mPageModel!!)
+        mPageSeekBarControls = createSeekControls()
 
         var lp = RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
         lp.addRule(RelativeLayout.ALIGN_PARENT_TOP)
@@ -332,8 +324,6 @@ class MuPDFRecyclerActivity : FragmentActivity(), ZoomListener {
             }
 
             override fun onDoubleTap(e: MotionEvent): Boolean {
-                mPageModel?.setCurrentPage(pos)
-                mPageModel?.pageCount = mCore!!.countPages()
                 mPageSeekBarControls?.toggleSeekControls()
                 zoomModel?.toggleZoomControls()
                 return true
@@ -353,18 +343,18 @@ class MuPDFRecyclerActivity : FragmentActivity(), ZoomListener {
     override fun commitZoom() {
     }
 
-    private fun createSeekControls(pageModel: CurrentPageModel): APageSeekBarControls {
+    private fun createSeekControls(): APageSeekBarControls {
         mPageSeekBarControls = APageSeekBarControls(this, object : PageViewPresenter {
             override fun reflow() {
                 toggleReflow()
             }
 
             override fun getPageCount(): Int {
-                return pageModel.getPageCount()
+                return mCore!!.countPages()
             }
 
             override fun getCurrentPageIndex(): Int {
-                return pageModel.currentPageIndex
+                return pos;
             }
 
             override fun goToPageIndex(page: Int) {
@@ -383,7 +373,6 @@ class MuPDFRecyclerActivity : FragmentActivity(), ZoomListener {
                 return mPath!!
             }
         })
-        pageModel.addEventListener(mPageSeekBarControls)
         return mPageSeekBarControls!!
     }
 

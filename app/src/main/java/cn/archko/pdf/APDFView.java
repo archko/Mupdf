@@ -155,6 +155,7 @@ public class APDFView extends RelativeLayout {
                 mBitmap = bitmap;
                 mBitmapManager.setBitmap(mPageNumber, bitmap);
                 mEntireView.setImageBitmap(mBitmap);
+                mEntireView.getImageMatrix().reset();
             }
 
         };
