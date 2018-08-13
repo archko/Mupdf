@@ -155,6 +155,7 @@ public abstract class BaseViewerActivity extends Activity implements DecodingPro
         documentView.setAPageSeekBarControls(mPageSeekBarControls);
         frameLayout.addView(mPageSeekBarControls);
         mPageSeekBarControls.hide();
+        mPageSeekBarControls.setReflow(true);
     }
 
     public void decodingProgressChanged(final int currentlyDecoding) {
