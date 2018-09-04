@@ -456,7 +456,7 @@ class MuPDFRecyclerActivity : FragmentActivity(), ZoomListener {
         }
 
         override fun onBindViewHolder(viewHolder: RecyclerView.ViewHolder, position: Int) {
-            pos = viewHolder.adapterPosition
+            pos = viewHolder.position
             val pdfHolder = viewHolder as PdfHolder
 
             pdfHolder.onBind(position)
