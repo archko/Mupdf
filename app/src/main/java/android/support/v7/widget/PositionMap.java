@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+
 package android.support.v7.widget;
 
 import java.util.ArrayList;
@@ -37,16 +38,17 @@ class PositionMap<E> implements Cloneable {
     }
 
     /**
-     * Creates a new PositionMap containing no mappings that will not require any additional memory allocation to store
-     * the specified number of mappings. If you supply an initial capacity of 0, the sparse array will be initialized
-     * with a light-weight representation not requiring any additional array allocations.
+     * Creates a new PositionMap containing no mappings that will not
+     * require any additional memory allocation to store the specified
+     * number of mappings.  If you supply an initial capacity of 0, the
+     * sparse array will be initialized with a light-weight representation
+     * not requiring any additional array allocations.
      */
     public PositionMap(int initialCapacity) {
         if (initialCapacity == 0) {
             mKeys = ContainerHelpers.EMPTY_INTS;
             mValues = ContainerHelpers.EMPTY_OBJECTS;
-        }
-        else {
+        } else {
             initialCapacity = idealIntArraySize(initialCapacity);
             mKeys = new int[initialCapacity];
             mValues = new Object[initialCapacity];
@@ -62,31 +64,31 @@ class PositionMap<E> implements Cloneable {
             clone = (PositionMap<E>) super.clone();
             clone.mKeys = mKeys.clone();
             clone.mValues = mValues.clone();
-        }
-        catch (final CloneNotSupportedException cnse) {
+        } catch (CloneNotSupportedException cnse) {
             /* ignore */
         }
         return clone;
     }
 
     /**
-     * Gets the Object mapped from the specified key, or <code>null</code> if no such mapping has been made.
+     * Gets the Object mapped from the specified key, or <code>null</code>
+     * if no such mapping has been made.
      */
     public E get(int key) {
         return get(key, null);
     }
 
     /**
-     * Gets the Object mapped from the specified key, or the specified Object if no such mapping has been made.
+     * Gets the Object mapped from the specified key, or the specified Object
+     * if no such mapping has been made.
      */
     @SuppressWarnings("unchecked")
-    public E get(int key , E valueIfKeyNotFound) {
-        final int i = ContainerHelpers.binarySearch(mKeys, mSize, key);
+    public E get(int key, E valueIfKeyNotFound) {
+        int i = ContainerHelpers.binarySearch(mKeys, mSize, key);
 
         if (i < 0 || mValues[i] == DELETED) {
             return valueIfKeyNotFound;
-        }
-        else {
+        } else {
             return (E) mValues[i];
         }
     }
@@ -95,7 +97,7 @@ class PositionMap<E> implements Cloneable {
      * Removes the mapping from the specified key, if there was any.
      */
     public void delete(int key) {
-        final int i = ContainerHelpers.binarySearch(mKeys, mSize, key);
+        int i = ContainerHelpers.binarySearch(mKeys, mSize, key);
 
         if (i >= 0) {
             if (mValues[i] != DELETED) {
@@ -124,35 +126,35 @@ class PositionMap<E> implements Cloneable {
 
     /**
      * Remove a range of mappings as a batch.
-     * 
+     *
      * @param index Index to begin at
      * @param size Number of mappings to remove
      */
-    public void removeAtRange(int index , int size) {
+    public void removeAtRange(int index, int size) {
         final int end = Math.min(mSize, index + size);
         for (int i = index; i < end; i++) {
             removeAt(i);
         }
     }
 
-    public void insertKeyRange(int keyStart , int count) {
+    public void insertKeyRange(int keyStart, int count) {
 
     }
 
-    public void removeKeyRange(ArrayList<E> removedItems , int keyStart , int count) {
+    public void removeKeyRange(ArrayList<E> removedItems, int keyStart, int count) {
 
     }
 
     private void gc() {
         // Log.e("SparseArray", "gc start with " + mSize);
 
-        final int n = mSize;
+        int n = mSize;
         int o = 0;
-        final int[] keys = mKeys;
-        final Object[] values = mValues;
+        int[] keys = mKeys;
+        Object[] values = mValues;
 
         for (int i = 0; i < n; i++) {
-            final Object val = values[i];
+            Object val = values[i];
 
             if (val != DELETED) {
                 if (i != o) {
@@ -172,16 +174,16 @@ class PositionMap<E> implements Cloneable {
     }
 
     /**
-     * Adds a mapping from the specified key to the specified value, replacing the previous mapping from the specified
-     * key if there was one.
+     * Adds a mapping from the specified key to the specified value,
+     * replacing the previous mapping from the specified key if there
+     * was one.
      */
-    public void put(int key , E value) {
+    public void put(int key, E value) {
         int i = ContainerHelpers.binarySearch(mKeys, mSize, key);
 
         if (i >= 0) {
             mValues[i] = value;
-        }
-        else {
+        } else {
             i = ~i;
 
             if (i < mSize && mValues[i] == DELETED) {
@@ -198,10 +200,10 @@ class PositionMap<E> implements Cloneable {
             }
 
             if (mSize >= mKeys.length) {
-                final int n = idealIntArraySize(mSize + 1);
+                int n = idealIntArraySize(mSize + 1);
 
-                final int[] nkeys = new int[n];
-                final Object[] nvalues = new Object[n];
+                int[] nkeys = new int[n];
+                Object[] nvalues = new Object[n];
 
                 // Log.e("SparseArray", "grow " + mKeys.length + " to " + n);
                 System.arraycopy(mKeys, 0, nkeys, 0, mKeys.length);
@@ -224,7 +226,8 @@ class PositionMap<E> implements Cloneable {
     }
 
     /**
-     * Returns the number of key-value mappings that this SparseArray currently stores.
+     * Returns the number of key-value mappings that this SparseArray
+     * currently stores.
      */
     public int size() {
         if (mGarbage) {
@@ -235,8 +238,9 @@ class PositionMap<E> implements Cloneable {
     }
 
     /**
-     * Given an index in the range <code>0...size()-1</code>, returns the key from the <code>index</code>th key-value
-     * mapping that this SparseArray stores.
+     * Given an index in the range <code>0...size()-1</code>, returns
+     * the key from the <code>index</code>th key-value mapping that this
+     * SparseArray stores.
      */
     public int keyAt(int index) {
         if (mGarbage) {
@@ -247,8 +251,9 @@ class PositionMap<E> implements Cloneable {
     }
 
     /**
-     * Given an index in the range <code>0...size()-1</code>, returns the value from the <code>index</code>th key-value
-     * mapping that this SparseArray stores.
+     * Given an index in the range <code>0...size()-1</code>, returns
+     * the value from the <code>index</code>th key-value mapping that this
+     * SparseArray stores.
      */
     @SuppressWarnings("unchecked")
     public E valueAt(int index) {
@@ -260,10 +265,11 @@ class PositionMap<E> implements Cloneable {
     }
 
     /**
-     * Given an index in the range <code>0...size()-1</code>, sets a new value for the <code>index</code>th key-value
-     * mapping that this SparseArray stores.
+     * Given an index in the range <code>0...size()-1</code>, sets a new
+     * value for the <code>index</code>th key-value mapping that this
+     * SparseArray stores.
      */
-    public void setValueAt(int index , E value) {
+    public void setValueAt(int index, E value) {
         if (mGarbage) {
             gc();
         }
@@ -272,7 +278,8 @@ class PositionMap<E> implements Cloneable {
     }
 
     /**
-     * Returns the index for which {@link #keyAt} would return the specified key, or a negative number if the specified
+     * Returns the index for which {@link #keyAt} would return the
+     * specified key, or a negative number if the specified
      * key is not mapped.
      */
     public int indexOfKey(int key) {
@@ -284,25 +291,23 @@ class PositionMap<E> implements Cloneable {
     }
 
     /**
-     * Returns an index for which {@link #valueAt} would return the specified key, or a negative number if no keys map
-     * to the specified value.
-     * <p>
-     * Beware that this is a linear search, unlike lookups by key, and that multiple keys can map to the same value and
-     * this will find only one of them.
-     * <p>
-     * Note also that unlike most collections' {@code indexOf} methods, this method compares values using {@code ==}
-     * rather than {@code equals}.
+     * Returns an index for which {@link #valueAt} would return the
+     * specified key, or a negative number if no keys map to the
+     * specified value.
+     * <p>Beware that this is a linear search, unlike lookups by key,
+     * and that multiple keys can map to the same value and this will
+     * find only one of them.
+     * <p>Note also that unlike most collections' {@code indexOf} methods,
+     * this method compares values using {@code ==} rather than {@code equals}.
      */
     public int indexOfValue(E value) {
         if (mGarbage) {
             gc();
         }
 
-        for (int i = 0; i < mSize; i++) {
-            if (mValues[i] == value) {
+        for (int i = 0; i < mSize; i++)
+            if (mValues[i] == value)
                 return i;
-            }
-        }
 
         return -1;
     }
@@ -311,8 +316,8 @@ class PositionMap<E> implements Cloneable {
      * Removes all key-value mappings from this SparseArray.
      */
     public void clear() {
-        final int n = mSize;
-        final Object[] values = mValues;
+        int n = mSize;
+        Object[] values = mValues;
 
         for (int i = 0; i < n; i++) {
             values[i] = null;
@@ -323,10 +328,10 @@ class PositionMap<E> implements Cloneable {
     }
 
     /**
-     * Puts a key/value pair into the array, optimizing for the case where the key is greater than all existing keys in
-     * the array.
+     * Puts a key/value pair into the array, optimizing for the case where
+     * the key is greater than all existing keys in the array.
      */
-    public void append(int key , E value) {
+    public void append(int key, E value) {
         if (mSize != 0 && key <= mKeys[mSize - 1]) {
             put(key, value);
             return;
@@ -336,12 +341,12 @@ class PositionMap<E> implements Cloneable {
             gc();
         }
 
-        final int pos = mSize;
+        int pos = mSize;
         if (pos >= mKeys.length) {
-            final int n = idealIntArraySize(pos + 1);
+            int n = idealIntArraySize(pos + 1);
 
-            final int[] nkeys = new int[n];
-            final Object[] nvalues = new Object[n];
+            int[] nkeys = new int[n];
+            Object[] nvalues = new Object[n];
 
             // Log.e("SparseArray", "grow " + mKeys.length + " to " + n);
             System.arraycopy(mKeys, 0, nkeys, 0, mKeys.length);
@@ -358,9 +363,10 @@ class PositionMap<E> implements Cloneable {
 
     /**
      * {@inheritDoc}
-     * <p>
-     * This implementation composes a string by iterating over its mappings. If this map contains itself as a value, the
-     * string "(this Map)" will appear in its place.
+     *
+     * <p>This implementation composes a string by iterating over its mappings. If
+     * this map contains itself as a value, the string "(this Map)"
+     * will appear in its place.
      */
     @Override
     public String toString() {
@@ -368,20 +374,19 @@ class PositionMap<E> implements Cloneable {
             return "{}";
         }
 
-        final StringBuilder buffer = new StringBuilder(mSize * 28);
+        StringBuilder buffer = new StringBuilder(mSize * 28);
         buffer.append('{');
-        for (int i = 0; i < mSize; i++) {
+        for (int i=0; i<mSize; i++) {
             if (i > 0) {
                 buffer.append(", ");
             }
-            final int key = keyAt(i);
+            int key = keyAt(i);
             buffer.append(key);
             buffer.append('=');
-            final Object value = valueAt(i);
+            Object value = valueAt(i);
             if (value != this) {
                 buffer.append(value);
-            }
-            else {
+            } else {
                 buffer.append("(this Map)");
             }
         }
@@ -390,11 +395,9 @@ class PositionMap<E> implements Cloneable {
     }
 
     static int idealByteArraySize(int need) {
-        for (int i = 4; i < 32; i++) {
-            if (need <= (1 << i) - 12) {
+        for (int i = 4; i < 32; i++)
+            if (need <= (1 << i) - 12)
                 return (1 << i) - 12;
-            }
-        }
 
         return need;
     }
@@ -434,7 +437,7 @@ class PositionMap<E> implements Cloneable {
         static final Object[] EMPTY_OBJECTS = new Object[0];
 
         // This is Arrays.binarySearch(), but doesn't do any argument validation.
-        static int binarySearch(int[] array , int size , int value) {
+        static int binarySearch(int[] array, int size, int value) {
             int lo = 0;
             int hi = size - 1;
 
@@ -444,15 +447,13 @@ class PositionMap<E> implements Cloneable {
 
                 if (midVal < value) {
                     lo = mid + 1;
-                }
-                else if (midVal > value) {
+                } else if (midVal > value) {
                     hi = mid - 1;
-                }
-                else {
-                    return mid; // value found
+                } else {
+                    return mid;  // value found
                 }
             }
-            return ~lo; // value not present
+            return ~lo;  // value not present
         }
     }
 

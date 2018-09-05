@@ -25,9 +25,10 @@ import android.view.animation.DecelerateInterpolator;
 import android.view.animation.LinearInterpolator;
 
 /**
- * {@link RecyclerView.SmoothScroller} implementation which uses {@link LinearInterpolator} until
- * the target position becames a child of the RecyclerView and then uses
- * {@link DecelerateInterpolator} to slowly approach to target position.
+ * {@link RecyclerView.SmoothScroller} implementation which uses
+ * {@link android.view.animation.LinearInterpolator} until the target position becames a child of
+ * the RecyclerView and then uses
+ * {@link android.view.animation.DecelerateInterpolator} to slowly approach to target position.
  */
 abstract public class LinearSmoothScroller extends RecyclerView.SmoothScroller {
 
@@ -41,35 +42,31 @@ abstract public class LinearSmoothScroller extends RecyclerView.SmoothScroller {
 
     /**
      * Align child view's left or top with parent view's left or top
-     * 
+     *
      * @see #calculateDtToFit(int, int, int, int, int)
-     * @see #calculateDxToMakeVisible(View, int)
-     * @see #calculateDyToMakeVisible(View, int)
+     * @see #calculateDxToMakeVisible(android.view.View, int)
+     * @see #calculateDyToMakeVisible(android.view.View, int)
      */
     public static final int SNAP_TO_START = -1;
 
     /**
      * Align child view's right or bottom with parent view's right or bottom
-     * 
+     *
      * @see #calculateDtToFit(int, int, int, int, int)
-     * @see #calculateDxToMakeVisible(View, int)
-     * @see #calculateDyToMakeVisible(View, int)
+     * @see #calculateDxToMakeVisible(android.view.View, int)
+     * @see #calculateDyToMakeVisible(android.view.View, int)
      */
     public static final int SNAP_TO_END = 1;
 
     /**
-     * <p>
-     * Decides if the child should be snapped from start or end, depending on where it currently is in relation to its
-     * parent.
-     * </p>
-     * <p>
-     * For instance, if the view is virtually on the left of RecyclerView, using {@code SNAP_TO_ANY} is the same as
-     * using {@code SNAP_TO_START}
-     * </p>
-     * 
+     * <p>Decides if the child should be snapped from start or end, depending on where it
+     * currently is in relation to its parent.</p>
+     * <p>For instance, if the view is virtually on the left of RecyclerView, using
+     * {@code SNAP_TO_ANY} is the same as using {@code SNAP_TO_START}</p>
+     *
      * @see #calculateDtToFit(int, int, int, int, int)
-     * @see #calculateDxToMakeVisible(View, int)
-     * @see #calculateDyToMakeVisible(View, int)
+     * @see #calculateDxToMakeVisible(android.view.View, int)
+     * @see #calculateDyToMakeVisible(android.view.View, int)
      */
     public static final int SNAP_TO_ANY = 0;
 
@@ -106,7 +103,7 @@ abstract public class LinearSmoothScroller extends RecyclerView.SmoothScroller {
      * {@inheritDoc}
      */
     @Override
-    protected void onTargetFound(View targetView , RecyclerView.State state , Action action) {
+    protected void onTargetFound(View targetView, RecyclerView.State state, Action action) {
         final int dx = calculateDxToMakeVisible(targetView, getHorizontalSnapPreference());
         final int dy = calculateDyToMakeVisible(targetView, getVerticalSnapPreference());
         final int distance = (int) Math.sqrt(dx * dx + dy * dy);
@@ -120,15 +117,15 @@ abstract public class LinearSmoothScroller extends RecyclerView.SmoothScroller {
      * {@inheritDoc}
      */
     @Override
-    protected void onSeekTargetStep(int dx , int dy , RecyclerView.State state , Action action) {
+    protected void onSeekTargetStep(int dx, int dy, RecyclerView.State state, Action action) {
         if (getChildCount() == 0) {
             stop();
             return;
         }
-        if (DEBUG) {
-            if (mTargetVector != null && ((mTargetVector.x * dx < 0 || mTargetVector.y * dy < 0))) {
-                throw new IllegalStateException("Scroll happened in the opposite direction" + " of the target. Some calculations are wrong");
-            }
+        if (DEBUG && mTargetVector != null
+                && ((mTargetVector.x * dx < 0 || mTargetVector.y * dy < 0))) {
+            throw new IllegalStateException("Scroll happened in the opposite direction"
+                    + " of the target. Some calculations are wrong");
         }
         mInterimTargetDx = clampApplyScroll(mInterimTargetDx, dx);
         mInterimTargetDy = clampApplyScroll(mInterimTargetDy, dy);
@@ -150,24 +147,22 @@ abstract public class LinearSmoothScroller extends RecyclerView.SmoothScroller {
 
     /**
      * Calculates the scroll speed.
-     * 
+     *
      * @param displayMetrics DisplayMetrics to be used for real dimension calculations
-     * @return The time (in ms) it should take for each pixel. For instance, if returned value is 2 ms, it means
-     *         scrolling 1000 pixels with LinearInterpolation should take 2 seconds.
+     * @return The time (in ms) it should take for each pixel. For instance, if returned value is
+     * 2 ms, it means scrolling 1000 pixels with LinearInterpolation should take 2 seconds.
      */
     protected float calculateSpeedPerPixel(DisplayMetrics displayMetrics) {
         return MILLISECONDS_PER_INCH / displayMetrics.densityDpi;
     }
 
     /**
-     * <p>
-     * Calculates the time for deceleration so that transition from LinearInterpolator to DecelerateInterpolator looks
-     * smooth.
-     * </p>
-     * 
+     * <p>Calculates the time for deceleration so that transition from LinearInterpolator to
+     * DecelerateInterpolator looks smooth.</p>
+     *
      * @param dx Distance to scroll
-     * @return Time for DecelerateInterpolator to smoothly traverse the distance when transitioning from
-     *         LinearInterpolation
+     * @return Time for DecelerateInterpolator to smoothly traverse the distance when transitioning
+     * from LinearInterpolation
      */
     protected int calculateTimeForDeceleration(int dx) {
         // we want to cover same area with the linear interpolator for the first 10% of the
@@ -175,15 +170,15 @@ abstract public class LinearSmoothScroller extends RecyclerView.SmoothScroller {
         // area under curve (1-(1-x)^2) can be calculated as (1 - x/3) * x * x
         // which gives 0.100028 when x = .3356
         // this is why we divide linear scrolling time with .3356
-        return (int) Math.ceil(calculateTimeForScrolling(dx) / .3356);
+        return  (int) Math.ceil(calculateTimeForScrolling(dx) / .3356);
     }
 
     /**
      * Calculates the time it should take to scroll the given distance (in pixels)
-     * 
+     *
      * @param dx Distance in pixels that we want to scroll
      * @return Time in milliseconds
-     * @see #calculateSpeedPerPixel(DisplayMetrics)
+     * @see #calculateSpeedPerPixel(android.util.DisplayMetrics)
      */
     protected int calculateTimeForScrolling(int dx) {
         // In a case where dx is very small, rounding may return 0 although dx > 0.
@@ -193,46 +188,49 @@ abstract public class LinearSmoothScroller extends RecyclerView.SmoothScroller {
     }
 
     /**
-     * When scrolling towards a child view, this method defines whether we should align the left or the right edge of
-     * the child with the parent RecyclerView.
-     * 
+     * When scrolling towards a child view, this method defines whether we should align the left
+     * or the right edge of the child with the parent RecyclerView.
+     *
      * @return SNAP_TO_START, SNAP_TO_END or SNAP_TO_ANY; depending on the current target vector
      * @see #SNAP_TO_START
      * @see #SNAP_TO_END
      * @see #SNAP_TO_ANY
      */
     protected int getHorizontalSnapPreference() {
-        return mTargetVector == null || mTargetVector.x == 0 ? SNAP_TO_ANY : mTargetVector.x > 0 ? SNAP_TO_END : SNAP_TO_START;
+        return mTargetVector == null || mTargetVector.x == 0 ? SNAP_TO_ANY :
+                mTargetVector.x > 0 ? SNAP_TO_END : SNAP_TO_START;
     }
 
     /**
-     * When scrolling towards a child view, this method defines whether we should align the top or the bottom edge of
-     * the child with the parent RecyclerView.
-     * 
+     * When scrolling towards a child view, this method defines whether we should align the top
+     * or the bottom edge of the child with the parent RecyclerView.
+     *
      * @return SNAP_TO_START, SNAP_TO_END or SNAP_TO_ANY; depending on the current target vector
      * @see #SNAP_TO_START
      * @see #SNAP_TO_END
      * @see #SNAP_TO_ANY
      */
     protected int getVerticalSnapPreference() {
-        return mTargetVector == null || mTargetVector.y == 0 ? SNAP_TO_ANY : mTargetVector.y > 0 ? SNAP_TO_END : SNAP_TO_START;
+        return mTargetVector == null || mTargetVector.y == 0 ? SNAP_TO_ANY :
+                mTargetVector.y > 0 ? SNAP_TO_END : SNAP_TO_START;
     }
 
     /**
-     * When the target scroll position is not a child of the RecyclerView, this method calculates a direction vector
-     * towards that child and triggers a smooth scroll.
-     * 
+     * When the target scroll position is not a child of the RecyclerView, this method calculates
+     * a direction vector towards that child and triggers a smooth scroll.
+     *
      * @see #computeScrollVectorForPosition(int)
      */
     protected void updateActionForInterimTarget(Action action) {
         // find an interim target position
-        final PointF scrollVector = computeScrollVectorForPosition(getTargetPosition());
+        PointF scrollVector = computeScrollVectorForPosition(getTargetPosition());
         if (scrollVector == null || (scrollVector.x == 0 && scrollVector.y == 0)) {
-            Log.e(TAG, "To support smooth scrolling, you should override \n" + "LayoutManager#computeScrollVectorForPosition.\n"
+            Log.e(TAG, "To support smooth scrolling, you should override \n"
+                    + "LayoutManager#computeScrollVectorForPosition.\n"
                     + "Falling back to instant scroll");
             final int target = getTargetPosition();
+            action.jumpTo(target);
             stop();
-            instantScrollToPosition(target);
             return;
         }
         normalize(scrollVector);
@@ -244,10 +242,12 @@ abstract public class LinearSmoothScroller extends RecyclerView.SmoothScroller {
         // To avoid UI hiccups, trigger a smooth scroll to a distance little further than the
         // interim target. Since we track the distance travelled in onSeekTargetStep callback, it
         // won't actually scroll more than what we need.
-        action.update((int) (mInterimTargetDx * TARGET_SEEK_EXTRA_SCROLL_RATIO), (int) (mInterimTargetDy * TARGET_SEEK_EXTRA_SCROLL_RATIO), (int) (time * TARGET_SEEK_EXTRA_SCROLL_RATIO), mLinearInterpolator);
+        action.update((int) (mInterimTargetDx * TARGET_SEEK_EXTRA_SCROLL_RATIO)
+                , (int) (mInterimTargetDy * TARGET_SEEK_EXTRA_SCROLL_RATIO)
+                , (int) (time * TARGET_SEEK_EXTRA_SCROLL_RATIO), mLinearInterpolator);
     }
 
-    private int clampApplyScroll(int tmpDt , int dt) {
+    private int clampApplyScroll(int tmpDt, int dt) {
         final int before = tmpDt;
         tmpDt -= dt;
         if (before * tmpDt <= 0) { // changed sign, reached 0 or was 0, reset
@@ -257,10 +257,11 @@ abstract public class LinearSmoothScroller extends RecyclerView.SmoothScroller {
     }
 
     /**
-     * Helper method for {@link #calculateDxToMakeVisible(View, int)} and
-     * {@link #calculateDyToMakeVisible(View, int)}
+     * Helper method for {@link #calculateDxToMakeVisible(android.view.View, int)} and
+     * {@link #calculateDyToMakeVisible(android.view.View, int)}
      */
-    public int calculateDtToFit(int viewStart , int viewEnd , int boxStart , int boxEnd , int snapPreference) {
+    public int calculateDtToFit(int viewStart, int viewEnd, int boxStart, int boxEnd, int
+            snapPreference) {
         switch (snapPreference) {
             case SNAP_TO_START:
                 return boxStart - viewStart;
@@ -284,19 +285,23 @@ abstract public class LinearSmoothScroller extends RecyclerView.SmoothScroller {
     }
 
     /**
-     * Calculates the vertical scroll amount necessary to make the given view fully visible inside the RecyclerView.
-     * 
-     * @param view The view which we want to make fully visible
-     * @param snapPreference The edge which the view should snap to when entering the visible area. One of
-     *            {@link #SNAP_TO_START}, {@link #SNAP_TO_END} or {@link #SNAP_TO_END}.
-     * @return The vertical scroll amount necessary to make the view visible with the given snap preference.
+     * Calculates the vertical scroll amount necessary to make the given view fully visible
+     * inside the RecyclerView.
+     *
+     * @param view           The view which we want to make fully visible
+     * @param snapPreference The edge which the view should snap to when entering the visible
+     *                       area. One of {@link #SNAP_TO_START}, {@link #SNAP_TO_END} or
+     *                       {@link #SNAP_TO_END}.
+     * @return The vertical scroll amount necessary to make the view visible with the given
+     * snap preference.
      */
-    public int calculateDyToMakeVisible(View view , int snapPreference) {
+    public int calculateDyToMakeVisible(View view, int snapPreference) {
         final RecyclerView.LayoutManager layoutManager = getLayoutManager();
         if (!layoutManager.canScrollVertically()) {
             return 0;
         }
-        final RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) view.getLayoutParams();
+        final RecyclerView.LayoutParams params = (RecyclerView.LayoutParams)
+                view.getLayoutParams();
         final int top = layoutManager.getDecoratedTop(view) - params.topMargin;
         final int bottom = layoutManager.getDecoratedBottom(view) + params.bottomMargin;
         final int start = layoutManager.getPaddingTop();
@@ -305,19 +310,23 @@ abstract public class LinearSmoothScroller extends RecyclerView.SmoothScroller {
     }
 
     /**
-     * Calculates the horizontal scroll amount necessary to make the given view fully visible inside the RecyclerView.
-     * 
-     * @param view The view which we want to make fully visible
-     * @param snapPreference The edge which the view should snap to when entering the visible area. One of
-     *            {@link #SNAP_TO_START}, {@link #SNAP_TO_END} or {@link #SNAP_TO_END}
-     * @return The vertical scroll amount necessary to make the view visible with the given snap preference.
+     * Calculates the horizontal scroll amount necessary to make the given view fully visible
+     * inside the RecyclerView.
+     *
+     * @param view           The view which we want to make fully visible
+     * @param snapPreference The edge which the view should snap to when entering the visible
+     *                       area. One of {@link #SNAP_TO_START}, {@link #SNAP_TO_END} or
+     *                       {@link #SNAP_TO_END}
+     * @return The vertical scroll amount necessary to make the view visible with the given
+     * snap preference.
      */
-    public int calculateDxToMakeVisible(View view , int snapPreference) {
+    public int calculateDxToMakeVisible(View view, int snapPreference) {
         final RecyclerView.LayoutManager layoutManager = getLayoutManager();
         if (!layoutManager.canScrollHorizontally()) {
             return 0;
         }
-        final RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) view.getLayoutParams();
+        final RecyclerView.LayoutParams params = (RecyclerView.LayoutParams)
+                view.getLayoutParams();
         final int left = layoutManager.getDecoratedLeft(view) - params.leftMargin;
         final int right = layoutManager.getDecoratedRight(view) + params.rightMargin;
         final int start = layoutManager.getPaddingLeft();

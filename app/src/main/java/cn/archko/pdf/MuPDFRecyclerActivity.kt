@@ -17,7 +17,6 @@ import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.text.TextUtils
-import android.util.Log
 import android.util.SparseArray
 import android.view.*
 import android.widget.RelativeLayout
@@ -28,10 +27,8 @@ import com.artifex.mupdf.fitz.Outline
 import com.artifex.mupdfdemo.MuPDFReflowRecyclerViewAdapter
 import cx.hell.android.pdfviewpro.Options
 import org.jetbrains.anko.toast
-import org.vudroid.core.events.CurrentPageListener
 import org.vudroid.core.events.PageViewPresenter
 import org.vudroid.core.events.ZoomListener
-import org.vudroid.core.models.CurrentPageModel
 import org.vudroid.core.models.ZoomModel
 import org.vudroid.core.views.APageSeekBarControls
 import org.vudroid.core.views.PageViewZoomControls
@@ -456,7 +453,7 @@ class MuPDFRecyclerActivity : FragmentActivity(), ZoomListener {
         }
 
         override fun onBindViewHolder(viewHolder: RecyclerView.ViewHolder, position: Int) {
-            pos = viewHolder.position
+            pos = viewHolder.adapterPosition
             val pdfHolder = viewHolder as PdfHolder
 
             pdfHolder.onBind(position)
