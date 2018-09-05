@@ -78,7 +78,7 @@ class MuPDFRecyclerActivity : FragmentActivity(), ZoomListener {
         }
 
         pdfBookmarkManager = PDFBookmarkManager()
-        pdfBookmarkManager?.setStartBookmark(mPath)
+        pdfBookmarkManager!!.setStartBookmark(mPath)
         sensorHelper = SensorHelper(this)
 
         loadDoc()
@@ -94,6 +94,7 @@ class MuPDFRecyclerActivity : FragmentActivity(), ZoomListener {
                 mRecyclerView.scrollToPosition(pos)
             }
             mPageSeekBarControls?.setReflow(true)
+            zoomModel?.setZoom(pdfBookmarkManager!!.getBookmarkToRestore().absoluteZoomLevel / 1000f)
         } catch (e: Exception) {
             e.printStackTrace()
             finish()
@@ -420,7 +421,7 @@ class MuPDFRecyclerActivity : FragmentActivity(), ZoomListener {
     override fun onPause() {
         super.onPause()
 
-        pdfBookmarkManager?.saveCurrentPage(mPath, mCore!!.countPages(), pos, 1000f, 0, 0)
+        pdfBookmarkManager?.saveCurrentPage(mPath, mCore!!.countPages(), pos, zoomModel!!.zoom * 1000.0f, -1, 0)
 
         sensorHelper?.onPause()
     }

@@ -75,7 +75,9 @@ public class PDFBookmarkManager {
                 bookmarkToRestore.absoluteZoomLevel = zoom;
             }
 
-            bookmarkToRestore.offsetX = scrollX;
+            if (scrollX >= 0) { //for mupdfrecycleractivity,don't modify scrollx
+                bookmarkToRestore.offsetX = scrollX;
+            }
             bookmarkToRestore.offsetY = scrollY;
 
             return bookmarkToRestore;
