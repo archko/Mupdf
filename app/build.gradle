@@ -53,6 +53,62 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+    /*flavorDimensions "api", "mode"
+    productFlavors {
+
+        full {
+            dimension "mode"
+            //applicationIdSuffix ".full"
+        }
+
+        demo {
+            // Assigns this product flavor to the "mode" flavor dimension.
+            dimension "mode"
+            //applicationIdSuffix ".demo"
+        }
+
+        // Configurations in the "api" product flavors override those in "mode"
+        // flavors and the defaultConfig {} block. Gradle determines the priority
+        // between flavor dimensions based on the order in which they appear next
+        // to the flavorDimensions property above--the first dimension has a higher
+        // priority than the second, and so on.
+        minApi21 {
+            dimension "api"
+            minSdkVersion '21'
+            // To ensure the target device receives the version of the app with
+            // the highest compatible API level, assign version codes in increasing
+            // value with API level. To learn more about assigning version codes to
+            // support app updates and uploading to Google Play, read Multiple APK Support
+            versionCode 0 + android.defaultConfig.versionCode
+            versionNameSuffix "-minApi21"
+        }
+
+        minApi16 {
+            dimension "api"
+            minSdkVersion '16'
+            versionCode 0 + android.defaultConfig.versionCode
+            versionNameSuffix "-minApi16"
+        }
+    }
+    variantFilter { variant ->
+        def names = variant.flavors*.name
+        // To check for a certain build type, use variant.buildType.name == "<buildType>"
+        if (names.contains("minApi16") && names.contains("demo")) {
+            // Gradle ignores any variants that satisfy the conditions above.
+            //setIgnore(true)
+        }
+    }
+    splits {
+        // Screen density split settings
+        density {
+
+            // Enable or disable the density split mechanism
+            enable false
+
+            // Exclude these densities from splits
+            //exclude "ldpi", "tvdpi", "xxxhdpi", "400dpi", "560dpi"
+        }
+    }*/
     lintOptions { abortOnError false }
     sourceSets {
         main {
@@ -64,10 +120,10 @@ android {
 dependencies {
     api fileTree(include: ['*.jar'], dir: 'libs')
     api "com.android.support:support-v4:${SUPPORT_LIB_VERSION}"
-    api "com.android.support:recyclerview-v7:${SUPPORT_LIB_VERSION}"
+    //api "com.android.support:recyclerview-v7:${SUPPORT_LIB_VERSION}"
     api "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     api "org.jetbrains.anko:anko-common:$anko_version"
-    api 'com.android.support.constraint:constraint-layout:1.0.2'
+    api 'com.android.support.constraint:constraint-layout:1.1.0'
 
     api project(':viewer')
 }
