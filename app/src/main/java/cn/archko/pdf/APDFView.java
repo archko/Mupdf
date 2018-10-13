@@ -107,7 +107,7 @@ public class APDFView extends RelativeLayout {
         if (null != mBitmap) {
             mEntireView.setImageBitmap(mBitmap);
             android.graphics.Matrix matrix = new android.graphics.Matrix();
-            matrix.setTranslate(-xOrigin / 2, 0);
+            matrix.setTranslate(-xOrigin, 0);
             matrix.postScale(((float) mSize.x) / mBitmap.getWidth(), ((float) mSize.y) / mBitmap.getHeight());
             mEntireView.setImageMatrix(matrix);
             if (!refresh) {
