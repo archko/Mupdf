@@ -98,7 +98,7 @@ public class APDFView extends RelativeLayout {
             refresh = true;
             caculateSize(pageSize, zoom);
         }
-        int xOrigin = (int) (mSize.x * (zoom - 1f) / 2);
+        int xOrigin = (int) ((mSize.x - mViewSize.x) / 2);
         Log.d("view", "view:" + mViewSize + " patchX:" + xOrigin + " mss:" + mSourceScale + " mSize:" + mSize + " zoom:" + zoom);
 
         if (null == mBitmap) {
