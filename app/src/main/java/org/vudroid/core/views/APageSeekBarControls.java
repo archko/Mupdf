@@ -24,7 +24,7 @@ public class APageSeekBarControls extends LinearLayout implements View.OnClickLi
 
     PageViewPresenter mPageViewPresenter;
     protected SeekBar mPageSlider;
-    protected int mPageSliderRes;
+    protected int mPageSliderRes=1;
     protected TextView mPageNumberView;
     protected Runnable gotoPageRunnable = null;
 

@@ -105,11 +105,11 @@ public class APDFView extends RelativeLayout {
             mBitmap = mBitmapManager.getBitmap(mPageNumber);
         }
         if (null != mBitmap) {
-            mEntireView.setImageBitmap(mBitmap);
             android.graphics.Matrix matrix = new android.graphics.Matrix();
-            matrix.setTranslate(-xOrigin, 0);
+            matrix.postTranslate(-xOrigin, 0);
             matrix.postScale(((float) mSize.x) / mBitmap.getWidth(), ((float) mSize.y) / mBitmap.getHeight());
             mEntireView.setImageMatrix(matrix);
+            mEntireView.setImageBitmap(mBitmap);
             if (!refresh) {
                 return;
             }
@@ -154,8 +154,8 @@ public class APDFView extends RelativeLayout {
                 mBusyIndicator.setVisibility(GONE);
                 mBitmap = bitmap;
                 mBitmapManager.setBitmap(mPageNumber, bitmap);
-                mEntireView.setImageBitmap(mBitmap);
                 mEntireView.getImageMatrix().reset();
+                mEntireView.setImageBitmap(mBitmap);
             }
 
         };
