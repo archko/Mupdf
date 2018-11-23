@@ -206,6 +206,16 @@ open class SearchFragment : DialogFragment(), AdapterView.OnItemClickListener, A
         val bundle = Bundle()
         bundle.putSerializable(FileInfoFragment.FILE_LIST_ENTRY, entry)
         fileInfoFragment.arguments = bundle
+
+        fileInfoFragment.setListener(object : DataListener {
+            override fun onSuccess(vararg args: Any?) {
+                val fileEntry = args[0] as FileListEntry
+                pdfView(fileEntry.file)
+            }
+
+            override fun onFailed(vararg args: Any?) {
+            }
+        })
         fileInfoFragment.show(ft, "dialog")
     }
 }

@@ -34,6 +34,11 @@ class FileInfoFragment : DialogFragment() {
     lateinit var mIcon: ImageView
     var progress: AKProgress? = null
     var pageCount = 0;
+    lateinit var mDataListener: DataListener
+
+    public fun setListener(dataListener: DataListener) {
+        mDataListener = dataListener
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,12 +68,21 @@ class FileInfoFragment : DialogFragment() {
         mLastModified = view.findViewById<TextView>(R.id.lastModified)
         mPageCount = view.findViewById<TextView>(R.id.pageCount)
         mIcon = view.findViewById<ImageView>(R.id.icon)
-        val button = view.findViewById<Button>(R.id.btn_ok)
+        var button = view.findViewById<Button>(R.id.btn_cancel)
         button.setOnClickListener { this@FileInfoFragment.dismiss() }
+        button = view.findViewById<Button>(R.id.btn_ok)
+        button.setOnClickListener {
+            read()
+        }
 
         dialog.setTitle(R.string.menu_info)
 
         return view
+    }
+
+    private fun read() {
+        this@FileInfoFragment.dismiss()
+        mDataListener?.onSuccess(mEntry)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {

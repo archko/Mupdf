@@ -137,20 +137,34 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/lastRead"
-            android:layout_marginRight="16dp"
             android:layout_marginTop="4dp"
+            android:layout_marginRight="16dp"
             android:layout_toRightOf="@id/labelLastRead"
             android:maxHeight="4dp"
             android:minHeight="4dp"
             android:textSize="14sp" />
     </RelativeLayout>
 
-    <Button
-        android:id="@+id/btn_ok"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
-        android:text="OK" />
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btn_cancel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Cancel" />
+
+        <Button
+            android:id="@+id/btn_ok"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Read" />
+    </LinearLayout>
 
     <ImageView
         android:id="@+id/icon"

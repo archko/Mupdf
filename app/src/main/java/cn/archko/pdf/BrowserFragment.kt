@@ -480,6 +480,15 @@ open class BrowserFragment : RefreshableFragment(), OnItemClickListener, SwipeRe
         val bundle = Bundle()
         bundle.putSerializable(FileInfoFragment.FILE_LIST_ENTRY, entry)
         fileInfoFragment.arguments = bundle
+        fileInfoFragment.setListener(object : DataListener {
+            override fun onSuccess(vararg args: Any?) {
+                val fileEntry = args[0] as FileListEntry
+                filesListView?.let { prepareMenu(it, fileEntry) }
+            }
+
+            override fun onFailed(vararg args: Any?) {
+            }
+        })
         fileInfoFragment.show(ft, "dialog")
     }
 
