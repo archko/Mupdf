@@ -243,7 +243,7 @@ class MuPDFRecyclerActivity : FragmentActivity(), ZoomListener {
 
     private fun reflowModeSet(reflow: Boolean) {
         mReflow = reflow
-        mRecyclerView.adapter = if (mReflow) MuPDFReflowRecyclerViewAdapter(this, mCore) else BaseRecyclerAdapter()
+        mRecyclerView.adapter = if (mReflow) MuPDFReflowRecyclerViewAdapter(this, mCore, ScrollPositionListener { this.pos = it; }) else BaseRecyclerAdapter()
         mPageSeekBarControls?.reflowButton!!.setColorFilter(if (mReflow) Color.argb(0xFF, 172, 114, 37) else Color.argb(0xFF, 255, 255, 255))
         if (pos > 0) {
             mRecyclerView.scrollToPosition(pos)

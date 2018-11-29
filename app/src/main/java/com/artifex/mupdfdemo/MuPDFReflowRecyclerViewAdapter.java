@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.artifex.mupdf.fitz.Document;
 
 import cn.archko.pdf.R;
+import cn.archko.pdf.ScrollPositionListener;
 
 /**
  * @author: archko 2016/5/13 :11:03
@@ -22,9 +23,12 @@ public class MuPDFReflowRecyclerViewAdapter extends RecyclerView.Adapter {
 
     private String TXT_PATTERN = "</?(html|head|body|span|div|p)[^>]*>|(<style>[^<]*</style>)";
 
-    public MuPDFReflowRecyclerViewAdapter(Context c, Document core) {
+    private ScrollPositionListener scrollPositionListener;
+
+    public MuPDFReflowRecyclerViewAdapter(Context c, Document core, ScrollPositionListener scrollPositionListener) {
         mContext = c;
         mCore = core;
+        this.scrollPositionListener = scrollPositionListener;
     }
 
     public long getItemId(int position) {
@@ -54,12 +58,15 @@ public class MuPDFReflowRecyclerViewAdapter extends RecyclerView.Adapter {
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int pos) {
         final int position = pos;
-        PDFTextView reflowView = (PDFTextView) holder.itemView;
+        if (null != scrollPositionListener) {
+            scrollPositionListener.onScroll(position);
+        }
         byte[] result = mCore.loadPage(position).textAsHtml();
 
         String text = new String(result);
         text = text.replaceAll("(<style>[^<]*</style>)|(<![^>*])", "").trim();
         Spanned spanned = Html.fromHtml(text);
+        PDFTextView reflowView = (PDFTextView) holder.itemView;
         reflowView.setText(spanned);
     }
 
@@ -86,7 +93,7 @@ public class MuPDFReflowRecyclerViewAdapter extends RecyclerView.Adapter {
             mPaint.setTextSize(mTextSize * 1.2f);
             //setTextSize(getTextSize()*1.1f);
             setPadding(40, 50, 40, 30);
-            setLineSpacing(0, 1.2f);
+            setLineSpacing(0, 0.75f);
             setTextColor(context.getResources().getColor(R.color.text_reflow_color));
             setBackgroundColor(context.getResources().getColor(R.color.text_reflow_bg_color));
             setTextIsSelectable(true);
