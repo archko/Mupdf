@@ -2,9 +2,10 @@
 
 buildscript {
     repositories {
+        maven { url 'http://maven.aliyun.com/nexus/content/groups/public' }
+        mavenCentral()
         google()
         jcenter()
-        mavenCentral()
     }
     ext.support_version = '25.0.0'
     ext.kotlin_version = '1.2.71'
@@ -19,9 +20,10 @@ buildscript {
 
 allprojects {
     repositories {
+        maven { url 'http://maven.aliyun.com/nexus/content/groups/public' }
+        mavenCentral()
         google()
         jcenter()
-        mavenCentral()
         // 引入AAR
         flatDir {
             List<String> dirs = new ArrayList<>()
