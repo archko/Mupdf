@@ -94,7 +94,9 @@ class MuPDFRecyclerActivity : FragmentActivity(), ZoomListener {
                 mRecyclerView.scrollToPosition(pos)
             }
             mPageSeekBarControls?.setReflow(true)
-            zoomModel?.setZoom(pdfBookmarkManager!!.getBookmarkToRestore().absoluteZoomLevel / 1000f)
+            if (null != pdfBookmarkManager!!.getBookmarkToRestore()) {
+                zoomModel?.setZoom(pdfBookmarkManager!!.getBookmarkToRestore().absoluteZoomLevel / 1000f)
+            }
         } catch (e: Exception) {
             e.printStackTrace()
             finish()
