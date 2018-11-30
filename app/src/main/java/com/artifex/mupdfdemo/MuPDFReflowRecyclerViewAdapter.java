@@ -69,8 +69,7 @@ public class MuPDFReflowRecyclerViewAdapter extends RecyclerView.Adapter {
         byte[] result = mCore.loadPage(position).textAsHtml();
 
         String text = new String(result);
-        text = UnicodeDecoder.unescape2(text);
-        //Log.d("text", text);
+        //Log.d("text", text = UnicodeDecoder.unescape2(text););
         Spanned spanned = Html.fromHtml(text);
         PDFTextView reflowView = (PDFTextView) holder.itemView;
         reflowView.onBind(spanned);
@@ -107,7 +106,7 @@ public class MuPDFReflowRecyclerViewAdapter extends RecyclerView.Adapter {
             mPaint = textView.getPaint();
             mTextSize = mPaint.getTextSize();
             mPaint.setTextSize(mTextSize * 1.1f);
-            textView.setLineSpacing(0, 0.75f);
+            textView.setPadding(30, 0, 30, 0);
             textView.setTextColor(context.getResources().getColor(R.color.text_reflow_color));
             //textView.setTextIsSelectable(true);
         }
