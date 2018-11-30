@@ -5,14 +5,19 @@ import android.graphics.Paint;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.text.Spanned;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.artifex.mupdf.fitz.Document;
 
 import cn.archko.pdf.R;
 import cn.archko.pdf.ScrollPositionListener;
+import cn.archko.pdf.UnicodeDecoder;
+import cx.hell.android.pdfviewpro.APVApplication;
 
 /**
  * @author: archko 2016/5/13 :11:03
@@ -20,8 +25,7 @@ import cn.archko.pdf.ScrollPositionListener;
 public class MuPDFReflowRecyclerViewAdapter extends RecyclerView.Adapter {
     private final Context mContext;
     private final Document mCore;
-
-    private String TXT_PATTERN = "</?(html|head|body|span|div|p)[^>]*>|(<style>[^<]*</style>)";
+    private int height = 720;
 
     private ScrollPositionListener scrollPositionListener;
 
@@ -29,6 +33,7 @@ public class MuPDFReflowRecyclerViewAdapter extends RecyclerView.Adapter {
         mContext = c;
         mCore = core;
         this.scrollPositionListener = scrollPositionListener;
+        height = APVApplication.getInstance().screenHeight;
     }
 
     public long getItemId(int position) {
@@ -64,10 +69,11 @@ public class MuPDFReflowRecyclerViewAdapter extends RecyclerView.Adapter {
         byte[] result = mCore.loadPage(position).textAsHtml();
 
         String text = new String(result);
-        text = text.replaceAll("(<style>[^<]*</style>)|(<![^>*])", "").trim();
+        text = UnicodeDecoder.unescape2(text);
+        //Log.d("text", text);
         Spanned spanned = Html.fromHtml(text);
         PDFTextView reflowView = (PDFTextView) holder.itemView;
-        reflowView.setText(spanned);
+        reflowView.onBind(spanned);
     }
 
     class ItemViewHolder extends RecyclerView.ViewHolder {
@@ -80,28 +86,34 @@ public class MuPDFReflowRecyclerViewAdapter extends RecyclerView.Adapter {
 
     }
 
-    private static class PDFTextView extends TextView {
+    private class PDFTextView extends LinearLayout {
 
         Paint mPaint;
         float mTextSize = 15;
         float mScale = 1.0f;
+        TextView textView;
 
         public PDFTextView(Context context) {
             super(context);
-            mPaint = getPaint();
-            mTextSize = mPaint.getTextSize();
-            mPaint.setTextSize(mTextSize * 1.2f);
-            //setTextSize(getTextSize()*1.1f);
-            setPadding(40, 50, 40, 30);
-            setLineSpacing(0, 0.75f);
-            setTextColor(context.getResources().getColor(R.color.text_reflow_color));
+            setOrientation(VERTICAL);
+            setMinimumHeight(height / 2);
+            textView = new TextView(context);
+            LayoutParams lp = new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            lp.gravity = Gravity.CENTER_HORIZONTAL;
+            addView(textView, lp);
+            setPadding(0, 50, 0, 30);
             setBackgroundColor(context.getResources().getColor(R.color.text_reflow_bg_color));
-            setTextIsSelectable(true);
+
+            mPaint = textView.getPaint();
+            mTextSize = mPaint.getTextSize();
+            mPaint.setTextSize(mTextSize * 1.1f);
+            textView.setLineSpacing(0, 0.75f);
+            textView.setTextColor(context.getResources().getColor(R.color.text_reflow_color));
+            //textView.setTextIsSelectable(true);
         }
 
-        @Override
-        public boolean onTouchEvent(MotionEvent ev) {
-            return false;
+        public void onBind(Spanned spanned) {
+            textView.setText(spanned);
         }
     }
 }

@@ -138,11 +138,12 @@ public class MuPDFCore
 
 	public synchronized RectF[] searchPage(int pageNum, String text) {
 		gotoPage(pageNum);
-		Rect[] rs = page.search(text);
-		RectF[] rfs = new RectF[rs.length];
-		for (int i=0; i < rs.length; ++i)
-			rfs[i] = new RectF(rs[i].x0, rs[i].y0, rs[i].x1, rs[i].y1);
-		return rfs;
+		//Rect[] rs = page.search(text);
+		//RectF[] rfs = new RectF[rs.length];
+		//for (int i=0; i < rs.length; ++i)
+		//	rfs[i] = new RectF(rs[i].x0, rs[i].y0, rs[i].x1, rs[i].y1);
+		//return rfs;
+        return null;
 	}
 
 	public synchronized boolean hasOutline() {

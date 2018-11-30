@@ -1,6 +1,7 @@
 package cx.hell.android.pdfviewpro;
 
 import android.app.Application;
+import android.util.DisplayMetrics;
 import android.util.Log;
 
 import cn.archko.pdf.CrashHandler;
@@ -15,6 +16,8 @@ public class APVApplication extends Application {
 
     int threadCount = 2;
     int threadPriority = 3;
+    public int screenHeight=720;
+    public int screenWidth=1080;
 
     public static APVApplication getInstance() {
         return mInstance;
@@ -41,6 +44,10 @@ public class APVApplication extends Application {
         //PDF.setApplicationContext(this); // PDF class needs application context to load assets
         mInstance = this;
         Thread.setDefaultUncaughtExceptionHandler(new CrashHandler());
+
+        DisplayMetrics displayMetrics=getResources().getDisplayMetrics();
+        screenHeight=displayMetrics.heightPixels;
+        screenWidth=displayMetrics.widthPixels;
     }
 
     /**
