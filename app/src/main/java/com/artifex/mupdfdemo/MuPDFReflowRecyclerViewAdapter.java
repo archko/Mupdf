@@ -3,11 +3,7 @@ package com.artifex.mupdfdemo;
 import android.content.Context;
 import android.graphics.Paint;
 import android.support.v7.widget.RecyclerView;
-import android.text.Html;
-import android.text.Spanned;
-import android.util.Log;
 import android.view.Gravity;
-import android.view.MotionEvent;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -16,7 +12,6 @@ import com.artifex.mupdf.fitz.Document;
 
 import cn.archko.pdf.R;
 import cn.archko.pdf.ScrollPositionListener;
-import cn.archko.pdf.UnicodeDecoder;
 import cx.hell.android.pdfviewpro.APVApplication;
 
 /**
@@ -66,13 +61,13 @@ public class MuPDFReflowRecyclerViewAdapter extends RecyclerView.Adapter {
         if (null != scrollPositionListener) {
             scrollPositionListener.onScroll(position);
         }
-        byte[] result = mCore.loadPage(position).textAsHtml();
+        byte[] result = mCore.loadPage(position).textAsText();
 
-        String text = new String(result);
-        //Log.d("text", text = UnicodeDecoder.unescape2(text););
-        Spanned spanned = Html.fromHtml(text);
+        String text = new String(result).trim();
+        //Log.d("text", text = UnicodeDecoder.unescape2(text));
+        //Spanned spanned = Html.fromHtml(text);
         PDFTextView reflowView = (PDFTextView) holder.itemView;
-        reflowView.onBind(spanned);
+        reflowView.onBind(text);
     }
 
     class ItemViewHolder extends RecyclerView.ViewHolder {
@@ -100,18 +95,19 @@ public class MuPDFReflowRecyclerViewAdapter extends RecyclerView.Adapter {
             LayoutParams lp = new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             lp.gravity = Gravity.CENTER_HORIZONTAL;
             addView(textView, lp);
-            setPadding(0, 50, 0, 30);
+            setPadding(0, 40, 0, 40);
             setBackgroundColor(context.getResources().getColor(R.color.text_reflow_bg_color));
 
             mPaint = textView.getPaint();
             mTextSize = mPaint.getTextSize();
-            mPaint.setTextSize(mTextSize * 1.1f);
+            mPaint.setTextSize(mTextSize * 1.2f);
+            textView.setLineSpacing(0, 1.35f);
             textView.setPadding(30, 0, 30, 0);
             textView.setTextColor(context.getResources().getColor(R.color.text_reflow_color));
             //textView.setTextIsSelectable(true);
         }
 
-        public void onBind(Spanned spanned) {
+        public void onBind(String  spanned) {
             textView.setText(spanned);
         }
     }
