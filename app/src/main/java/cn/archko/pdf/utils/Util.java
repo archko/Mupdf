@@ -20,6 +20,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.lang.ref.WeakReference;
 
+import cx.hell.android.pdfviewpro.APVApplication;
+
 /**
  * @author: archko 2014/4/17 :15:21
  */
@@ -144,5 +146,9 @@ public class Util {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
+    }
+
+    public static float getScale() {
+        return APVApplication.getInstance().getResources().getDisplayMetrics().density;
     }
 }

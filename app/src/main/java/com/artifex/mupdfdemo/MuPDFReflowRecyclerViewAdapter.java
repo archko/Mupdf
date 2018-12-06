@@ -1,8 +1,14 @@
 package com.artifex.mupdfdemo;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Paint;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
+import android.text.Spanned;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -12,6 +18,8 @@ import com.artifex.mupdf.fitz.Document;
 
 import cn.archko.pdf.R;
 import cn.archko.pdf.ScrollPositionListener;
+import cn.archko.pdf.utils.StreamUtils;
+import cn.archko.pdf.utils.Util;
 import cx.hell.android.pdfviewpro.APVApplication;
 
 /**
@@ -21,6 +29,8 @@ public class MuPDFReflowRecyclerViewAdapter extends RecyclerView.Adapter {
     private final Context mContext;
     private final Document mCore;
     private int height = 720;
+    private float systemScale = Util.getScale();
+    private int type = 0;
 
     private ScrollPositionListener scrollPositionListener;
 
@@ -61,13 +71,9 @@ public class MuPDFReflowRecyclerViewAdapter extends RecyclerView.Adapter {
         if (null != scrollPositionListener) {
             scrollPositionListener.onScroll(position);
         }
-        byte[] result = mCore.loadPage(position).textAsText();
+        byte[] result = mCore.loadPage(position).textAsText("preserve-images=yes,preserve-whitespace=yes");
 
-        String text = new String(result).trim();
-        //Log.d("text", text = UnicodeDecoder.unescape2(text));
-        //Spanned spanned = Html.fromHtml(text);
-        PDFTextView reflowView = (PDFTextView) holder.itemView;
-        reflowView.onBind(text);
+        ((ItemViewHolder) holder).onBind(result);
     }
 
     class ItemViewHolder extends RecyclerView.ViewHolder {
@@ -78,6 +84,9 @@ public class MuPDFReflowRecyclerViewAdapter extends RecyclerView.Adapter {
             pageView = itemView;
         }
 
+        public void onBind(byte[] result) {
+            pageView.onBind(result);
+        }
     }
 
     private class PDFTextView extends LinearLayout {
@@ -90,7 +99,7 @@ public class MuPDFReflowRecyclerViewAdapter extends RecyclerView.Adapter {
         public PDFTextView(Context context) {
             super(context);
             setOrientation(VERTICAL);
-            setMinimumHeight(height / 2);
+            setMinimumHeight(height / 3);
             textView = new TextView(context);
             LayoutParams lp = new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             lp.gravity = Gravity.CENTER_HORIZONTAL;
@@ -107,7 +116,24 @@ public class MuPDFReflowRecyclerViewAdapter extends RecyclerView.Adapter {
             //textView.setTextIsSelectable(true);
         }
 
-        public void onBind(String  spanned) {
+        public void onBind(byte[] result) {
+            String text = new String(result).trim();
+            //Log.d("text", text = UnicodeDecoder.unescape2(text));
+            Html.ImageGetter imageGetter = new Html.ImageGetter() {
+                @Override
+                public Drawable getDrawable(String source) {
+                    //Log.d("text", source);
+                    Bitmap bitmap = StreamUtils.base64ToBitmap(source.replaceAll("data:image/(png|jpeg);base64,", "").replaceAll("\\s", ""));
+                    if (null != bitmap) {
+                        Drawable drawable = new BitmapDrawable(bitmap);
+                        drawable.setBounds(0, 0, (int) (bitmap.getWidth() * systemScale), (int) (bitmap.getHeight() * systemScale));
+                        return drawable;
+                    }
+                    Log.d("text", "bitmap decode failed.");
+                    return null;
+                }
+            };
+            Spanned spanned = Html.fromHtml(text, imageGetter, null);
             textView.setText(spanned);
         }
     }

@@ -1,5 +1,9 @@
 package cn.archko.pdf.utils;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.Environment;
+import android.util.Base64;
 import android.util.Log;
 import android.widget.ProgressBar;
 
@@ -234,4 +238,25 @@ public class StreamUtils {
         return "";
     }
 
+    public static Bitmap base64ToBitmap(String str) {
+        try {
+            byte[] bytes = Base64.decode(str, Base64.DEFAULT);
+            return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    static int i = 0;
+
+    public static void saveBitmapToSDCard(Bitmap bitmap) {
+        FileOutputStream fos = null;
+        try {
+            fos = new FileOutputStream(Environment.getExternalStorageDirectory().getPath()+"/"+(i++)+".png");
+            bitmap.compress(Bitmap.CompressFormat.PNG, 80, fos);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
 }
