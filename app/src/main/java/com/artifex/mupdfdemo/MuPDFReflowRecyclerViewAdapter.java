@@ -123,9 +123,9 @@ public class MuPDFReflowRecyclerViewAdapter extends RecyclerView.Adapter {
                 @Override
                 public Drawable getDrawable(String source) {
                     //Log.d("text", source);
-                    Bitmap bitmap = StreamUtils.base64ToBitmap(source.replaceAll("data:image/(png|jpeg);base64,", "").replaceAll("\\s", ""));
+                    Bitmap bitmap = StreamUtils.base64ToBitmap(source.replaceAll("data:image/(png|jpeg);base64,", "")/*.replaceAll("\\s", "")*/);
                     if (null != bitmap) {
-                        Drawable drawable = new BitmapDrawable(bitmap);
+                        Drawable drawable = new BitmapDrawable(null, bitmap);
                         drawable.setBounds(0, 0, (int) (bitmap.getWidth() * systemScale), (int) (bitmap.getHeight() * systemScale));
                         return drawable;
                     }
