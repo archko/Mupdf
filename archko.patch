@@ -1,13 +1,5 @@
-commit d63bd2277b674e98c63f621d9d8c64b8e525ee49 (HEAD)
-Author: Sebastian Rasmussen <sebras@gmail.com>
-Date:   Wed Nov 14 15:48:12 2018 +0100
-
-    java: Update mupdf_native.h after javah replacement.
-=====================================================
-
-
 diff --git a/platform/java/mupdf_native.c b/platform/java/mupdf_native.c
-index 946be1b3..38bba7b9 100644
+index 946be1b3..26b3a087 100644
 --- a/platform/java/mupdf_native.c
 +++ b/platform/java/mupdf_native.c
 @@ -5764,9 +5764,163 @@ FUN(Page_textAsHtml)(JNIEnv *env, jobject self)
@@ -94,9 +86,9 @@ index 946be1b3..38bba7b9 100644
 +
 +		buf = fz_new_buffer(ctx, 256);
 +		out = fz_new_output_with_buffer(ctx, buf);
-+		//fz_print_stext_header_as_html(ctx, out);
-+		fz_print_stext_page_as_html(ctx, out, text);
-+		//fz_print_stext_trailer_as_html(ctx, out);
++		//fz_print_stext_header_as_xhtml(ctx, out);
++		fz_print_stext_page_as_xhtml(ctx, out, text);
++		//fz_print_stext_trailer_as_xhtml(ctx, out);
 +		fz_close_output(ctx, out);
 +	}
 +	fz_always(ctx)

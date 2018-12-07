@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import com.artifex.mupdf.fitz.Document;
 
+import cn.archko.pdf.AKHtml;
 import cn.archko.pdf.R;
 import cn.archko.pdf.ScrollPositionListener;
 import cn.archko.pdf.utils.StreamUtils;
@@ -28,7 +29,8 @@ import cx.hell.android.pdfviewpro.APVApplication;
 public class MuPDFReflowRecyclerViewAdapter extends RecyclerView.Adapter {
     private final Context mContext;
     private final Document mCore;
-    private int height = 720;
+    private int screenHeight = 720;
+    private int screenWidth = 1080;
     private float systemScale = Util.getScale();
     private int type = 0;
 
@@ -38,7 +40,8 @@ public class MuPDFReflowRecyclerViewAdapter extends RecyclerView.Adapter {
         mContext = c;
         mCore = core;
         this.scrollPositionListener = scrollPositionListener;
-        height = APVApplication.getInstance().screenHeight;
+        screenHeight = APVApplication.getInstance().screenHeight;
+        screenWidth = APVApplication.getInstance().screenWidth;
     }
 
     public long getItemId(int position) {
@@ -71,7 +74,7 @@ public class MuPDFReflowRecyclerViewAdapter extends RecyclerView.Adapter {
         if (null != scrollPositionListener) {
             scrollPositionListener.onScroll(position);
         }
-        byte[] result = mCore.loadPage(position).textAsText("preserve-images=yes,preserve-whitespace=yes");
+        byte[] result = mCore.loadPage(position).textAsHtml2("preserve-images,preserve-whitespace");
 
         ((ItemViewHolder) holder).onBind(result);
     }
@@ -95,11 +98,12 @@ public class MuPDFReflowRecyclerViewAdapter extends RecyclerView.Adapter {
         float mTextSize = 15;
         float mScale = 1.0f;
         TextView textView;
+        private float minImgHeight = 32;
 
         public PDFTextView(Context context) {
             super(context);
             setOrientation(VERTICAL);
-            setMinimumHeight(height / 3);
+            setMinimumHeight(screenHeight / 3);
             textView = new TextView(context);
             LayoutParams lp = new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             lp.gravity = Gravity.CENTER_HORIZONTAL;
@@ -110,10 +114,14 @@ public class MuPDFReflowRecyclerViewAdapter extends RecyclerView.Adapter {
             mPaint = textView.getPaint();
             mTextSize = mPaint.getTextSize();
             mPaint.setTextSize(mTextSize * 1.2f);
-            textView.setLineSpacing(0, 1.35f);
+            // html:行间距要调小,会导致图文重排图片上移,段间距偏大,行间距也偏大,
+            // xhtml:默认不修改,文本行间距偏小,段间距偏大.
+            // text:所有文本不换行,显示不对.剩下与xhtml相同.如果不使用Html.from设置,有换行,但显示不了图片.
+            // textView.setLineSpacing(0, 0.8f);
             textView.setPadding(30, 0, 30, 0);
             textView.setTextColor(context.getResources().getColor(R.color.text_reflow_color));
             //textView.setTextIsSelectable(true);
+            minImgHeight = textView.getPaint().measureText("我") + 5;
         }
 
         public void onBind(byte[] result) {
@@ -124,16 +132,25 @@ public class MuPDFReflowRecyclerViewAdapter extends RecyclerView.Adapter {
                 public Drawable getDrawable(String source) {
                     //Log.d("text", source);
                     Bitmap bitmap = StreamUtils.base64ToBitmap(source.replaceAll("data:image/(png|jpeg);base64,", "")/*.replaceAll("\\s", "")*/);
-                    if (null != bitmap) {
-                        Drawable drawable = new BitmapDrawable(null, bitmap);
-                        drawable.setBounds(0, 0, (int) (bitmap.getWidth() * systemScale), (int) (bitmap.getHeight() * systemScale));
-                        return drawable;
+
+                    if (null == bitmap || (bitmap.getWidth() < minImgHeight && bitmap.getHeight() < minImgHeight)) {
+                        Log.d("text", "bitmap decode failed.");
+                        return null;
                     }
-                    Log.d("text", "bitmap decode failed.");
-                    return null;
+                    int width = bitmap.getWidth();
+                    int height = bitmap.getHeight();
+                    if (width > screenWidth) {
+                        height = (int) ((float) (screenWidth * height) / width);
+                    } else {
+                        width = (int) (bitmap.getWidth() * systemScale);
+                        height = (int) (bitmap.getHeight() * systemScale);
+                    }
+                    Drawable drawable = new BitmapDrawable(null, bitmap);
+                    drawable.setBounds(0, 0, width, height);
+                    return drawable;
                 }
             };
-            Spanned spanned = Html.fromHtml(text, imageGetter, null);
+            Spanned spanned = AKHtml.fromHtml(text, imageGetter, null);
             textView.setText(spanned);
         }
     }
