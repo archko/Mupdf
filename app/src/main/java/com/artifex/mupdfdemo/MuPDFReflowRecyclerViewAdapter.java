@@ -74,7 +74,7 @@ public class MuPDFReflowRecyclerViewAdapter extends RecyclerView.Adapter {
         if (null != scrollPositionListener) {
             scrollPositionListener.onScroll(position);
         }
-        byte[] result = mCore.loadPage(position).textAsHtml2("preserve-images,preserve-whitespace");
+        byte[] result = mCore.loadPage(position).textAsHtml2("preserve-whitespace,inhibit-spaces,preserve-images");
 
         ((ItemViewHolder) holder).onBind(result);
     }
@@ -139,11 +139,12 @@ public class MuPDFReflowRecyclerViewAdapter extends RecyclerView.Adapter {
                     }
                     int width = bitmap.getWidth();
                     int height = bitmap.getHeight();
+                    width = (int) (bitmap.getWidth() * systemScale);
+                    height = (int) (bitmap.getHeight() * systemScale);
                     if (width > screenWidth) {
-                        height = (int) ((float) (screenWidth * height) / width);
-                    } else {
-                        width = (int) (bitmap.getWidth() * systemScale);
-                        height = (int) (bitmap.getHeight() * systemScale);
+                        float ratio = ((float) (screenWidth)) / width;
+                        height = (int) (ratio * height);
+                        width = screenWidth;
                     }
                     Drawable drawable = new BitmapDrawable(null, bitmap);
                     drawable.setBounds(0, 0, width, height);
