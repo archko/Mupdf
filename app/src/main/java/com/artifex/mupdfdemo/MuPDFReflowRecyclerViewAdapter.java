@@ -137,17 +137,15 @@ public class MuPDFReflowRecyclerViewAdapter extends RecyclerView.Adapter {
                         Log.d("text", "bitmap decode failed.");
                         return null;
                     }
-                    int width = bitmap.getWidth();
-                    int height = bitmap.getHeight();
-                    width = (int) (bitmap.getWidth() * systemScale);
-                    height = (int) (bitmap.getHeight() * systemScale);
+                    float width = bitmap.getWidth() * systemScale;
+                    float height = bitmap.getHeight() * systemScale;
                     if (width > screenWidth) {
-                        float ratio = ((float) (screenWidth)) / width;
-                        height = (int) (ratio * height);
+                        float ratio = screenWidth / width;
+                        height = ratio * height;
                         width = screenWidth;
                     }
                     Drawable drawable = new BitmapDrawable(null, bitmap);
-                    drawable.setBounds(0, 0, width, height);
+                    drawable.setBounds(0, 0, (int) width, (int) height);
                     return drawable;
                 }
             };
