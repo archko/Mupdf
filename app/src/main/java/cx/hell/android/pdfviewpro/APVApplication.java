@@ -4,7 +4,7 @@ import android.app.Application;
 import android.util.DisplayMetrics;
 import android.util.Log;
 
-import cn.archko.pdf.CrashHandler;
+import cn.archko.pdf.common.CrashHandler;
 //import cx.hell.android.lib.pdf.PDF;
 
 public class APVApplication extends Application {

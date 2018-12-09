@@ -65,7 +65,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import cn.archko.pdf.Flinger;
+import cn.archko.pdf.widgets.Flinger;
 
 import static android.support.v7.widget.AdapterHelper.Callback;
 import static android.support.v7.widget.AdapterHelper.UpdateOp;

@@ -33,6 +33,11 @@ android {
         versionName VERSION_NAME
         signingConfig signingConfigs.release
         ndk.abiFilters 'armeabi-v7a'
+        externalNativeBuild {
+            cmake {
+                cppFlags ""
+            }
+        }
     }
     compileOptions {
         encoding "UTF-8"
@@ -114,6 +119,11 @@ android {
         main {
             jni.srcDirs = []
             jniLibs.srcDirs = ['libs']
+        }
+    }
+    externalNativeBuild {
+        cmake {
+            path "src/main/cpp/CMakeLists.txt"
         }
     }
 }

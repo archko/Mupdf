@@ -18,8 +18,8 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
-import cn.archko.pdf.PDFBookmarkManager;
-import cn.archko.pdf.SensorHelper;
+import cn.archko.pdf.common.PDFBookmarkManager;
+import cn.archko.pdf.common.SensorHelper;
 import org.vudroid.core.events.CurrentPageListener;
 import org.vudroid.core.events.DecodingProgressListener;
 import org.vudroid.core.events.PageViewPresenter;

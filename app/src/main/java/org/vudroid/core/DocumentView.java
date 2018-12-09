@@ -20,7 +20,7 @@ import org.vudroid.core.models.ZoomModel;
 import org.vudroid.core.multitouch.MultiTouchZoom;
 import org.vudroid.core.views.APageSeekBarControls;
 
-import cn.archko.pdf.Flinger;
+import cn.archko.pdf.widgets.Flinger;
 
 public class DocumentView extends View implements ZoomListener {
     final ZoomModel zoomModel;

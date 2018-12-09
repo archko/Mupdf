@@ -11,7 +11,7 @@ import org.vudroid.core.DecodeService;
 import org.vudroid.pdfdroid.codec.PdfContext;
 import org.vudroid.pdfdroid.codec.PdfDocument;
 
-import cn.archko.pdf.HistoryFragment;
+import cn.archko.pdf.fragments.HistoryFragment;
 
 public class PdfViewerActivity extends BaseViewerActivity {
 

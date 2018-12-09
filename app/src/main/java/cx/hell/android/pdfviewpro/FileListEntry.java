@@ -3,7 +3,7 @@ package cx.hell.android.pdfviewpro;
 import java.io.File;
 import java.io.Serializable;
 
-import cn.archko.pdf.AKProgress;
+import cn.archko.pdf.entity.AKProgress;
 
 public class FileListEntry implements Serializable, Cloneable {
     private String label = null;

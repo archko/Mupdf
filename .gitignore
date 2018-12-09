@@ -6,6 +6,7 @@
 /build
 /*.iml
 /app/build
+/app/.externalNativeBuild
 /viewer/build
 /mupdf/build
 /example/build
